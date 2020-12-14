@@ -1,7 +1,6 @@
 import Foundation
 import ABCI
 import ABCINIO
-import Routing
 
 public final class Store {
     public final class Transaction {
@@ -44,10 +43,6 @@ public final class KeyValueStoreApp {
     public init() {
         
     }
-    
-    private let router = Router(root: .root) {
-        Route("balance", destination: Endpoint.balance)
-    }
 }
 
 extension KeyValueStoreApp: ABCIApplication {
@@ -64,23 +59,6 @@ extension KeyValueStoreApp: ABCIApplication {
     }
 
     public func query(request: RequestQuery) -> ResponseQuery {
-        guard let url = URL(string: request.path) else {
-            return ResponseQuery(code: 1)
-        }
-
-        guard let endpoint = router.destination(for: url) else {
-            return ResponseQuery(code: 1)
-        }
-        
-        switch endpoint {
-        case .root:
-            break
-        case .store:
-            break
-        case .balance:
-            break
-        }
-        
         guard let key = String(data: request.data, encoding: .utf8) else {
             return ResponseQuery(code: 1)
         }

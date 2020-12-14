@@ -13,7 +13,7 @@ struct DeleteNameMessage: Codable {
 
 extension DeleteNameMessage: Message {
     var route: String {
-        routerKey
+        Keys.routerKey
     }
     
     var type: String {
@@ -25,7 +25,7 @@ extension DeleteNameMessage: Message {
     }
 
     func getSignBytes() -> Data {
-        mustSortJSON(data: moduleCodec.mustMarshalJSON(value: self))
+        mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
     }
 
     func validateBasic() throws {

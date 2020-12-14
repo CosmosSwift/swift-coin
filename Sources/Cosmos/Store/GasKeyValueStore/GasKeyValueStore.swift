@@ -3,8 +3,8 @@ import Database
 
 // Store applies gas tracking to an underlying KVStore. It implements the
 // KVStore interface.
-struct GasKeyValueStore {
-    let gasMeter:  GasMeter
+final class GasKeyValueStore {
+    var gasMeter:  GasMeter
     let gasConfiguration: GasConfiguration
     let parent: KeyValueStore
     
@@ -17,7 +17,6 @@ struct GasKeyValueStore {
 }
 
 extension GasKeyValueStore: KeyValueStore {
-
     // Implements Store.
     var storeType: StoreType {
         parent.storeType
@@ -88,7 +87,7 @@ extension GasKeyValueStore: KeyValueStore {
             parentIterator = parent.reverseIterator(start: start, end: end)
         }
 
-        let gasIterator = GasIterator(gasMeter: gasMeter, gasConfiguration: gasConfiguration, parent: parentIterator)
+        var gasIterator = GasIterator(gasMeter: gasMeter, gasConfiguration: gasConfiguration, parent: parentIterator)
         
         if gasIterator.isValid {
             gasIterator.consumeSeekGas()
@@ -100,9 +99,9 @@ extension GasKeyValueStore: KeyValueStore {
 }
 
 struct GasIterator: Iterator {
-    let gasMeter: GasMeter
+    var gasMeter: GasMeter
     let gasConfiguration: GasConfiguration
-    let parent: Iterator
+    var parent: Iterator
     
     init(gasMeter: GasMeter, gasConfiguration: GasConfiguration, parent: Iterator) {
         self.gasMeter = gasMeter
@@ -123,7 +122,7 @@ struct GasIterator: Iterator {
     // Next implements the Iterator interface. It seeks to the next key/value pair
     // in the iterator. It incurs a flat gas cost for seeking and a variable gas
     // cost based on the current value's length if the iterator is valid.
-    func next() {
+    mutating func next() {
         if isValid {
             consumeSeekGas()
         }
@@ -155,7 +154,7 @@ struct GasIterator: Iterator {
 
     // consumeSeekGas consumes a flat gas cost for seeking and a variable gas cost
     // based on the current value's length.
-    func consumeSeekGas() {
+    mutating func consumeSeekGas() {
         gasMeter.consumeGas(amount: gasConfiguration.readCostPerByte * Gas(value.count), descriptor: gasValuePerByteDescriptor)
         gasMeter.consumeGas(amount: gasConfiguration.iterationNextCostFlat, descriptor: gasIterNextCostFlatDescriptor)
     }

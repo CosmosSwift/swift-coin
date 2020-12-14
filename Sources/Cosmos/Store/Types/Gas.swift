@@ -16,7 +16,7 @@ protocol GasMeter {
     var gasConsumed: Gas { get }
     var gasConsumedToLimit: Gas { get }
     var limit: Gas { get }
-    func consumeGas(amount: Gas, descriptor: String)
+    mutating func consumeGas(amount: Gas, descriptor: String)
     var isPastLimit: Bool { get }
     var isOutOfGas: Bool { get }
 }
@@ -45,5 +45,43 @@ extension GasConfiguration {
             writeCostPerByte: 30,
             iterationNextCostFlat: 30
         )
+    }
+}
+
+struct InfiniteGasMeter: GasMeter {
+    var consumed: Gas
+    
+    init() {
+        self.consumed = 0
+    }
+    
+    var gasConsumed: Gas {
+        consumed
+    }
+    
+    var gasConsumedToLimit: Gas {
+        consumed
+    }
+
+    var limit: Gas {
+        0
+    }
+    
+    mutating func consumeGas(amount: Gas, descriptor: String) {
+        // TODO: Should we set the consumed field after overflow checking?
+        let (consumed, overflow) = self.consumed.addingReportingOverflow(amount)
+        self.consumed = consumed
+
+        if overflow {
+            fatalError("ErrorGasOverflow{\(descriptor)}")
+        }
+    }
+    
+    var isPastLimit: Bool {
+        false
+    }
+
+    var isOutOfGas: Bool {
+        false
     }
 }

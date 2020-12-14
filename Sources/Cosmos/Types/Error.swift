@@ -7,4 +7,5 @@ public enum Error: Swift.Error {
     case insufficientFunds(reason: String)
     case invalidDenomination(denomination: String)
     case keyNotFound(key: String)
+    case invalidGenesis(reason: String)
 }

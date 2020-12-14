@@ -2,7 +2,7 @@ import Cosmos
 
 extension Keeper {
     // NewQuerier creates a new querier for nameservice clients.
-    var querier: Querier {
+    func makeQuerier() -> Querier {
         return { request, path, requestQuery in
             switch path[0] {
         // this line is used by starport scaffolding # 2

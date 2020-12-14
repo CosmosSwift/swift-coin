@@ -7,7 +7,7 @@ extension Keeper {
     func getWhois(request: Request, key: String) throws -> Whois? {
         let store = request.keyValueStore(key: storeKey)
         
-        guard let key = (whoisPrefix + key).data(using: .utf8) else {
+        guard let key = (Keys.whoisPrefix + key).data(using: .utf8) else {
             // TODO: throw a specific error
             throw Cosmos.Error.unknownRequest(reason: "invalid key")
         }
@@ -24,7 +24,7 @@ extension Keeper {
         let store = request.keyValueStore(key: storeKey)
         let data = try codec.mustMarshalBinaryLengthPrefixed(value: whois)
         
-        guard let key = (whoisPrefix + name).data(using: .utf8) else {
+        guard let key = (Keys.whoisPrefix + name).data(using: .utf8) else {
             // TODO: throw a specific error
             throw Cosmos.Error.unknownRequest(reason: "invalid key")
         }
@@ -35,7 +35,7 @@ extension Keeper {
     // DeleteWhois deletes a whois
     func deleteWhois(request: Request, key: String) {
         let store = request.keyValueStore(key: storeKey)
-        store.delete(key: (whoisPrefix + key).data)
+        store.delete(key: (Keys.whoisPrefix + key).data)
     }
 
     // MARK: Functions used by querier
@@ -43,7 +43,7 @@ extension Keeper {
     func listWhois(request: Request) -> Data {
         var whoisList: [Whois] = []
         let store = request.keyValueStore(key: storeKey)
-        let iterator = store.prefixIterator(prefix: whoisPrefix.data)
+        let iterator = store.prefixIterator(prefix: Keys.whoisPrefix.data)
         
         while iterator.isValid {
             defer {
@@ -98,7 +98,7 @@ extension Keeper {
     // Check if the key exists in the store
     func exists(request: Request, key: String) -> Bool {
         let store = request.keyValueStore(key: storeKey)
-        return store.has(key: (whoisPrefix + key).data)
+        return store.has(key: (Keys.whoisPrefix + key).data)
     }
 
     // ResolveName - returns the string that the name resolves to
@@ -166,7 +166,7 @@ extension Keeper {
     // Get an iterator over all names in which the keys are the names and the values are the whois
     func getNamesIterator(request: Request) -> Iterator {
         let store = request.keyValueStore(key: storeKey)
-        return store.prefixIterator(prefix: whoisPrefix.data)
+        return store.prefixIterator(prefix: Keys.whoisPrefix.data)
     }
     
 

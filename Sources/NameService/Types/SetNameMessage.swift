@@ -16,7 +16,7 @@ struct SetNameMessage: Codable, Message {
 
     // Route should return the name of the module
     var route: String {
-        routerKey
+        Keys.routerKey
     }
 
     // Type should return the action
@@ -37,7 +37,7 @@ struct SetNameMessage: Codable, Message {
 
     // GetSignBytes encodes the message for signing
     func getSignBytes() -> Data {
-        mustSortJSON(data: moduleCodec.mustMarshalJSON(value: self))
+        mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
     }
 
     // GetSigners defines whose signature is required

@@ -2,7 +2,7 @@ import Cosmos
 
 extension Keeper {
     // NewHandler ...
-    var handler: Handler {
+    func makeHandler() -> Handler {
         return { request, message in
             var request = request
             request.eventManager = EventManager()
@@ -16,7 +16,7 @@ extension Keeper {
             case let message as DeleteNameMessage:
                 return try handleDeleteNameMessage(request: request, keeper: self, message: message)
             default:
-                throw Cosmos.Error.unknownRequest(reason: "unrecognized \(moduleName) message type: \(message)")
+                throw Cosmos.Error.unknownRequest(reason: "unrecognized \(Keys.moduleName) message type: \(message)")
             }
         }
     }

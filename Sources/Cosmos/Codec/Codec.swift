@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Codec {
+public class Codec {
     let encoder = JSONEncoder()
     let decoder = JSONDecoder()
     
@@ -48,6 +48,18 @@ public struct Codec {
 
         // Decode.
         return try unmarshalBinaryBare(data: data)
+    }
+    
+    public func unmarshalJSON<T: Decodable>(data: Data) throws -> T {
+        try decoder.decode(T.self, from: data)
+    }
+    
+    public func mustUnmarshalJSON<T: Decodable>(data: Data) -> T {
+        do {
+           return try decoder.decode(T.self, from: data)
+        } catch {
+            fatalError("\(error)")
+        }
     }
     
     // UnmarshalBinaryBare will panic if ptr is a nil-pointer.
