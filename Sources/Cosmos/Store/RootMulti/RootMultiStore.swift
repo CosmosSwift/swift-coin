@@ -5,8 +5,6 @@ import Database
 // cacheMultiStore which is for cache-wrapping other MultiStores. It implements
 // the CommitMultiStore interface.
 final class RootMultiStore: CommitMultiStore {
-    var isTracingEnabled: Bool = false
-    
     static let latestVersionKey = "s/latest"
     static let pruneHeightsKey  = "s/pruneheights"
     // s/<version>
@@ -32,8 +30,8 @@ final class RootMultiStore: CommitMultiStore {
     var isLazyLoadingEnabled: Bool = false
     let pruneHeights: [Int64]
 
-//    let traceWriter: Writer
-//    let traceContext: TraceContext
+    var traceWriter: TextOutputStream?
+    var traceContext: TraceContext = [:]
 
     var interBlockCache: MultiStorePersistentCache?
     
@@ -203,6 +201,34 @@ final class RootMultiStore: CommitMultiStore {
         self.interBlockCache = interBlockCache
     }
     
+    // SetTracer sets the tracer for the MultiStore that the underlying
+    // stores will utilize to trace operations. A MultiStore is returned.
+    func set(tracer: TextOutputStream) -> MultiStore {
+        self.traceWriter = tracer
+        return self
+    }
+
+    // SetTracingContext updates the tracing context for the MultiStore by merging
+    // the given context with the existing context by key. Any existing keys will
+    // be overwritten. It is implied that the caller should update the context when
+    // necessary between tracing operations. It returns a modified MultiStore.
+    func set(tracingContext: TraceContext) -> MultiStore {
+        if !self.traceContext.isEmpty {
+            for (key, value) in traceContext {
+                self.traceContext[key] = value
+            }
+        } else {
+            self.traceContext = tracingContext
+        }
+
+        return self
+    }
+
+    // TracingEnabled returns if tracing is enabled for the MultiStore.
+    var isTracingEnabled: Bool {
+        traceWriter != nil
+    }
+
     //----------------------------------------
     // +CommitStore
 

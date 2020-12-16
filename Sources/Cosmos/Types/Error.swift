@@ -8,4 +8,10 @@ public enum Error: Swift.Error {
     case invalidDenomination(denomination: String)
     case keyNotFound(key: String)
     case invalidGenesis(reason: String)
+    case transactionDecode(reason: String)
+    case invalidRequest(reason: String)
+    case noSignatures
+    case generic(reason: String)
+    case unknownAddress(reason: String)
+    case invalidCoins(reason: String)
 }

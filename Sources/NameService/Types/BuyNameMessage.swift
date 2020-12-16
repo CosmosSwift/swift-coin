@@ -17,7 +17,7 @@ struct BuyNameMessage: Codable {
 extension BuyNameMessage: Message {
     // Route should return the name of the module
     var route: String {
-        Keys.routerKey
+        NameServiceKeys.routerKey
     }
 
     // Type should return the action

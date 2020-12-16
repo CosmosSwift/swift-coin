@@ -6,9 +6,20 @@ let package = Package(
     platforms: [
         .macOS(.v10_15),
     ],
+    products: [
+        .library(name: "Tendermint", targets: ["Tendermint"]),
+        .library(name: "Database", targets: ["Database"]),
+        .library(name: "Cosmos", targets: ["Cosmos"]),
+        .library(name: "App", targets: ["App"]),
+        // App Module
+        .library(name: "NameService", targets: ["NameService"]),
+        // Executables
+        .executable(name: "nameservicecli", targets: ["nameservicecli"])
+    ],
     dependencies: [
         .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .upToNextMajor(from: "0.34.0")),
-        .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
+        .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
+        .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
     ],
     targets: [
         .target(
@@ -17,7 +28,6 @@ let package = Package(
                 .product(name: "ABCI", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
                 .target(name: "Cosmos"),
-                .target(name: "Bank"),
             ]
         ),
         .target(
@@ -31,7 +41,6 @@ let package = Package(
             name: "NameService",
             dependencies: [
                 .target(name: "Cosmos"),
-                .target(name: "Bank"),
             ]
         ),
         .target(
@@ -43,14 +52,13 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
             ]
         ),
+        .target(name: "Database"),
         .target(
-            name: "Bank",
+            name: "Tendermint",
             dependencies: [
-                .target(name: "Cosmos"),
+                .product(name: "Crypto", package: "swift-crypto"),
             ]
         ),
-        .target(name: "Database"),
-        .target(name: "Tendermint"),
     ]
 )
 

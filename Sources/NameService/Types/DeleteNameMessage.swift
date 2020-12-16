@@ -13,7 +13,7 @@ struct DeleteNameMessage: Codable {
 
 extension DeleteNameMessage: Message {
     var route: String {
-        Keys.routerKey
+        NameServiceKeys.routerKey
     }
     
     var type: String {

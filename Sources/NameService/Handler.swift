@@ -1,6 +1,6 @@
 import Cosmos
 
-extension Keeper {
+extension NameServiceKeeper {
     // NewHandler ...
     func makeHandler() -> Handler {
         return { request, message in
@@ -16,7 +16,7 @@ extension Keeper {
             case let message as DeleteNameMessage:
                 return try handleDeleteNameMessage(request: request, keeper: self, message: message)
             default:
-                throw Cosmos.Error.unknownRequest(reason: "unrecognized \(Keys.moduleName) message type: \(message)")
+                throw Cosmos.Error.unknownRequest(reason: "unrecognized \(NameServiceKeys.moduleName) message type: \(message)")
             }
         }
     }

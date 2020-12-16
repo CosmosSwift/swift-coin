@@ -1,6 +1,6 @@
 import Cosmos
 
-extension Keeper {
+extension NameServiceKeeper {
     // NewQuerier creates a new querier for nameservice clients.
     func makeQuerier() -> Querier {
         return { request, path, requestQuery in

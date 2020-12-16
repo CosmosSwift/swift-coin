@@ -1,14 +1,13 @@
 import ABCI
 import Cosmos
-import Bank
 
 // AppModuleBasic defines the basic application module used by the nameservice module.
-public struct AppModuleBasic: Cosmos.AppModuleBasic {
+public struct NameServiceAppModuleBasic: AppModuleBasic {
     public init() {}
 
     // Name returns the nameservice module's name.
     public var name: String {
-        Keys.moduleName
+        NameServiceKeys.moduleName
     }
     
     public func register(codec: Codec) {
@@ -46,19 +45,19 @@ public struct AppModuleBasic: Cosmos.AppModuleBasic {
 //____________________________________________________________________________
 
 // AppModule implements an application module for the nameservice module.
-public struct AppModule: Cosmos.AppModule {
-    let keeper: Keeper
-    let coinKeeper: Bank.Keeper
+public struct NameServiceAppModule: AppModule {
+    let keeper: NameServiceKeeper
+    let coinKeeper: BankKeeper
     
     // NewAppModule creates a new AppModule object
-    init(keeper: Keeper, coinKeeper: Bank.Keeper) {
+    public init(keeper: NameServiceKeeper, coinKeeper: BankKeeper) {
         self.keeper = keeper
         self.coinKeeper = coinKeeper
     }
     
     // Name returns the nameservice module's name.
     public var name: String {
-        Keys.moduleName
+        NameServiceKeys.moduleName
     }
     
     public func register(codec: Codec) {
@@ -82,7 +81,7 @@ public struct AppModule: Cosmos.AppModule {
     
     // Route returns the message routing key for the nameservice module.
     public var route: String {
-        Keys.routerKey
+        NameServiceKeys.routerKey
     }
     
     // NewHandler returns an sdk.Handler for the nameservice module.
@@ -92,7 +91,7 @@ public struct AppModule: Cosmos.AppModule {
     
     // QuerierRoute returns the nameservice module's querier route name.
     public var querierRoute: String {
-        Keys.querierRoute
+        NameServiceKeys.querierRoute
     }
     
     // NewQuerierHandler returns the nameservice module sdk.Querier.

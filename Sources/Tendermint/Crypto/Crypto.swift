@@ -5,6 +5,13 @@ import Foundation
 // Use an alias so Unmarshal methods (with ptr receivers) are available too.
 public typealias Address = Data
 
+public enum Crypto {
+    public static func addressHash(data: Data) -> Address {
+        return TMHash.sumTruncated(data: data)
+    }
+}
+
+
 public protocol PublicKey: Codable {
     var address: Address { get }
     var bytes: Data { get }

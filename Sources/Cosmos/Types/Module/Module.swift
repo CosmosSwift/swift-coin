@@ -114,12 +114,54 @@ public protocol AppModule: AppModuleGenesis {
 
 // Manager defines a module manager that provides the high level utility for managing and executing
 // operations for a group of modules
-public struct Manager {
+public class Manager {
     let modules: [String: AppModule]
-    let orderInitGenesis: [String]
-    let orderExportGenesis: [String]
-    let orderBeginBlockers: [String]
-    let orderEndBlockers: [String]
+    var orderInitGenesis: [String]
+    var orderExportGenesis: [String]
+    var orderBeginBlockers: [String]
+    var orderEndBlockers: [String]
+    
+    // NewManager creates a new Manager object
+    public init(_ modules: AppModule...) {
+        var moduleMap: [String: AppModule] = [:]
+        var modulesOrdering: [String] = []
+        
+        for module in modules {
+            moduleMap[module.name] = module
+            modulesOrdering.append(module.name)
+        }
+        
+        self.modules = moduleMap
+        self.orderInitGenesis = modulesOrdering
+        self.orderExportGenesis = modulesOrdering
+        self.orderBeginBlockers = modulesOrdering
+        self.orderEndBlockers = modulesOrdering
+    }
+    
+    // SetOrderInitGenesis sets the order of init genesis calls
+    public func setOrderInitGenesis(_ moduleNames: String...) {
+        self.orderInitGenesis = moduleNames
+    }
+    
+    // SetOrderExportGenesis sets the order of export genesis calls
+    func setOrderExportGenesis(_ moduleNames: String...) {
+        self.orderExportGenesis = moduleNames
+    }
+
+    // SetOrderBeginBlockers sets the order of set begin-blocker calls
+    func setOrderBeginBlockers(_ moduleNames: String...) {
+        self.orderBeginBlockers = moduleNames
+    }
+
+
+    // SetOrderEndBlockers sets the order of set end-blocker calls
+    public func setOrderEndBlockers(_ moduleNames: String...) {
+        self.orderEndBlockers = moduleNames
+    }
+    
+    
+
+
     
     // InitGenesis performs init genesis functionality for modules
     public func initGenesis(request: Request, genesisState: [String: RawMessage]) -> ResponseInitChain {

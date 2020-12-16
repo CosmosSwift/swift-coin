@@ -3,9 +3,9 @@ import Logging
 import ABCI
 import Database
 
-enum Key {
-// MainStoreKey is the string representation of the main store
- public static let MainStoreKey = "main"
+public enum BaseAppKeys {
+    // MainStoreKey is the string representation of the main store
+    public static let mainStoreKey = "main"
 }
 
 // mainConsensusParamsKey defines a key to store the consensus params in the
@@ -16,7 +16,7 @@ let mainConsensusParamsKey = "consensus_params".data
 // from disk. This is useful for state migration, when loading a datastore written with
 // an older version of the software. In particular, if a module changed the substore key name
 // (or removed a substore) between two versions of the software.
-typealias StoreLoader = (_ commitMultiStore: CommitMultiStore) throws -> Void
+public typealias StoreLoader = (_ commitMultiStore: CommitMultiStore) throws -> Void
 
 
 // BaseApp reflects the ABCI application implementation.
@@ -34,13 +34,13 @@ open class BaseApp {
     let commitMultiStore: CommitMultiStore
     
     // function to handle store loading, may be overridden with SetStoreLoader()
-    let storeLoader: StoreLoader
+    var storeLoader: StoreLoader
     
     // handle any kind of message
-    let router: Router
+    var router: Router
     
     // router for redirecting query calls
-    let queryRouter: QueryRouter
+    var queryRouter: QueryRouter
     
     // unmarshal []byte into sdk.Tx
     let transactionDecoder: TransactionDecoder
@@ -48,14 +48,27 @@ open class BaseApp {
     // set upon LoadVersion or LoadLatestVersion.
     // Main KVStore in cms
     var baseKey: KeyValueStoreKey?
-
-//    anteHandler    sdk.AnteHandler  // ante handler for fee and auth
-//    initChainer    sdk.InitChainer  // initialize state with validators and state blob
-//    beginBlocker   sdk.BeginBlocker // logic to run before any txs
-//    endBlocker     sdk.EndBlocker   // logic to run after all txs, and to determine valset changes
-//    addrPeerFilter sdk.PeerFilter   // filter peers by address and port
-//    idPeerFilter   sdk.PeerFilter   // filter peers by node ID
-    let fauxMerkleMode: Bool             // if true, IAVL MountStores uses MountStoresDB for simulation speed.
+    
+    // ante handler for fee and auth
+    var anteHandler: AnteHandler?
+    
+    // initialize state with validators and state blob
+    var initChainer: InitChainer?
+    
+    // logic to run before any txs
+    var beginBlocker: BeginBlocker?
+    
+    // logic to run after all txs, and to determine valset changes
+    var endBlocker: EndBlocker?
+    
+    // filter peers by address and port
+    var addressPeerFilter: PeerFilter?
+    
+    // filter peers by node ID
+    var idPeerFilter: PeerFilter?
+    
+    // if true, IAVL MountStores uses MountStoresDB for simulation speed.
+    var fauxMerkleMode: Bool = false
 
     // volatile states:
     //
@@ -72,7 +85,7 @@ open class BaseApp {
     var interBlockCache: MultiStorePersistentCache? = nil
 
     // absent validators from begin block
-    let voteInfos: [VoteInfo]
+    var voteInfos: [VoteInfo] = []
 
     // consensus params
     // TODO: Move this in the future to baseapp param store on main store.
@@ -83,19 +96,19 @@ open class BaseApp {
     var minGasPrices: DecimalCoins? = nil
 
     // flag for sealing options and parameters to a BaseApp
-    var sealed: Bool
+    var sealed: Bool = false
 
     // block height at which to halt the chain and gracefully shutdown
-    var haltHeight: UInt64
+    var haltHeight: UInt64 = 0
 
     // minimum block time (in Unix seconds) at which to halt the chain and gracefully shutdown
-    var haltTime: UInt64
+    var haltTime: UInt64 = 0
 
     // application's version string
-    let appVersion: String
+    var appVersion: String = ""
 
     // trace set will return full stack traces for errors in ABCI Log field
-    var trace: Bool
+    var trace: Bool = false
     
     // NewBaseApp returns a reference to an initialized BaseApp. It accepts a
     // variadic number of option functions, which act on the BaseApp to set
@@ -107,8 +120,7 @@ open class BaseApp {
         logger: Logger,
         database: Database,
         transactionDecoder: @escaping TransactionDecoder,
-        fauxMerkleMode: Bool = false,
-        trace: Bool = false
+        options: [(BaseApp) -> Void] = []
     ) {
         self.logger = logger
         self.name = name
@@ -118,20 +130,14 @@ open class BaseApp {
         self.router = Router()
         self.queryRouter = QueryRouter()
         self.transactionDecoder = transactionDecoder
-        self.fauxMerkleMode = fauxMerkleMode
-        self.trace = trace
-        
-        self.voteInfos = []
-        self.consensusParams = nil
-        self.sealed = false
-        self.haltHeight = 0
-        self.haltTime = 0
-        self.appVersion = ""
 
-        // TODO: Make sure we add this code to interBlockCache setter.
-//        if app.interBlockCache != nil {
-//            app.commitMultiStore.interBlockCache = app.interBlockCache
-//        }
+        for option in options {
+            option(self)
+        }
+
+        if let interBlockCache = self.interBlockCache {
+            commitMultiStore.set(interBlockCache: interBlockCache)
+        }
     }
     
     // DefaultStoreLoader will be used by default and loads the latest version

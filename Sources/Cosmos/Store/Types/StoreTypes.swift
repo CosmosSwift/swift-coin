@@ -10,7 +10,7 @@ public protocol CacheWrapper {
 }
 
 // Stores of MultiStore must implement CommitStore.
-protocol CommitKeyValueStore: CommitStore, KeyValueStore {}
+public protocol CommitKeyValueStore: CommitStore, KeyValueStore {}
 
 //----------------------------------------
 // CacheWrap
@@ -34,7 +34,7 @@ public protocol CacheWrap {
 // CommitID
 
 // CommitID contains the tree version number and its merkle root.
-struct CommitID {
+public struct CommitID {
     let version: Int64
     let hash: Data
     
@@ -49,7 +49,7 @@ extension CommitID: CustomStringConvertible {
         version == 0 && hash.isEmpty
     }
    
-    var description: String {
+    public var description: String {
         "CommitID{\(hash):\(version)}"
     }
 }
@@ -68,19 +68,19 @@ public protocol Store: CacheWrapper {
 }
 
 // something that can persist to disk
-protocol Commiter {
+public protocol Commiter {
     func commit() -> CommitID
     func lastCommitID() -> CommitID
 }
 
 // Stores of MultiStore must implement CommitStore.
-protocol CommitStore: Commiter, Store {}
+public protocol CommitStore: Commiter, Store {}
 
 //----------------------------------------
 // MultiStore
 
 // StoreUpgrades defines a series of transformations to apply the multistore db upon load
-struct StoreUpgrades: Codable  {
+public struct StoreUpgrades: Codable  {
     let renamed: [StoreRename]
     let deleted: [String]
 }
@@ -117,15 +117,36 @@ public struct KeyValueStoreKey: StoreKey {
     }
 }
 
+// TransientStoreKey is used for indexing transient stores in a MultiStore
+public struct TransientStoreKey: StoreKey {
+    public let name: String
+    
+    // Constructs new TransientStoreKey
+    // Must return a pointer according to the ocap principle
+    init(name: String) {
+        self.name = name
+    }
+
+    public var string: String {
+        // TODO: Here self is the memory address in the Go counterpart
+        // Check what to do here since we're in a struct
+        "TransientStoreKey{\(self), \(name)}"
+    }
+}
+
+// TraceContext contains TraceKVStore context data. It will be written with
+// every trace operation.
+public typealias TraceContext = [String: Any]
+
 // From MultiStore.CacheMultiStore()....
-protocol CacheMultiStore: MultiStore {
+public protocol CacheMultiStore: MultiStore {
     // Writes operations to underlying KVStore
     func write() 
 }
 
 
 // A non-cache MultiStore.
-protocol CommitMultiStore: Commiter, MultiStore {
+public protocol CommitMultiStore: Commiter, MultiStore {
     // Mount a store of type using the given db.
     // If db == nil, the new store will use the CommitMultiStore db.
     func mountStoreWithDatabase(key: StoreKey, type: StoreType, database: Database)
@@ -192,7 +213,7 @@ public protocol KeyValueStore: Store {
     func reverseIterator(start: Data?, end: Data?) -> Iterator
 }
 
-protocol MultiStore: Store {
+public protocol MultiStore: Store {
     // Cache wrap MultiStore.
     // NOTE: Caller should probably not call .Write() on each, but
     // call CacheMultiStore.Write().
@@ -213,17 +234,17 @@ protocol MultiStore: Store {
     // SetTracer sets the tracer for the MultiStore that the underlying
     // stores will utilize to trace operations. The modified MultiStore is
     // returned.
-//    func setTracer(writer: Writer) -> MultiStore
+    func set(tracer: TextOutputStream) -> MultiStore
 
     // SetTracingContext sets the tracing context for a MultiStore. It is
     // implied that the caller should update the context when necessary between
     // tracing operations. The modified MultiStore is returned.
-//    func setTracingContext(context: TraceContext) -> MultiStore
+    func set(tracingContext: TraceContext) -> MultiStore
 }
 
 // MultiStorePersistentCache defines an interface which provides inter-block
 // (persistent) caching capabilities for multiple CommitKVStores based on StoreKeys.
-protocol MultiStorePersistentCache {
+public protocol MultiStorePersistentCache {
     // Wrap and return the provided CommitKVStore with an inter-block (persistent)
     // cache.
     func getStoreCache(key: StoreKey, store: CommitKeyValueStore) -> CommitKeyValueStore

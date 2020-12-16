@@ -5,8 +5,8 @@ import Foundation
 public struct AccountAddress: Codable, Equatable {
     private let data: Data
     
-    public init() {
-        self.data = Data()
+    public init(data: Data = Data()) {
+        self.data = data
     }
     
     public var isEmpty: Bool {

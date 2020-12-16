@@ -1,4 +1,4 @@
-struct Router {
+public struct Router {
     let routes: [String: Handler]
     
     // NewRouter returns a reference to a new router.

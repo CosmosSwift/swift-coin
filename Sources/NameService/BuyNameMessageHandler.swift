@@ -1,7 +1,7 @@
 import Cosmos
 
 // Handle a message to buy name
-func handleBuyNameMessage(request: Request, keeper: Keeper, message: BuyNameMessage) throws -> Result {
+func handleBuyNameMessage(request: Request, keeper: NameServiceKeeper, message: BuyNameMessage) throws -> Result {
     guard let price = keeper.getPrice(request: request, name: message.name) else {
         // TODO: Check what's the best error to throw
         throw Cosmos.Error.insufficientFunds(reason: "Bid not high enough")

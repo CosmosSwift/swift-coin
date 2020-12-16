@@ -3,7 +3,7 @@ import Cosmos
 // Handle a message to set name
 func handleSetNameMessage(
     request: Request,
-    keeper: Keeper,
+    keeper: NameServiceKeeper,
     message: SetNameMessage
 ) throws -> Cosmos.Result {
     // Checks if the the msg sender is the same as the current owner

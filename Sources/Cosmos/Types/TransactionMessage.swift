@@ -1,7 +1,7 @@
 import Foundation
 
 // Transactions messages must fulfill the `Message`
-public protocol Message {
+public protocol Message: Codable {
     // Return the message type.
     // Must be alphanumeric or empty.
     var route: String { get }
@@ -26,7 +26,7 @@ public protocol Message {
 //__________________________________________________________
 
 // Transactions objects must fulfill the Tx
-public protocol Transaction {
+public protocol Transaction: Codable {
     // Gets the all the transaction's messages.
     var messages: [Message] { get }
 
