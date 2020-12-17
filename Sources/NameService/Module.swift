@@ -3,6 +3,7 @@ import Cosmos
 
 // AppModuleBasic defines the basic application module used by the nameservice module.
 public struct NameServiceAppModuleBasic: AppModuleBasic {
+    // TODO: Probably all of AppModuleBasic requirements should be static
     public init() {}
 
     // Name returns the nameservice module's name.
@@ -11,6 +12,7 @@ public struct NameServiceAppModuleBasic: AppModuleBasic {
     }
     
     public func register(codec: Codec) {
+        // TODO: Maybe store codec here
         Codec.register(codec: codec)
     }
 

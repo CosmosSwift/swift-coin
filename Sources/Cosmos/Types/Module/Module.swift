@@ -23,14 +23,14 @@ public typealias BasicManager = Dictionary<String, AppModuleBasic>
 
 extension BasicManager {
     // NewBasicManager creates a new BasicManager object
-    public static func make(with modules: AppModuleBasic...) -> BasicManager {
+    public init(_ modules: AppModuleBasic...) {
         var moduleMap: BasicManager = [:]
         
         for module in modules {
             moduleMap[module.name] = module
         }
         
-        return moduleMap
+        self = moduleMap
     }
     
     // RegisterCodec registers all module codecs
@@ -114,7 +114,7 @@ public protocol AppModule: AppModuleGenesis {
 
 // Manager defines a module manager that provides the high level utility for managing and executing
 // operations for a group of modules
-public class Manager {
+public class ModuleManager {
     let modules: [String: AppModule]
     var orderInitGenesis: [String]
     var orderExportGenesis: [String]
@@ -158,11 +158,21 @@ public class Manager {
     public func setOrderEndBlockers(_ moduleNames: String...) {
         self.orderEndBlockers = moduleNames
     }
-    
-    
 
+    // RegisterRoutes registers all module routes and module querier routes
+    public func registerRoutes(router: Router, queryRouter: QueryRouter) {
+        // TODO: Implement
+        fatalError()
+//        for _, module := range m.Modules {
+//            if module.Route() != "" {
+//                router.AddRoute(module.Route(), module.NewHandler())
+//            }
+//            if module.QuerierRoute() != "" {
+//                queryRouter.AddRoute(module.QuerierRoute(), module.NewQuerierHandler())
+//            }
+//        }
+    }
 
-    
     // InitGenesis performs init genesis functionality for modules
     public func initGenesis(request: Request, genesisState: [String: RawMessage]) -> ResponseInitChain {
         var validatorUpdates: [ValidatorUpdate] = []

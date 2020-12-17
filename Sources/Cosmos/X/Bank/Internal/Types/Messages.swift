@@ -1,5 +1,3 @@
-import Cosmos
-
 // Input models transaction input
 public struct Input: Codable {
     let address: AccountAddress

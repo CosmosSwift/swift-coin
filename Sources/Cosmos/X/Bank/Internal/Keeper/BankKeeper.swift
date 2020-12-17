@@ -39,20 +39,22 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
     // The coins are then transferred from the delegator address to a ModuleAccount address.
     // If any of the delegation amounts are negative, an error is returned.
     public func delegateCoins(request: Request, delegatorAddress: AccountAddress, moduleAccountAddress: AccountAddress, amount: Coins) throws {
-        guard let delegatorAccount = accountKeeper.account(request: request, address: delegatorAddress) else {
-            throw Cosmos.Error.unknownAddress(reason: "account \(delegatorAddress) does not exist")
-        }
-
-        guard let moduleAccount = accountKeeper.account(request: request, address: moduleAccountAddress) else {
-            throw Cosmos.Error.unknownAddress(reason: "module account \(moduleAccountAddress) does not exist")
-        }
+        // TODO: Implement
+        fatalError()
+//        guard let delegatorAccount = accountKeeper.account(request: request, address: delegatorAddress) else {
+//            throw Cosmos.Error.unknownAddress(reason: "account \(delegatorAddress) does not exist")
+//        }
+//
+//        guard let moduleAccount = accountKeeper.account(request: request, address: moduleAccountAddress) else {
+//            throw Cosmos.Error.unknownAddress(reason: "module account \(moduleAccountAddress) does not exist")
+//        }
 
         // TODO: Implement isValid
 //        if !amount.isValid {
 //            throw Cosmos.Error.invalidCoins(reason: "\(amount)")
 //        }
 
-        let oldCoins = delegatorAccount.coins
+//        let oldCoins = delegatorAccount.coins
 
         // TODO: Implement safeSubtract
 //        let (_, hasNegative) = oldCoins.safeSubtract(amount)
@@ -64,9 +66,9 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
         // TODO: Implement trackDelegation
 //        try trackDelegation(delegatorAccount, request.blockHeader().time, amount)
 
-        accountKeeper.setAccount(request: request, account: delegatorAccount)
+//        accountKeeper.setAccount(request: request, account: delegatorAccount)
 
-        try addCoins(request: request, address: moduleAccountAddress, amount: amount)
+//        try addCoins(request: request, address: moduleAccountAddress, amount: amount)
     }
     
     public func undelegateCoins(request: Request, moduleAccountAddress: AccountAddress, delegatorAddress: AccountAddress, amount: Coins) throws {
@@ -89,6 +91,9 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
         fatalError()
 
     }
+    
+    // TODO: Check if it's OK to discard the result
+    @discardableResult
     public func addCoins(request: Request, address: AccountAddress, amount: Coins) throws -> Coins {
         // TODO: Implement
         fatalError()
@@ -158,8 +163,11 @@ public protocol SendKeeper: ViewKeeper {
     func inputOutputCoins(request: Request, inputs: [Input], outputs: [Output]) throws
     func sendCoins(request: Request, fromAddress: AccountAddress, toAddress: AccountAddress, amount: Coins) throws
 
+    // TODO: Check if it's OK to discard the result
     @discardableResult
     func subtractCoins(requet: Request, address: AccountAddress, amount: Coins) throws -> Coins
+    // TODO: Check if it's OK to discard the result
+    @discardableResult
     func addCoins(request: Request, address: AccountAddress, amount: Coins) throws -> Coins
     func setCoins(request: Request, address: AccountAddress, amount: Coins) throws
 

@@ -1,4 +1,9 @@
-import Cosmos
+extension BankKeys {
+    // DefaultParamspace for params keeper
+    public static let defaultParamspace = moduleName
+    // DefaultSendEnabled enabled
+    public static var defaultSendEnabled = true
+}
 
 extension KeyTable {
     // ParamStoreKeySendEnabled is store's key for SendEnabled

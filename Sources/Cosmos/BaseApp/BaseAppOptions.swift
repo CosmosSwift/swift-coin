@@ -1,4 +1,4 @@
-
+import Database
 
 extension BaseApp {
     private func assertSealed(_ message: String) {
@@ -6,6 +6,28 @@ extension BaseApp {
             fatalError(message)
         }
     }
+    
+    public func setName(_ name: String) {
+        assertSealed("SetName() on sealed BaseApp")
+        self.name = name
+    }
+
+    // SetAppVersion sets the application's version string.
+    public func setAppVersion(version: String) {
+        assertSealed("SetAppVersion() on sealed BaseApp")
+        self.appVersion = version
+    }
+
+    public func setDatabase(database: Database) {
+        assertSealed("SetDB() on sealed BaseApp")
+        self.database = database
+    }
+
+    public func setCommitMultiStore(commitMultiStore: CommitMultiStore) {
+        assertSealed("SetEndBlocker() on sealed BaseApp")
+        self.commitMultiStore = commitMultiStore
+    }
+
     
     public func setInitChainer(_ initChainer: @escaping InitChainer) {
         assertSealed("SetInitChainer() on sealed BaseApp")

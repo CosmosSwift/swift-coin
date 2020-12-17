@@ -24,14 +24,14 @@ public protocol App {
     func load(height: Int64) throws
 
     // Exports the state of the application for a genesis file.
-    func ExportAppStateAndValidators(
+    func exportAppStateAndValidators(
         forZeroHeight: Bool,
         jailWhiteList: [String]
     ) throws -> (RawMessage, [GenesisValidator])
 
     // All the registered module account addreses.
-    func moduleAccountAddrs() -> [String: Bool]
+    static var moduleAccountAddresses: [String: Bool] { get }
 
     // Helper for the simulation framework.
-    func simulationManager() -> SimulationManager
+    var simulationManager: SimulationManager? { get }
 }

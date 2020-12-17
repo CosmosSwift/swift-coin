@@ -9,54 +9,40 @@ let home = ProcessInfo.processInfo.environment["HOME"] ?? ""
 let defaultCLIHome = "\(home)/.nameservicecli"
 let defaultNodeHome = "\(home)/.nameserviced"
 
-func makeCodec() -> Codec {
-    let codec = Codec()
-
-//    ModuleBasics.registerCodec(codec)
-//    registerCodec(codec)
-//    codec.registerCrypto(codec)
-
-//    return codec.seal()
-    return codec
-}
-
-final class NewApp: BaseApp {
+final class NameServiceApp: BaseApp, App {
     static let appName = "nameservice"
     let codec: Codec = makeCodec()
     
-    static let moduleBasics = BasicManager.make(with:
-    //    genutil.AppModuleBasic{},
-    //    auth.AppModuleBasic{},
-    //    bank.AppModuleBasic{},
-    //    staking.AppModuleBasic{},
-    //    params.AppModuleBasic{},
-    //    supply.AppModuleBasic{},
+    static let moduleBasics = BasicManager(
+        GenUtilAppModuleBasic(),
+        AuthAppModuleBasic(),
+        BankAppModuleBasic(),
+        StakingAppModuleBasic(),
+        ParamsAppModuleBasic(),
+        SupplyAppModuleBasic(),
         NameServiceAppModuleBasic()
-    //// this line is used by starport scaffolding # 2
     )
     
-    static let moduleAccountPermissions: [String: [String]] = [:
-    //    Auth.FeeCollectorName: [],
-        // this line is used by starport scaffolding # 2.1
-    //    Staking.BondedPoolName:    [supply.Burner, supply.Staking],
-    //    Staking.NotBondedPoolName: [supply.Burner, supply.Staking],
+    static let moduleAccountPermissions: [String: [String]] = [
+        AuthKeys.feeCollectorName: [],
+        StakingKeys.bondedPoolName:    [SupplyPermissions.burner, SupplyPermissions.staking],
+        StakingKeys.notBondedPoolName: [SupplyPermissions.burner, SupplyPermissions.staking],
     ]
    
-    let invCheckPeriod: UInt
+    let invariantCheckPeriod: UInt
     
     let keys:  [String: KeyValueStoreKey]
     let transientKeys: [String: TransientStoreKey]
 
-    let subspaces: [String: Subspace]
-//
+    var subspaces: [String: Subspace] = [:]
+
     let accountKeeper: AccountKeeper
     let bankKeeper: BankKeeper
-//    stakingKeeper  staking.Keeper
-//    supplyKeeper   supply.Keeper
-//    paramsKeeper   params.Keeper
+    let stakingKeeper: StakingKeeper
+    let supplyKeeper: SupplyKeeper
+    let paramsKeeper: ParamsKeeper
     let nameserviceKeeper: NameServiceKeeper
-//  // this line is used by starport scaffolding # 3
-    let moduleManager: Manager
+    let moduleManager: ModuleManager
 
     let simulationManager: SimulationManager? = nil
     
@@ -65,10 +51,10 @@ final class NewApp: BaseApp {
         database: Database,
         commitMultiStoreTracer: TextOutputStream,
         loadLatest: Bool,
-        invCheckPeriod: UInt,
+        invariantCheckPeriod: UInt,
         options: ((BaseApp) -> Void)...
-    ) {
-        self.invCheckPeriod = invCheckPeriod
+    ) throws {
+        self.invariantCheckPeriod = invariantCheckPeriod
 
         self.keys = KeyValueStoreKeys(
             BaseAppKeys.mainStoreKey,
@@ -77,7 +63,6 @@ final class NewApp: BaseApp {
             SupplyKeys.storeKey,
             ParamsKeys.storeKey,
             NameServiceKeys.storeKey
-        // this line is used by starport scaffolding # 5
         )
 
         self.transientKeys = TransientStoreKeys(
@@ -85,45 +70,72 @@ final class NewApp: BaseApp {
             ParamsKeys.transientStoreKey
         )
         
-        self.subspaces = [:]
-//        app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tKeys[params.TStoreKey])
-//        app.subspaces[auth.ModuleName] = app.paramsKeeper.Subspace(auth.DefaultParamspace)
-//        app.subspaces[bank.ModuleName] = app.paramsKeeper.Subspace(bank.DefaultParamspace)
-//        app.subspaces[staking.ModuleName] = app.paramsKeeper.Subspace(staking.DefaultParamspace)
+        self.paramsKeeper = ParamsKeeper(
+            codec: self.codec,
+            // TODO: Deal with force unwrap.
+            key: keys[ParamsKeys.storeKey]!,
+            // TODO: Deal with force unwrap.
+            transientKey: transientKeys[ParamsKeys.transientStoreKey]!
+        )
+        
+        self.subspaces[AuthKeys.moduleName] = self.paramsKeeper.subspace(AuthKeys.defaultParamspace)
+        self.subspaces[BankKeys.moduleName] = self.paramsKeeper.subspace(BankKeys.defaultParamspace)
+        self.subspaces[StakingKeys.moduleName] = self.paramsKeeper.subspace(StakingKeys.defaultParamspace)
         
         self.accountKeeper = AccountKeeper(
             codec: self.codec,
-            // TODO: Deal with force unwrap.
             key: self.keys[AuthKeys.storeKey]!,
-            // TODO: Deal with force unwrap.
             paramstore: self.subspaces[AuthKeys.moduleName]!,
             proto: protoBaseAccount
         )
 
         self.bankKeeper = BaseKeeper(
             accountKeeper: self.accountKeeper,
-            // TODO: Deal with force unwrap.
             paramSpace: self.subspaces[BankKeys.moduleName]!,
-            blacklistedAddresses: Self.moduleAccountAddresses()
+            blacklistedAddresses: Self.moduleAccountAddresses
+        )
+
+        self.supplyKeeper = SupplyKeeper(
+            codec: self.codec,
+            storeKey: keys[SupplyKeys.storeKey]!,
+            accountKeeper: self.accountKeeper,
+            bankKeeper: self.bankKeeper,
+            moduleAccountPermissions: Self.moduleAccountPermissions
+        )
+
+        self.stakingKeeper = StakingKeeper(
+            codec: self.codec,
+            key: keys[StakingKeys.storeKey]!,
+            supplyKeeper: self.supplyKeeper,
+            paramstore: self.subspaces[StakingKeys.moduleName]!
+        )
+
+        self.stakingKeeper.setHooks(
+            MultiStakingHooks()
         )
 
         self.nameserviceKeeper = NameServiceKeeper(
             coinKeeper: self.bankKeeper,
             codec: self.codec,
-            // TODO: Deal with force unwrap.
             storeKey: keys[NameServiceKeys.storeKey]!
         )
-
-        // this line is used by starport scaffolding # 4
-
-        self.moduleManager = Manager(
-//            genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
-//            auth.NewAppModule(app.accountKeeper),
-//            bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-//            supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-            NameServiceAppModule(keeper: nameserviceKeeper, coinKeeper: self.bankKeeper)
-//            staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
-          // this line is used by starport scaffolding # 6
+        
+        self.moduleManager = ModuleManager(
+            GenUtilAppModule(
+                accountKeeper: self.accountKeeper,
+                stakingKeeper: self.stakingKeeper
+                // TODO: Deal with this, can't use self.deliverTx because self is not fully initialized yet.
+//                deliverTx: self.deliverTx
+            ),
+            AuthAppModule(accountKeeper: self.accountKeeper),
+            BankAppModule(keeper: self.bankKeeper, accountKeeper: self.accountKeeper),
+            SupplyAppModule(keeper: self.supplyKeeper, accountKeeper: self.accountKeeper),
+            NameServiceAppModule(keeper: self.nameserviceKeeper, coinKeeper: self.bankKeeper),
+            StakingAppModule(
+                keeper: self.stakingKeeper,
+                accountKeeper: self.accountKeeper,
+                supplyKeeper: self.supplyKeeper
+            )
         )
 
         super.init(
@@ -135,87 +147,52 @@ final class NewApp: BaseApp {
         )
       
         self.setCommitMultiStoreTracer(tracer: commitMultiStoreTracer)
+        self.setAppVersion(version: VersionInfo.defaultVersion)
 
-        moduleManager.setOrderEndBlockers(
-//            StakingKeys.moduleName
-            // this line is used by starport scaffolding # 6.1
+        self.moduleManager.setOrderEndBlockers(
+            StakingKeys.moduleName
         )
 
-        moduleManager.setOrderInitGenesis(
-            // this line is used by starport scaffolding # 6.2
+        self.moduleManager.setOrderInitGenesis(
             StakingKeys.moduleName,
             AuthKeys.moduleName,
             BankKeys.moduleName,
             NameServiceKeys.moduleName,
             SupplyKeys.moduleName,
             GenUtilKeys.moduleName
-        // this line is used by starport scaffolding # 7
         )
 
-//        moduleManager.registerRoutes(self.router(), self.queryRouter())
+        self.moduleManager.registerRoutes(
+            router: self.router,
+            queryRouter: self.queryRouter
+        )
+
         self.setInitChainer(self.initChainer)
         self.setBeginBlocker(self.beginBlocker)
         self.setEndBlocker(self.endBlocker)
 
-//        self.SetAnteHandler(
-//            auth.NewAnteHandler(
-//                app.accountKeeper,
-//                app.supplyKeeper,
-//                auth.DefaultSigVerificationGasConsumer,
-//            ),
-//        )
+        self.setAnteHandler(
+            Auth.anteHandler(
+                accountKeeper: self.accountKeeper,
+                supplyKeeper: self.supplyKeeper,
+                signatureVerificationGasConsumer: Auth.defaultSignatureVerificationGasConsumer
+            )
+        )
 
-//        self.mountKVStores(keys)
-//        self.mountTransientStores(tKeys)
+        self.mountKeyValueStores(keys: self.keys)
+        self.mountTransientStores(keys: self.transientKeys)
 
-//        if loadLatest {
-//            do {
-//                try self.loadLatestVersion(self.keys[BaseAppKeys.mainStoreKey]!)
-//            } catch {
-//                // TODO: Probably don't need to fatalError here
-//                // Maybe just throwing and let the error flow through
-//                // the call stack might be enough
-//               fatalError("\(error)")
-//            }
-//        }
-        
-
-        fatalError()
-    
-//        baseApp.appVersion = version.Version
-//
-//        app.supplyKeeper = supply.NewKeeper(
-//            app.cdc,
-//            keys[supply.StoreKey],
-//            app.accountKeeper,
-//            app.bankKeeper,
-//            maccPerms,
-//        )
-//
-//        stakingKeeper := staking.NewKeeper(
-//            app.cdc,
-//            keys[staking.StoreKey],
-//            app.supplyKeeper,
-//            app.subspaces[staking.ModuleName],
-//        )
-//
-//        // this line is used by starport scaffolding # 5.2
-//
-//        app.stakingKeeper = *stakingKeeper.SetHooks(
-//            staking.NewMultiStakingHooks(
-//                // this line is used by starport scaffolding # 5.3
-//            ),
-//        )
+        if loadLatest {
+            try self.loadLatestVersion(baseKey: self.keys[BaseAppKeys.mainStoreKey]!)
+        }
     }
 }
-//
-//var _ simapp.App = (*NewApp)(nil)
 
 typealias GenesisState = [String: RawMessage]
 
-extension NewApp {
+extension NameServiceApp {
     static func newDefaultGenesisState() -> GenesisState {
-        return moduleBasics.defaultGenesis()
+        moduleBasics.defaultGenesis()
     }
     
     func initChainer(request: Request, initChainRequest: RequestInitChain) -> ResponseInitChain {
@@ -237,7 +214,7 @@ extension NewApp {
         try load(version: height, baseKey: keys[baseKey]!)
     }
     
-    static func moduleAccountAddresses() -> [String: Bool] {
+    static var moduleAccountAddresses: [String: Bool] {
         var moduleAccountAddresses: [String: Bool] = [:]
         
         for (permission, _) in moduleAccountPermissions {
@@ -246,13 +223,17 @@ extension NewApp {
         
         return moduleAccountAddresses
     }
-   
-    // TODO: Check if this is required. Looks like these accessors are not quite required in Swiftland.
-//    func codec() -> Codec {
-//        codec
-//    }
-//
-//    func simulationManager() -> SimulationManager {
-//        simulationManager
-//    }
 }
+
+func makeCodec() -> Codec {
+    let codec = Codec()
+
+    // TODO: Decide what to do about codecs
+//    ModuleBasics.registerCodec(codec)
+//    registerCodec(codec)
+//    codec.registerCrypto(codec)
+
+//    return codec.seal()
+    return codec
+}
+

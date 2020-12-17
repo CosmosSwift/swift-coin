@@ -9,10 +9,10 @@ let gasHasDescriptor = "Has"
 let gasDeleteDescriptor = "Delete"
 
 // Gas measured by the SDK
-typealias Gas = UInt64
+public typealias Gas = UInt64
 
 // GasMeter interface to track gas consumption
-protocol GasMeter {
+public protocol GasMeter {
     var gasConsumed: Gas { get }
     var gasConsumedToLimit: Gas { get }
     var limit: Gas { get }

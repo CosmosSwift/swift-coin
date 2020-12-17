@@ -6,6 +6,15 @@ public enum ParamsKeys {
 
     // TStoreKey is the string store key for the param transient store
     public static let transientStoreKey = "transient_" + storeKey
+    
+    // ModuleName defines the name of the module
+    public static let moduleName = "params"
+
+    // RouterKey defines the routing key for a ParameterChangeProposal
+    public static let routerKey = "params"
+
+    // ProposalTypeChange defines the type for a ParameterChangeProposal
+    public static let proposalTypeChange = "ParameterChange"
 }
 
 // Individual parameter store for each keeper

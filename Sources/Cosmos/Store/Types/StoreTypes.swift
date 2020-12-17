@@ -234,6 +234,8 @@ public protocol MultiStore: Store {
     // SetTracer sets the tracer for the MultiStore that the underlying
     // stores will utilize to trace operations. The modified MultiStore is
     // returned.
+    // TODO: Check if it's OK to discard the result
+    @discardableResult
     func set(tracer: TextOutputStream) -> MultiStore
 
     // SetTracingContext sets the tracing context for a MultiStore. It is
