@@ -1,17 +1,17 @@
 import Foundation
 import Logging
 import ABCI
-import Cosmos
 import Database
+import Cosmos
 import NameService
 
 let home = ProcessInfo.processInfo.environment["HOME"] ?? ""
-let defaultCLIHome = "\(home)/.nameservicecli"
-let defaultNodeHome = "\(home)/.nameserviced"
+public let defaultCLIHome = "\(home)/.nameservicecli"
+public let defaultNodeHome = "\(home)/.nameserviced"
 
-final class NameServiceApp: BaseApp, App {
+public final class NameServiceApp: BaseApp, App {
     static let appName = "nameservice"
-    let codec: Codec = makeCodec()
+    public let codec: Codec = makeCodec()
     
     static let moduleBasics = BasicManager(
         GenUtilAppModuleBasic(),
@@ -44,9 +44,9 @@ final class NameServiceApp: BaseApp, App {
     let nameserviceKeeper: NameServiceKeeper
     let moduleManager: ModuleManager
 
-    let simulationManager: SimulationManager? = nil
+    public let simulationManager: SimulationManager? = nil
     
-    init(
+    public init(
         logger: Logger,
         database: Database,
         commitMultiStoreTracer: TextOutputStream,
@@ -195,26 +195,26 @@ extension NameServiceApp {
         moduleBasics.defaultGenesis()
     }
     
-    func initChainer(request: Request, initChainRequest: RequestInitChain) -> ResponseInitChain {
+    public func initChainer(request: Request, initChainRequest: RequestInitChain) -> ResponseInitChain {
         let genesisState: GenesisState = codec.mustUnmarshalJSON(data: initChainRequest.appStateBytes)
         return moduleManager.initGenesis(request: request, genesisState: genesisState)
     }
 
-    func beginBlocker(request: Request, beginBlockRequest: RequestBeginBlock) -> ResponseBeginBlock {
+    public func beginBlocker(request: Request, beginBlockRequest: RequestBeginBlock) -> ResponseBeginBlock {
          moduleManager.beginBlock(request: request, beginBlockRequest: beginBlockRequest)
     }
     
-    func endBlocker(request: Request, endBlockRequest: RequestEndBlock) -> ResponseEndBlock {
+    public func endBlocker(request: Request, endBlockRequest: RequestEndBlock) -> ResponseEndBlock {
         moduleManager.endBlock(request: request, endBlockRequest: endBlockRequest)
     }
     
-    func load(height: Int64) throws {
+    public func load(height: Int64) throws {
         let baseKey = BaseAppKeys.mainStoreKey
         // TODO: Check what's the best way to deal with optionality here.
         try load(version: height, baseKey: keys[baseKey]!)
     }
     
-    static var moduleAccountAddresses: [String: Bool] {
+    public static var moduleAccountAddresses: [String: Bool] {
         var moduleAccountAddresses: [String: Bool] = [:]
         
         for (permission, _) in moduleAccountPermissions {
@@ -225,7 +225,7 @@ extension NameServiceApp {
     }
 }
 
-func makeCodec() -> Codec {
+public func makeCodec() -> Codec {
     let codec = Codec()
 
     // TODO: Decide what to do about codecs

@@ -4,7 +4,7 @@ import Cosmos
 extension NameServiceApp {
     // ExportAppStateAndValidators exports the state of the application for a genesis
     // file.
-    func exportAppStateAndValidators(
+    public func exportAppStateAndValidators(
         forZeroHeight: Bool,
         jailWhiteList: [String]
     ) throws -> (RawMessage, [GenesisValidator]) {

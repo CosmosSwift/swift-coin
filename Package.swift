@@ -14,12 +14,14 @@ let package = Package(
         // App Module
         .library(name: "NameService", targets: ["NameService"]),
         // Executables
-        .executable(name: "nameservicecli", targets: ["nameservicecli"])
+        .executable(name: "nameservicecli", targets: ["nameservicecli"]),
+        .executable(name: "nameserviced", targets: ["nameserviced"]),
     ],
     dependencies: [
         .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .upToNextMajor(from: "0.34.0")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
+        .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
     ],
     targets: [
         .target(
@@ -28,6 +30,13 @@ let package = Package(
                 .product(name: "ABCI", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
                 .target(name: "Cosmos"),
+            ]
+        ),
+        .target(
+            name: "nameserviced",
+            dependencies: [
+                .target(name: "App"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(
