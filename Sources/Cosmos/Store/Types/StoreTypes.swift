@@ -236,7 +236,7 @@ public protocol MultiStore: Store {
     // returned.
     // TODO: Check if it's OK to discard the result
     @discardableResult
-    func set(tracer: TextOutputStream) -> MultiStore
+    func set(tracer: Writer?) -> MultiStore
 
     // SetTracingContext sets the tracing context for a MultiStore. It is
     // implied that the caller should update the context when necessary between

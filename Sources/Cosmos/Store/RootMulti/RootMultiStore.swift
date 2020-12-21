@@ -30,7 +30,7 @@ final class RootMultiStore: CommitMultiStore {
     var isLazyLoadingEnabled: Bool = false
     let pruneHeights: [Int64]
 
-    var traceWriter: TextOutputStream?
+    var traceWriter:  Writer?
     var traceContext: TraceContext = [:]
 
     var interBlockCache: MultiStorePersistentCache?
@@ -203,7 +203,7 @@ final class RootMultiStore: CommitMultiStore {
     
     // SetTracer sets the tracer for the MultiStore that the underlying
     // stores will utilize to trace operations. A MultiStore is returned.
-    func set(tracer: TextOutputStream) -> MultiStore {
+    func set(tracer: Writer?) -> MultiStore {
         self.traceWriter = tracer
         return self
     }

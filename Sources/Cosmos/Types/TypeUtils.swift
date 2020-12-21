@@ -1,4 +1,5 @@
 import Foundation
+import Database
 
 // SortedJSON takes any JSON and returns it sorted by keys. Also, all white-spaces
 // are removed.
@@ -19,3 +20,5 @@ public func mustSortJSON(data: Data) -> Data {
        fatalError("\(error)")
     }
 }
+
+

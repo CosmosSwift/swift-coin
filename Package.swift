@@ -36,7 +36,6 @@ let package = Package(
             name: "nameserviced",
             dependencies: [
                 .target(name: "App"),
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(
@@ -58,7 +57,9 @@ let package = Package(
                 .target(name: "Database"),
                 .target(name: "Tendermint"),
                 .product(name: "ABCI", package: "ABCI"),
+                .product(name: "ABCINIO", package: "ABCI"),
                 .product(name: "Logging", package: "swift-log"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(name: "Database"),

@@ -49,9 +49,9 @@ struct StandardTransaction: Transaction {
        
         for message in messages {
             for address in message.getSigners() {
-                if seen[address.string()] == false {
+                if seen[address.string] == false {
                     signers.append(address)
-                    seen[address.string()] = true
+                    seen[address.string] = true
                 }
             }
         }

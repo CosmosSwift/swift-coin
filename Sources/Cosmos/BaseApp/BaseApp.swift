@@ -20,7 +20,7 @@ public typealias StoreLoader = (_ commitMultiStore: CommitMultiStore) throws -> 
 
 
 // BaseApp reflects the ABCI application implementation.
-open class BaseApp {
+open class BaseApp: Sealable {
     /// Initialized on creation
     let logger: Logger
    

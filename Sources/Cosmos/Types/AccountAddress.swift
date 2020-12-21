@@ -13,7 +13,19 @@ public struct AccountAddress: Codable, Equatable {
         data.isEmpty
     }
     
-    public func string() -> String {
-        String(data: data, encoding: .utf8)!
+    public var string: String {
+        guard !data.isEmpty else {
+            return ""
+        }
+
+        let bech32PrefixAccountAddress = Configuration.bech32AccountAddressPrefix
+
+        do {
+            // TODO: Implement
+            fatalError()
+//            return try Bech32.convertAndEncode(bech32PrefixAccountAddress, data)
+        } catch {
+           fatalError("\(error)")
+        }
     }
 }

@@ -23,10 +23,23 @@ public enum ParamsKeys {
 public struct Subspace {
     let codec: Codec
     let key: StoreKey // []byte -> []byte, stores parameter
-    let tkey: StoreKey // []byte -> bool, stores parameter change
+    let transientKey: StoreKey // []byte -> bool, stores parameter change
     let name: Data
     var table: KeyTable
     
+    init(
+        codec: Codec,
+        key: StoreKey,
+        transientKey: StoreKey,
+        name: String
+    ) {
+        self.codec = codec
+        self.key = key
+        self.transientKey = transientKey
+        self.name = name.data
+        self.table = KeyTable()
+    }
+
     // WithKeyTable initializes KeyTable and returns modified Subspace
     public func with(keyTable: KeyTable) -> Subspace {
         var copy = self

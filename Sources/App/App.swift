@@ -5,12 +5,13 @@ import Database
 import Cosmos
 import NameService
 
-let home = ProcessInfo.processInfo.environment["HOME"] ?? ""
-public let defaultCLIHome = "\(home)/.nameservicecli"
-public let defaultNodeHome = "\(home)/.nameserviced"
 
 public final class NameServiceApp: BaseApp, App {
-    static let appName = "nameservice"
+    private static let home = ProcessInfo.processInfo.environment["HOME"] ?? ""
+    public static let defaultCLIHome = "\(home)/.nameservicecli"
+    public static let defaultNodeHome = "\(home)/.nameserviced"
+    
+    private static let appName = "nameservice"
     public let codec: Codec = makeCodec()
     
     static let moduleBasics = BasicManager(
@@ -49,7 +50,7 @@ public final class NameServiceApp: BaseApp, App {
     public init(
         logger: Logger,
         database: Database,
-        commitMultiStoreTracer: TextOutputStream,
+        commitMultiStoreTracer:  Writer?,
         loadLatest: Bool,
         invariantCheckPeriod: UInt,
         options: ((BaseApp) -> Void)...
@@ -218,22 +219,24 @@ extension NameServiceApp {
         var moduleAccountAddresses: [String: Bool] = [:]
         
         for (permission, _) in moduleAccountPermissions {
-            moduleAccountAddresses[Supply.moduleAddress(name: permission).string()] = true
+            moduleAccountAddresses[Supply.moduleAddress(name: permission).string] = true
         }
         
         return moduleAccountAddresses
     }
 }
 
-public func makeCodec() -> Codec {
-    let codec = Codec()
+extension NameServiceApp {
+    public static func makeCodec() -> Codec {
+        let codec = Codec()
 
-    // TODO: Decide what to do about codecs
-//    ModuleBasics.registerCodec(codec)
-//    registerCodec(codec)
-//    codec.registerCrypto(codec)
+        // TODO: Decide what to do about codecs
+    //    ModuleBasics.registerCodec(codec)
+    //    registerCodec(codec)
+    //    codec.registerCrypto(codec)
 
-//    return codec.seal()
-    return codec
+    //    return codec.seal()
+        return codec
+    }
 }
 

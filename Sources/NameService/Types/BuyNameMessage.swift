@@ -28,7 +28,7 @@ extension BuyNameMessage: Message {
     // ValidateBasic runs stateless checks on the message
     func validateBasic() throws {
         if buyer.isEmpty{
-            throw Cosmos.Error.invalidAddress(address: buyer.string())
+            throw Cosmos.Error.invalidAddress(address: buyer.string)
         }
         
         if name.isEmpty {

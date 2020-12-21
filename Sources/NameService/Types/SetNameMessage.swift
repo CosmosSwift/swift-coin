@@ -27,7 +27,7 @@ struct SetNameMessage: Codable, Message {
     // ValidateBasic runs stateless checks on the message
     func validateBasic() throws {
         if owner.isEmpty {
-            throw Cosmos.Error.invalidAddress(address: owner.string())
+            throw Cosmos.Error.invalidAddress(address: owner.string)
         }
         
         if name.isEmpty || value.isEmpty {

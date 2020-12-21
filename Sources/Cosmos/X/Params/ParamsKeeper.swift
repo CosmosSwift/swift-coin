@@ -1,5 +1,5 @@
 // Keeper of the global paramstore
-public struct ParamsKeeper {
+public final class ParamsKeeper {
     // TODO: Implement
     let codec: Codec
     let key: StoreKey
@@ -18,21 +18,23 @@ public struct ParamsKeeper {
     
     // Allocate subspace used for keepers
     public func subspace(_ subspace: String) -> Subspace {
-        // TODO: Implement
-        fatalError()
-//        _, ok := k.spaces[s]
-//        if ok {
-//            panic("subspace already occupied")
-//        }
-//
-//        if s == "" {
-//            panic("cannot use empty string for subspace")
-//        }
-//
-//        space := subspace.NewSubspace(k.cdc, k.key, k.tkey, s)
-//        k.spaces[s] = &space
-//
-//        return space
+        guard spaces[subspace] == nil else {
+            fatalError("subspace already occupied")
+        }
+        
+        guard !subspace.isEmpty else {
+            fatalError("cannot use empty string for subspace")
+        }
+        
+        let space = Subspace(
+            codec: codec,
+            key: key,
+            transientKey: transientKey,
+            name: subspace
+        )
+        
+        spaces[subspace] = space
+        return space
     }
 
 }
