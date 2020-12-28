@@ -19,7 +19,7 @@ public protocol PublicKey: Codable {
     func equals(other: PublicKey) -> Bool
 }
 
-public protocol PrivateKey {
+public protocol PrivateKey: Codable {
     var bytes: Data { get }
     func sign(message: Data) throws -> Data
     var publicKey: PublicKey { get }

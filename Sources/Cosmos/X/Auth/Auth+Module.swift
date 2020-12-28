@@ -32,27 +32,21 @@ public class AuthAppModule: AuthAppModuleBasic, AppModule {
         self.accountKeeper = accountKeeper
     }
     
-    // TODO: Implement all these
-    // registers
-    public func register(invariants: InvariantRegistry) {
-        fatalError()
-    }
+    // RegisterInvariants performs a no-op.
+    public func registerInvariants(in invariantRegistry: InvariantRegistry) {}
 
-    // routes
-    public var route: String {
-        fatalError()
-    }
-
-    public func makeHandler() -> Handler {
-        fatalError()
-    }
+    // Route returns the message routing key for the auth module.
+    public var route: String { "" }
     
-    public var querierRoute: String {
-        fatalError()
-    }
+    // NewHandler returns an sdk.Handler for the auth module.
+    public func makeHandler() -> Handler? { nil }
     
-    public func makeQuerier() -> Querier {
-        fatalError()
+    // QuerierRoute returns the auth module's querier route name.
+    public var querierRoute: String { AuthKeys.querierRoute }
+    
+    // NewQuerierHandler returns the auth module sdk.Querier.
+    public func makeQuerier() -> Querier? {
+        accountKeeper.makeQuerier()
     }
 
     // ABCI

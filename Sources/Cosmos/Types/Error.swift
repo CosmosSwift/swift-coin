@@ -3,6 +3,7 @@ public enum Error: Swift.Error {
     case unknownRequest(reason: String)
     case unauthorized(reason: String)
     case jsonMarshal(error: Swift.Error)
+    case jsonUnmarshal(error: Swift.Error)
     case decodingError(reason: String)
     case insufficientFunds(reason: String)
     case invalidDenomination(denomination: String)
@@ -14,4 +15,8 @@ public enum Error: Swift.Error {
     case generic(reason: String)
     case unknownAddress(reason: String)
     case invalidCoins(reason: String)
+    case sendDisabled
+    case noInputs
+    case noOutputs
+    case inputOutputMismatch
 }

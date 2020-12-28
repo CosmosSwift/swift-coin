@@ -48,10 +48,10 @@ struct StandardTransaction: Transaction {
         var signers: [AccountAddress] = []
        
         for message in messages {
-            for address in message.getSigners() {
-                if seen[address.string] == false {
+            for address in message.signers {
+                if seen[address.description] == false {
                     signers.append(address)
-                    seen[address.string] = true
+                    seen[address.description] = true
                 }
             }
         }

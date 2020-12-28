@@ -36,26 +36,24 @@ public final class BankAppModule: BankAppModuleBasic, AppModule {
         self.accountKeeper = accountKeeper
     }
     
-    // TODO: Implement all these
-    // registers
-    public func register(invariants: InvariantRegistry) {
-        fatalError()
-    }
+    // RegisterInvariants registers the bank module invariants.
+    public func registerInvariants(in invariantRegistry: InvariantRegistry) {}
 
-    // routes
+    // Route returns the message routing key for the bank module.
     public var route: String {
-        fatalError()
+        BankKeys.routerKey
     }
 
-    public func makeHandler() -> Handler {
-        fatalError()
+    // NewHandler returns an sdk.Handler for the bank module.
+    public func makeHandler() -> Handler? {
+        keeper.makeHandler()
     }
     
     public var querierRoute: String {
         fatalError()
     }
     
-    public func makeQuerier() -> Querier {
+    public func makeQuerier() -> Querier? {
         fatalError()
     }
 

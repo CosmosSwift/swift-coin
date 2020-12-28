@@ -40,18 +40,18 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
         self.supplyKeeper = supplyKeeper
     }
     
-    // TODO: Implement all these
-    // registers
-    public func register(invariants: InvariantRegistry) {
-        fatalError()
+    // RegisterInvariants registers the staking module invariants.
+    public func registerInvariants(in invariantRegistry: InvariantRegistry) {
+        keeper.registerInvariants(in: invariantRegistry)
     }
 
     // routes
     public var route: String {
+        
         fatalError()
     }
 
-    public func makeHandler() -> Handler {
+    public func makeHandler() -> Handler? {
         fatalError()
     }
     
@@ -59,7 +59,7 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
         fatalError()
     }
     
-    public func makeQuerier() -> Querier {
+    public func makeQuerier() -> Querier? {
         fatalError()
     }
 

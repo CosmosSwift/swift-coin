@@ -5,7 +5,7 @@ import Tendermint
 // This can be extended by embedding within in your AppAccount.
 // However one doesn't have to use BaseAccount as long as your struct
 // implements Account.
-class BaseAccount: ExportedAccount {
+public class BaseAccount {
     var address: AccountAddress
     var coins: Coins
     var publicKey: PublicKey?
@@ -15,10 +15,10 @@ class BaseAccount: ExportedAccount {
     // NewBaseAccount creates a new BaseAccount object
     init(
         address: AccountAddress,
-        coins: Coins,
-        publicKey: PublicKey,
-        accountNumber: UInt64,
-        sequence: UInt64
+        coins: Coins = Coins(),
+        publicKey: PublicKey? = nil,
+        accountNumber: UInt64 = 0,
+        sequence: UInt64 = 0
     ) {
         self.address = address
         self.coins = coins
@@ -111,7 +111,7 @@ class BaseAccount: ExportedAccount {
 
 
 // ProtoBaseAccount - a prototype function for BaseAccount
-public func protoBaseAccount() -> ExportedAccount {
+public func protoBaseAccount() -> Account {
     fatalError()
     // TODO: BaseAccount is returned here with no parameters in the original codebase
     // Check what exactly that would mean

@@ -36,5 +36,5 @@ func handleBuyNameMessage(request: Request, keeper: NameServiceKeeper, message: 
     
     try keeper.setOwner(request: request, name: message.name, owner: message.buyer)
     try keeper.setPrice(request: request, name: message.name, price: message.bid)
-    return .success
+    return Result()
 }

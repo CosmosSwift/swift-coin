@@ -66,9 +66,11 @@ let package = Package(
         .target(
             name: "Tendermint",
             dependencies: [
+                .target(name: "Bech32"),
                 .product(name: "Crypto", package: "swift-crypto"),
             ]
         ),
+        .target(name: "Bech32"),
     ]
 )
 

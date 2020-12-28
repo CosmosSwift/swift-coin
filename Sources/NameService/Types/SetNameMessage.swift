@@ -27,7 +27,7 @@ struct SetNameMessage: Codable, Message {
     // ValidateBasic runs stateless checks on the message
     func validateBasic() throws {
         if owner.isEmpty {
-            throw Cosmos.Error.invalidAddress(address: owner.string)
+            throw Cosmos.Error.invalidAddress(address: owner.description)
         }
         
         if name.isEmpty || value.isEmpty {
@@ -36,12 +36,12 @@ struct SetNameMessage: Codable, Message {
     }
 
     // GetSignBytes encodes the message for signing
-    func getSignBytes() -> Data {
+    var signedData: Data {
         mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
     }
 
     // GetSigners defines whose signature is required
-    func getSigners() -> [AccountAddress] {
+    var signers: [AccountAddress] {
         [owner]
     }
 }

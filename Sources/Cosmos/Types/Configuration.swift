@@ -1,3 +1,5 @@
+import Foundation
+
 // DefaultKeyringServiceName defines a default service name for the keyring.
 let defaultKeyringServiceName = "cosmos"
 
@@ -7,7 +9,7 @@ public class Configuration: Sealable {
 //    fullFundraiserPath  string
     var bech32AddressPrefix: [String: String]
 //    txEncoder           TxEncoder
-//    addressVerifier     func([]byte) error
+    public var addressVerifier: ((Data) throws -> Void)?
 //    mtx                 sync.RWMutex
 //    coinType            uint32
     var sealed: Bool = false

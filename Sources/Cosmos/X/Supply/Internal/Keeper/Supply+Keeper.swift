@@ -27,4 +27,15 @@ public struct SupplyKeeper {
         self.bankKeeper = bankKeeper
         self.permissionAddresses = permissionAddresses
     }
+    
+    // GetSupply retrieves the Supply from store
+    func supply(request: Request) -> Supply {
+        let store = request.keyValueStore(key: storeKey)
+        
+        guard let data = store.get(key: SupplyKeys.supplyKey) else {
+            fatalError("stored supply should not have been nil")
+        }
+        
+        return codec.mustUnmarshalBinaryLengthPrefixed(data: data)
+    }
 }

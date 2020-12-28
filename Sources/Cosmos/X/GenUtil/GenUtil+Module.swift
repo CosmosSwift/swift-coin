@@ -37,38 +37,6 @@ public final class GenUtilAppModule: GenUtilAppModuleBasic, AppModule {
 //        self.deliverTx = deliverTx
         super.init()
     }
-    
-    // TODO: Implement all these
-    // registers
-    public func register(invariants: InvariantRegistry) {
-        fatalError()
-    }
-
-    // routes
-    public var route: String {
-        fatalError()
-    }
-
-    public func makeHandler() -> Handler {
-        fatalError()
-    }
-    
-    public var querierRoute: String {
-        fatalError()
-    }
-    
-    public func makeQuerier() -> Querier {
-        fatalError()
-    }
-
-    // ABCI
-    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {
-        fatalError()
-    }
-    
-    public func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> [ValidatorUpdate] {
-        fatalError()
-    }
 
     // InitGenesis performs genesis initialization for the genutil module. It returns
     // no validator updates.

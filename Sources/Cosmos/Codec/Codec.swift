@@ -81,6 +81,15 @@ public class Codec {
         }
     }
     
+    public func mustUnmarshalBinaryLengthPrefixed<T: Decodable>(data: Data) -> T {
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+
+    
     // MustMarshalJSONIndent executes MarshalJSONIndent except it fatal errors upon failure.
     public func mustMarshalJSONIndent<T: Encodable>(value: T) -> Data {
         do {

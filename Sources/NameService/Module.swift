@@ -79,15 +79,15 @@ public struct NameServiceAppModule: AppModule {
     }
     
     // RegisterInvariants registers the nameservice module invariants.
-    public func register(invariants: InvariantRegistry) {}
-    
+    public func registerInvariants(in invariantRegistry: InvariantRegistry) {}
+
     // Route returns the message routing key for the nameservice module.
     public var route: String {
         NameServiceKeys.routerKey
     }
     
     // NewHandler returns an sdk.Handler for the nameservice module.
-    public func makeHandler() -> Handler {
+    public func makeHandler() -> Handler? {
         keeper.makeHandler()
     }
     
@@ -97,7 +97,7 @@ public struct NameServiceAppModule: AppModule {
     }
     
     // NewQuerierHandler returns the nameservice module sdk.Querier.
-    public func makeQuerier() -> Querier {
+    public func makeQuerier() -> Querier? {
         keeper.makeQuerier()
     }
     

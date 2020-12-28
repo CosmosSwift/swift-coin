@@ -15,12 +15,12 @@ public protocol Message: Codable {
     func validateBasic() throws
 
     // Get the canonical byte representation of the Msg.
-    func getSignBytes() -> Data
+    var signedData: Data { get }
 
     // Returns the addresses of signers that must sign.
     // CONTRACT: All signatures must be present to be valid.
     // CONTRACT: Returns addrs in some deterministic order.
-    func getSigners() -> [AccountAddress]
+    var signers: [AccountAddress] { get }
 }
 
 //__________________________________________________________

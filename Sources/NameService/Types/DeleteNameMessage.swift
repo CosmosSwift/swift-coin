@@ -20,11 +20,11 @@ extension DeleteNameMessage: Message {
         "delete_name"
     }
 
-    func getSigners() -> [AccountAddress] {
+    var signers: [AccountAddress] {
         [owner]
     }
 
-    func getSignBytes() -> Data {
+    var signedData: Data {
         mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
     }
 

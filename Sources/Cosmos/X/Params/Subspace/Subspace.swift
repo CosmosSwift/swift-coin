@@ -59,5 +59,28 @@ public struct Subspace {
 
         return copy
     }
+    
+    // Returns a KVStore identical with ctx.KVStore(s.key).Prefix()
+    func keyValueStore(request: Request) -> KeyValueStore {
+        // append here is safe, appends within a function won't cause
+        // weird side effects when its singlethreaded
+        PrefixStore(
+            parent: request.keyValueStore(key: key),
+            prefix: name + "/".data
+        )
+    }
 
+    // Get queries for a parameter by key from the Subspace's KVStore and sets the
+    // value to the provided pointer. If the value does not exist, it will panic.
+    func get<T: Decodable>(request: Request, key: Data) -> T {
+        let store = keyValueStore(request: request)
+        // TODO: Check this force unwrap!
+        let data = store.get(key: key)!
+
+        do {
+            return try codec.unmarshalJSON(data: data)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
 }

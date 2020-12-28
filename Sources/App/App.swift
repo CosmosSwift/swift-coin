@@ -155,12 +155,12 @@ public final class NameServiceApp: BaseApp, App {
         )
 
         self.moduleManager.setOrderInitGenesis(
-            StakingKeys.moduleName,
+//            StakingKeys.moduleName,
             AuthKeys.moduleName,
             BankKeys.moduleName,
             NameServiceKeys.moduleName,
-            SupplyKeys.moduleName,
-            GenUtilKeys.moduleName
+//            SupplyKeys.moduleName,
+                GenUtilKeys.moduleName
         )
 
         self.moduleManager.registerRoutes(
@@ -219,7 +219,7 @@ extension NameServiceApp {
         var moduleAccountAddresses: [String: Bool] = [:]
         
         for (permission, _) in moduleAccountPermissions {
-            moduleAccountAddresses[Supply.moduleAddress(name: permission).string] = true
+            moduleAccountAddresses[ModuleAccount.moduleAddress(name: permission).description] = true
         }
         
         return moduleAccountAddresses

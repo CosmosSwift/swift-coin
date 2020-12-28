@@ -13,7 +13,17 @@ struct PermissionsForAddress {
     
     init(name: String, permissions: [String]) {
         self.permissions = permissions
-        self.address = Supply.moduleAddress(name: name)
+        self.address = ModuleAccount.moduleAddress(name: name)
     }
 }
 
+extension SupplyPermissions {
+    // performs basic permission validation
+    static func validate(permissions: [String]) throws {
+        for permission in permissions {
+            guard !permission.trimmingCharacters(in: .whitespaces).isEmpty else {
+                throw Cosmos.Error.generic(reason: "module permission is empty")
+            }
+        }
+    }
+}

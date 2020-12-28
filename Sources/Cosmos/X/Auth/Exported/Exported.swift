@@ -8,7 +8,7 @@ import Tendermint
 //
 // Many complex conditions can be used in the concrete struct which implements Account.
 // TODO: Renamed from exported.Account to ExportedAccount investigate better name.
-public protocol ExportedAccount: CustomStringConvertible {
+public protocol Account: Codable, CustomStringConvertible {
     var address: AccountAddress { get }
     // errors if already set.
     func set(address: AccountAddress) throws

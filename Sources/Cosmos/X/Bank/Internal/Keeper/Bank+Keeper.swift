@@ -20,7 +20,7 @@ public protocol BankKeeper: SendKeeper {
 public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
     // NewBaseKeeper returns a new BaseKeeper
     public override init(
-        accountKeeper: AccountKeeperProtocol,
+        accountKeeper: AccountKeeper,
         paramSpace: Subspace,
         blacklistedAddresses: [String: Bool]
     ) {
@@ -104,19 +104,21 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
         fatalError()
     }
     
-    public func getSendEnabled(request: Request) -> Bool {
-        // TODO: Implement
-        fatalError()
+    // GetSendEnabled returns the current SendEnabled
+    public func isSendEnabled(request: Request) -> Bool {
+        paramSpace.get(
+            request: request,
+            key: KeyTable.paramStoreKeySendEnabled
+        )
     }
-    
+   
     public func setSendEnabled(request: Request, enabled: Bool) {
         // TODO: Implement
         fatalError()
     }
     
-    public func blacklistedAddress(address: AccountAddress) -> Bool {
-        // TODO: Implement
-        fatalError()
+    public func isBlacklisted(address: AccountAddress) -> Bool {
+        blacklistedAddresses[address.description] != nil
     }
     
     public func getCoins(request: Request, address: AccountAddress) -> Coins {
@@ -138,7 +140,7 @@ public class BaseSendKeeper: BaseViewKeeper {
     let blacklistedAddresses: [String: Bool]
     
     init(
-        accountKeeper: AccountKeeperProtocol,
+        accountKeeper: AccountKeeper,
         paramSpace: Subspace,
         blacklistedAddresses: [String: Bool]
     ) {
@@ -148,11 +150,14 @@ public class BaseSendKeeper: BaseViewKeeper {
     }
 }
 
+extension BaseSendKeeper {
+}
+
 // BaseViewKeeper implements a read only keeper implementation of ViewKeeper.
 public class BaseViewKeeper {
-    let accountKeeper: AccountKeeperProtocol
+    let accountKeeper: AccountKeeper
     
-    init(accountKeeper: AccountKeeperProtocol) {
+    init(accountKeeper: AccountKeeper) {
         self.accountKeeper = accountKeeper
     }
 }
@@ -171,10 +176,10 @@ public protocol SendKeeper: ViewKeeper {
     func addCoins(request: Request, address: AccountAddress, amount: Coins) throws -> Coins
     func setCoins(request: Request, address: AccountAddress, amount: Coins) throws
 
-    func getSendEnabled(request: Request) -> Bool
+    func isSendEnabled(request: Request) -> Bool
     func setSendEnabled(request: Request, enabled: Bool)
 
-    func blacklistedAddress(address: AccountAddress) -> Bool
+    func isBlacklisted(address: AccountAddress) -> Bool
 }
 
 // ViewKeeper defines a module interface that facilitates read only access to

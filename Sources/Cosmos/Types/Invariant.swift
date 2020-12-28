@@ -5,16 +5,14 @@
 public typealias Invariant = (_ request: Request) -> (String, Bool)
 
 // Invariants defines a group of invariants
-typealias Variants = [Invariant]
+typealias Invariants = [Invariant]
 
 // expected interface for registering invariants
 public protocol InvariantRegistry  {
     func registerRoute(moduleName: String, route: String, invariant: Invariant)
 }
 
-extension InvariantRegistry {
-    // FormatInvariant returns a standardized invariant message.
-    static func formatInvariant(module: String, name: String, message: String) -> String {
-        "\(module): \(name) invariant\n\(message)\n"
-    }
+// FormatInvariant returns a standardized invariant message.
+func formatInvariant(module: String, name: String, message: String) -> String {
+    "\(module): \(name) invariant\n\(message)\n"
 }

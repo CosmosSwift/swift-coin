@@ -97,17 +97,40 @@ public protocol AppModuleGenesis: AppModuleBasic {
 // AppModule is the standard form for an application module
 public protocol AppModule: AppModuleGenesis {
     // registers
-    func register(invariants: InvariantRegistry)
+    func registerInvariants(in invariantRegistry: InvariantRegistry)
 
     // routes
     var route: String { get }
-    func makeHandler() -> Handler
+    func makeHandler() -> Handler?
     var querierRoute: String { get }
-    func makeQuerier() -> Querier
+    func makeQuerier() -> Querier?
 
     // ABCI
     func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock)
     func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> [ValidatorUpdate]
+}
+
+public extension AppModule {
+    // RegisterInvariants is a placeholder function register no invariants
+    func registerInvariants(in invariantRegistry: InvariantRegistry) {}
+
+    // Route empty module message route
+    var route: String { "" }
+
+    // NewHandler returns an empty module handler
+    func makeHandler() -> Handler? { nil }
+
+    // QuerierRoute returns an empty module querier route
+    var querierRoute: String { "" }
+
+    // NewQuerierHandler returns an empty module querier
+    func makeQuerier() -> Querier? { nil }
+
+    // BeginBlock returns an empty module begin-block
+    func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {}
+
+    // EndBlock returns an empty module end-block
+    func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> [ValidatorUpdate] { [] }
 }
 
 //____________________________________________________________________________
@@ -161,16 +184,15 @@ public class ModuleManager {
 
     // RegisterRoutes registers all module routes and module querier routes
     public func registerRoutes(router: Router, queryRouter: QueryRouter) {
-        // TODO: Implement
-        fatalError()
-//        for _, module := range m.Modules {
-//            if module.Route() != "" {
-//                router.AddRoute(module.Route(), module.NewHandler())
-//            }
-//            if module.QuerierRoute() != "" {
-//                queryRouter.AddRoute(module.QuerierRoute(), module.NewQuerierHandler())
-//            }
-//        }
+        for (_, module) in modules {
+            if !module.route.isEmpty, let handler = module.makeHandler() {
+                router.addRoute(path: module.route, handler: handler)
+            }
+            
+            if !module.querierRoute.isEmpty, let querier = module.makeQuerier() {
+                queryRouter.addRoute(path: module.querierRoute, querier: querier)
+            }
+        }
     }
 
     // InitGenesis performs init genesis functionality for modules

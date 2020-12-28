@@ -27,26 +27,26 @@ extension BuyNameMessage: Message {
 
     // ValidateBasic runs stateless checks on the message
     func validateBasic() throws {
-        if buyer.isEmpty{
-            throw Cosmos.Error.invalidAddress(address: buyer.string)
+        guard !buyer.isEmpty else {
+            throw Cosmos.Error.invalidAddress(address: buyer.description)
         }
         
-        if name.isEmpty {
+        guard !name.isEmpty else {
             throw Cosmos.Error.unknownRequest(reason: "Name cannot be empty")
         }
         
-        if !bid.isAllPositive {
+        guard bid.isAllPositive else {
             throw Cosmos.Error.insufficientFunds(reason: "")
         }
     }
 
     // GetSignBytes encodes the message for signing
-    func getSignBytes() -> Data {
+    var signedData: Data {
         mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
     }
 
     // GetSigners defines whose signature is required
-    func getSigners() -> [AccountAddress] {
+    var signers: [AccountAddress] {
         [buyer]
     }
 }

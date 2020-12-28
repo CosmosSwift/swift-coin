@@ -11,5 +11,5 @@ func handleDeleteNameMessage(request: Request, keeper: NameServiceKeeper, messag
     }
 
     keeper.deleteWhois(request: request, key: message.name)
-    return .success
+    return Result()
 }
