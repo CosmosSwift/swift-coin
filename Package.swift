@@ -75,6 +75,7 @@ let package = Package(
             dependencies: [
                 .target(name: "Bech32"),
                 .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(name: "Bech32"),
