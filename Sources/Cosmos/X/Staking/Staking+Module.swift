@@ -47,20 +47,19 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
 
     // routes
     public var route: String {
-        
-        fatalError()
+        StakingKeys.routerKey
     }
 
     public func makeHandler() -> Handler? {
-        fatalError()
+        keeper.makeHandler()
     }
     
     public var querierRoute: String {
-        fatalError()
+        StakingKeys.querierRoute
     }
     
     public func makeQuerier() -> Querier? {
-        fatalError()
+        keeper.makeQuerier()
     }
 
     // ABCI

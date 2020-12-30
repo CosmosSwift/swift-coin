@@ -16,11 +16,52 @@ public protocol GasMeter {
     var gasConsumed: Gas { get }
     var gasConsumedToLimit: Gas { get }
     var limit: Gas { get }
-    mutating func consumeGas(amount: Gas, descriptor: String)
+    mutating func consumeGas(amount: Gas, descriptor: String) throws
     var isPastLimit: Bool { get }
     var isOutOfGas: Bool { get }
 }
 
+struct BasicGasMeter: GasMeter {
+    let limit: Gas
+    var gasConsumed: Gas
+    
+    // NewGasMeter returns a reference to a new basicGasMeter.
+    init(limit: Gas) {
+        self.limit = limit
+        self.gasConsumed = 0
+    }
+
+    var gasConsumedToLimit: Gas {
+        if isPastLimit {
+            return limit
+        }
+        
+        return gasConsumed
+    }
+
+    mutating func consumeGas(amount: Gas, descriptor: String) throws {
+        // TODO: Should we set the consumed field after overflow checking?
+        let (consumed, overflow) = gasConsumed.addingReportingOverflow(amount)
+
+        if overflow {
+            throw Cosmos.Error.gasOverflow(descriptor: descriptor)
+        }
+
+        if gasConsumed > limit {
+            throw Cosmos.Error.outOfGas(descriptor: descriptor)
+        }
+        
+        self.gasConsumed = consumed
+    }
+
+    var isPastLimit: Bool {
+        gasConsumed > limit
+    }
+
+    var isOutOfGas: Bool {
+        gasConsumed >= limit
+    }
+}
 
 // GasConfig defines gas cost for each operation on KVStores
 struct GasConfiguration {
@@ -47,6 +88,8 @@ extension GasConfiguration {
         )
     }
 }
+
+
 
 struct InfiniteGasMeter: GasMeter {
     var consumed: Gas

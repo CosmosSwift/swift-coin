@@ -1,4 +1,12 @@
-struct State {
+final class State {
     let multiStore: CacheMultiStore
-    let request: Request
+    var request: Request
+   
+    init(
+        multiStore: CacheMultiStore,
+        request: Request
+    ) {
+        self.multiStore = multiStore
+        self.request = request
+    }
 }

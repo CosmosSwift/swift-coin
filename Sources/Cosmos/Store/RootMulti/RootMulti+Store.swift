@@ -7,8 +7,11 @@ import Database
 final class RootMultiStore: CommitMultiStore {
     static let latestVersionKey = "s/latest"
     static let pruneHeightsKey  = "s/pruneheights"
+    
     // s/<version>
-    static let commitInfoKeyFormat = "s/%d"
+    static func commitInfoKey(version: Int64) -> String {
+        "s/\(version)"
+    }
 
     let database: Database
     var lastCommitInfo: CommitInfo? = nil
@@ -18,17 +21,13 @@ final class RootMultiStore: CommitMultiStore {
     // LoadLatestVersion performs a no-op as the stores aren't mounted yet.
     var pruningOptions: PruningOptions
     
-//    let storesParameters: [StoreKey: StoreParameters]
-    // TODO: Investigate if we should really use StoreKey as the dictionary key.
-    var storesParameters: [String: StoreParameters]
-//    let stores: [StoreKey: CommitKeyValueStore]
-    // TODO: Investigate if we should really use StoreKey as the dictionary key.
-    let stores: [String: CommitKeyValueStore]
+    var storesParameters: [StoreKey: StoreParameters]
+    var stores: [StoreKey: CommitKeyValueStore]
     var keysByName: [String: StoreKey]
     
     // SetLazyLoading sets if the iavl store should be loaded lazily or not
     var isLazyLoadingEnabled: Bool = false
-    let pruneHeights: [Int64]
+    var pruneHeights: [Int64]
 
     var traceWriter:  Writer?
     var traceContext: TraceContext = [:]
@@ -54,10 +53,8 @@ final class RootMultiStore: CommitMultiStore {
     }
 
     // Implements CommitMultiStore.
-    func mountStoreWithDatabase(key: StoreKey, type: StoreType, database: Database) {
-        // TODO: We're using key.name here to index the dictionary because StoreKey is not Hashable
-        // and we couldn't use it as storeParameters key.
-        if storesParameters[key.name] != nil {
+    func mountStoreWithDatabase(key: StoreKey, type: StoreType, database: Database?) {
+        if storesParameters[key] != nil {
             fatalError("Store duplicate store key \(key)")
         }
         
@@ -65,9 +62,7 @@ final class RootMultiStore: CommitMultiStore {
            fatalError("Store duplicate store key name \(key)")
         }
         
-        // TODO: We're using key.name here to index the dictionary because StoreKey is not Hashable
-        // and we couldn't use it as storeParameters key.
-        storesParameters[key.name] = StoreParameters(
+        storesParameters[key] = StoreParameters(
             key: key,
             database: database,
             type: type
@@ -93,9 +88,8 @@ final class RootMultiStore: CommitMultiStore {
                 return store
             }
         }
-        // TODO: We're using key.name here to index the dictionary because StoreKey is not Hashable
-        // and we couldn't use it as storeParameters key.
-        return stores[key.name]
+        
+        return stores[key]
     }
     
     // LoadLatestVersionAndUpgrade implements CommitMultiStore
@@ -121,69 +115,88 @@ final class RootMultiStore: CommitMultiStore {
     }
     
     func loadVersion(version: Int64, upgrades: StoreUpgrades?) throws {
-        fatalError()
-//        infos := make(map[string]storeInfo)
-//        var cInfo commitInfo
-//
-//        // load old data if we are not version 0
-//        if ver != 0 {
-//            var err error
-//            cInfo, err = getCommitInfo(rs.db, ver)
-//            if err != nil {
-//                return err
-//            }
-//
-//            // convert StoreInfos slice to map
-//            for _, storeInfo := range cInfo.StoreInfos {
-//                infos[storeInfo.Name] = storeInfo
-//            }
-//        }
-//
-//        // load each Store (note this doesn't panic on unmounted keys now)
-//        var newStores = make(map[types.StoreKey]types.CommitKVStore)
-//        for key, storeParams := range rs.storesParams {
-//            // Load it
-//            store, err := rs.loadCommitStoreFromParams(key, rs.getCommitID(infos, key.Name()), storeParams)
-//            if err != nil {
-//                return fmt.Errorf("failed to load Store: %v", err)
-//            }
-//            newStores[key] = store
-//
-//            // If it was deleted, remove all data
-//            if upgrades.IsDeleted(key.Name()) {
-//                if err := deleteKVStore(store.(types.KVStore)); err != nil {
-//                    return fmt.Errorf("failed to delete store %s: %v", key.Name(), err)
-//                }
-//            } else if oldName := upgrades.RenamedFrom(key.Name()); oldName != "" {
-//                // handle renames specially
-//                // make an unregistered key to satify loadCommitStore params
-//                oldKey := types.NewKVStoreKey(oldName)
-//                oldParams := storeParams
-//                oldParams.key = oldKey
-//
-//                // load from the old name
-//                oldStore, err := rs.loadCommitStoreFromParams(oldKey, rs.getCommitID(infos, oldName), oldParams)
-//                if err != nil {
-//                    return fmt.Errorf("failed to load old Store '%s': %v", oldName, err)
-//                }
-//
-//                // move all data
-//                if err := moveKVStoreData(oldStore.(types.KVStore), store.(types.KVStore)); err != nil {
-//                    return fmt.Errorf("failed to move store %s -> %s: %v", oldName, key.Name(), err)
-//                }
-//            }
-//        }
-//
-//        rs.lastCommitInfo = cInfo
-//        rs.stores = newStores
-//
-//        // load any pruned heights we missed from disk to be pruned on the next run
-//        ph, err := getPruningHeights(rs.db)
-//        if err == nil && len(ph) > 0 {
-//            rs.pruneHeights = ph
-//        }
-//
-//        return nil
+        var infos: [String: StoreInfo] = [:]
+        var commitInfo: CommitInfo?
+
+        // load old data if we are not version 0
+        if version != 0 {
+            let ci = try Self.commitInfo(database: database, version: version)
+
+            // convert StoreInfos slice to map
+            for storeInfo in ci.storeInfos {
+                infos[storeInfo.name] = storeInfo
+            }
+            
+            commitInfo = ci
+        }
+
+        // load each Store (note this doesn't panic on unmounted keys now)
+        var newStores: [StoreKey: CommitKeyValueStore] = [:]
+        
+        for (key, storeParameters) in storesParameters {
+            // Load it
+            do {
+                let store = try loadCommitStoreFromParameters(
+                    key: key,
+                    id: commitID(infos: infos, name: key.name),
+                    parameters: storeParameters
+                )
+                
+                newStores[key] = store
+
+                // If it was deleted, remove all data
+                if upgrades?.isDeleted(keyName: key.name) ?? false {
+                    do {
+                        try delete(keyValueStore: store)
+                    } catch {
+                        throw Cosmos.Error.generic(reason: "failed to delete store \(key.name): \(error)")
+                    }
+                } else if let oldName = upgrades?.renamedFrom(keyName: key.name) {
+                    // handle renames specially
+                    // make an unregistered key to satify loadCommitStore params
+                    let oldKey = KeyValueStoreKey(name: oldName)
+                    var oldParameters = storeParameters
+                    oldParameters.key = oldKey
+
+                    // load from the old name
+                    do {
+                        let oldStore = try loadCommitStoreFromParameters(
+                            key: oldKey,
+                            id: commitID(infos: infos, name: oldName),
+                            parameters: oldParameters
+                        )
+                        
+                        // move all data
+                        do {
+                            try moveKeyValueStoreData(
+                                oldStore: oldStore,
+                                newStore: store
+                            )
+                        } catch {
+                            throw Cosmos.Error.generic(reason: "failed to move store \(oldName) -> \(key.name): \(error)")
+                        }
+                    } catch {
+                        throw Cosmos.Error.generic(reason: "failed to load old Store '\(oldName)': \(error)")
+                    }
+                }
+            } catch {
+                throw Cosmos.Error.generic(reason: "failed to load Store: \(error)")
+            }
+        }
+
+        self.lastCommitInfo = commitInfo
+        self.stores = newStores
+
+        // load any pruned heights we missed from disk to be pruned on the next run
+        guard let pruneHeights = try? RootMultiStore.pruneHeights(database: self.database) else {
+            return
+        }
+        
+        guard !pruneHeights.isEmpty else {
+            return
+        }
+        
+        self.pruneHeights = pruneHeights
     }
 
     func commitID(infos: [String: StoreInfo], name: String) -> CommitID {
@@ -194,6 +207,48 @@ final class RootMultiStore: CommitMultiStore {
         return info.core.commitID
     }
     
+    func delete(keyValueStore: KeyValueStore) throws {
+        // Note that we cannot write while iterating, so load all keys here, delete below
+        var keys: [Data] = []
+        var iterator = keyValueStore.iterator(start: nil, end: nil)
+        
+        while iterator.isValid {
+            defer {
+                iterator.next()
+            }
+            
+            keys.append(iterator.key)
+        }
+        
+        iterator.close()
+
+        for key in keys {
+            keyValueStore.delete(key: key)
+        }
+    }
+    
+    // we simulate move by a copy and delete
+    func moveKeyValueStoreData(
+        oldStore: KeyValueStore,
+        newStore: KeyValueStore
+    ) throws {
+        // we read from one and write to another
+        var iterator = oldStore.iterator(start: nil, end: nil)
+        
+        while iterator.isValid {
+            defer {
+                iterator.next()
+            }
+            
+            newStore.set(key: iterator.key, value: iterator.value)
+        }
+        
+        iterator.close()
+
+        // then delete the old store
+        try delete(keyValueStore: oldStore)
+    }
+
     // SetInterBlockCache sets the Store's internal inter-block (persistent) cache.
     // When this is defined, all CommitKVStores will be wrapped with their respective
     // inter-block cache.
@@ -233,9 +288,9 @@ final class RootMultiStore: CommitMultiStore {
     // +CommitStore
 
     // Implements Committer/CommitStore.
-    func lastCommitID() -> CommitID {
+    var lastCommitID: CommitID? {
         // TODO: Check this force unwrap
-        lastCommitInfo!.commitID
+        lastCommitInfo?.commitID
     }
 
     // Implements Committer/CommitStore.
@@ -373,8 +428,7 @@ final class RootMultiStore: CommitMultiStore {
     // NOTE: The returned KVStore may be wrapped in an inter-block cache if it is
     // set on the root store.
     func keyValueStore(key: StoreKey) -> KeyValueStore {
-        // TODO: Create a hash in StoreKey and use it instead of name.
-        let store = stores[key.name]
+        let store = stores[key]
 
         // TODO: Implement
 //        if isTracingEnabled {
@@ -398,31 +452,59 @@ final class RootMultiStore: CommitMultiStore {
 //        return rs.GetCommitKVStore(key)
 //    }
 
+    func loadCommitStoreFromParameters(
+        key: StoreKey,
+        id: CommitID,
+        parameters: StoreParameters
+    ) throws -> CommitKeyValueStore {
+        let database: Database
 
-    //----------------------------------------
-    // Misc.
-    
-    static let codec = Codec()
+        if let parametersDatabase = parameters.database {
+            database = PrefixDatabase(prefix: "s/_/".data, database: parametersDatabase)
+        } else {
+            let prefix = "s/k:" + parameters.key.name + "/"
+            database = PrefixDatabase(prefix: prefix.data, database: self.database)
+        }
 
-    static func latestVersion(database: Database)  -> Int64 {
-        do {
-            guard let latestBytes = try database.get(key: latestVersionKey.data) else {
-                return 0
+        switch parameters.type {
+        case .multi:
+            fatalError("recursive MultiStores not yet supported")
+        case .iavlTree:
+            var store: CommitKeyValueStore = try IAVLStore(
+                database: database,
+                commitId: id,
+                isLazyLoadingEnabled: isLazyLoadingEnabled
+            )
+
+            if let cache = interBlockCache {
+                // Wrap and get a CommitKVStore with inter-block caching. Note, this should
+                // only wrap the primary CommitKVStore, not any store that is already
+                // cache-wrapped as that will create unexpected behavior.
+                store = cache.storeCache(key: key, store: store)
             }
-            
-            return try codec.unmarshalBinaryLengthPrefixed(data: latestBytes)
-        } catch {
-            fatalError("\(error)")
+
+            return store
+        case .database:
+            return CommitDatabaseAdapterStore(database: database)
+        case .transient:
+            guard key is TransientStoreKey else {
+                throw Cosmos.Error.generic(reason: "invalid StoreKey for StoreTypeTransient: \(key.description)")
+            }
+
+            return TransientStore()
+        default:
+            fatalError("unrecognized store type \(parameters.type)")
         }
     }
+
 }
 
 //----------------------------------------
 // storeParams
 
 struct StoreParameters {
-    let key: StoreKey
-    let database: Database
+    var key: StoreKey
+    let database: Database?
     let type: StoreType
 }
 
@@ -431,7 +513,7 @@ struct StoreParameters {
 // commitInfo
 
 // NOTE: Keep commitInfo a simple immutable struct.
-struct CommitInfo {
+struct CommitInfo: Codable {
     // Version
     let version: Int64
 
@@ -462,13 +544,124 @@ struct CommitInfo {
 // storeInfo contains the name and core reference for an
 // underlying store.  It is the leaf of the Stores top
 // level simple merkle tree.
-struct StoreInfo {
+struct StoreInfo: Codable {
     let name: String
     let core: StoreCore
 }
 
-struct StoreCore {
+struct StoreCore: Codable {
     // StoreType StoreType
     let commitID: CommitID
     // ... maybe add more state
+}
+
+//----------------------------------------
+// Misc.
+
+extension RootMultiStore {
+    static let codec = Codec()
+
+    static func latestVersion(database: Database)  -> Int64 {
+        do {
+            guard let latestBytes = try database.get(key: latestVersionKey.data) else {
+                return 0
+            }
+            
+            return try codec.unmarshalBinaryLengthPrefixed(data: latestBytes)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+    
+    //// Commits each store and returns a new commitInfo.
+    //func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore) commitInfo {
+    //    storeInfos := make([]storeInfo, 0, len(storeMap))
+    //
+    //    for key, store := range storeMap {
+    //        commitID := store.Commit()
+    //
+    //        if store.GetStoreType() == types.StoreTypeTransient {
+    //            continue
+    //        }
+    //
+    //        si := storeInfo{}
+    //        si.Name = key.Name()
+    //        si.Core.CommitID = commitID
+    //        storeInfos = append(storeInfos, si)
+    //    }
+    //
+    //    return commitInfo{
+    //        Version:    version,
+    //        StoreInfos: storeInfos,
+    //    }
+    //}
+
+    // Gets commitInfo from disk.
+    static func commitInfo(database: Database, version: Int64) throws -> CommitInfo {
+        let commitInfoKey = self.commitInfoKey(version: version)
+        
+        do {
+            guard let commitInfoData = try database.get(key: commitInfoKey.data) else {
+                throw Cosmos.Error.generic(reason: "failed to get commit info: no data")
+            }
+                
+            do {
+                return try codec.unmarshalBinaryLengthPrefixed(data: commitInfoData)
+            } catch {
+                throw Cosmos.Error.generic(reason: "failed to get Store: \(error)")
+            }
+            
+        } catch {
+            throw Cosmos.Error.generic(reason: "failed to get commit info: \(error)")
+        }
+    }
+
+    //func setCommitInfo(batch dbm.Batch, version int64, cInfo commitInfo) {
+    //    cInfoBytes := cdc.MustMarshalBinaryLengthPrefixed(cInfo)
+    //    cInfoKey := fmt.Sprintf(commitInfoKeyFmt, version)
+    //    batch.Set([]byte(cInfoKey), cInfoBytes)
+    //}
+    //
+    //func setLatestVersion(batch dbm.Batch, version int64) {
+    //    latestBytes := cdc.MustMarshalBinaryLengthPrefixed(version)
+    //    batch.Set([]byte(latestVersionKey), latestBytes)
+    //}
+    //
+    //func setPruningHeights(batch dbm.Batch, pruneHeights []int64) {
+    //    bz := cdc.MustMarshalBinaryBare(pruneHeights)
+    //    batch.Set([]byte(pruneHeightsKey), bz)
+    //}
+    
+    static func pruneHeights(database: Database) throws -> [Int64] {
+        let rawData: Data?
+        
+        do {
+            rawData = try database.get(key: pruneHeightsKey.data)
+        } catch {
+            throw Cosmos.Error.generic(reason: "failed to get pruned heights: \(error)")
+        }
+        
+        guard let data = rawData, !data.isEmpty else {
+            throw Cosmos.Error.generic(reason: "no pruned heights found")
+        }
+        
+        do {
+            return try codec.unmarshalBinaryBare(data: data)
+        } catch {
+            throw Cosmos.Error.generic(reason: "failed to unmarshal pruned heights: \(error)")
+        }
+    }
+    
+    //func flushMetadata(db dbm.DB, version int64, cInfo commitInfo, pruneHeights []int64) {
+    //    batch := db.NewBatch()
+    //    defer batch.Close()
+    //
+    //    setCommitInfo(batch, version, cInfo)
+    //    setLatestVersion(batch, version)
+    //    setPruningHeights(batch, pruneHeights)
+    //
+    //    if err := batch.Write(); err != nil {
+    //        panic(fmt.Errorf("error on batch write %w", err))
+    //    }
+    //}
 }

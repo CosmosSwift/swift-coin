@@ -24,32 +24,32 @@ extension GasKeyValueStore: KeyValueStore {
 
     // Implements KVStore.
     func get(key: Data) -> Data? {
-        gasMeter.consumeGas(amount: gasConfiguration.readCostFlat, descriptor: gasReadCostFlatDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.readCostFlat, descriptor: gasReadCostFlatDescriptor)
         let value = parent.get(key: key)
         // TODO overflow-safe math?
-        gasMeter.consumeGas(amount: gasConfiguration.readCostPerByte * Gas(value?.count ?? 0), descriptor: gasReadPerByteDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.readCostPerByte * Gas(value?.count ?? 0), descriptor: gasReadPerByteDescriptor)
         return value
     }
     
     // Implements KVStore.
     func set(key: Data, value: Data) {
         assertValid(value: value)
-        gasMeter.consumeGas(amount: gasConfiguration.writeCostFlat, descriptor: gasWriteCostFlatDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.writeCostFlat, descriptor: gasWriteCostFlatDescriptor)
         // TODO overflow-safe math?
-        gasMeter.consumeGas(amount: gasConfiguration.writeCostPerByte * Gas(value.count), descriptor: gasWritePerByteDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.writeCostPerByte * Gas(value.count), descriptor: gasWritePerByteDescriptor)
         parent.set(key: key, value: value)
     }
 
     // Implements KVStore.
     func has(key: Data) -> Bool {
-        gasMeter.consumeGas(amount: gasConfiguration.hasCost, descriptor: gasHasDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.hasCost, descriptor: gasHasDescriptor)
         return parent.has(key: key)
     }
 
     // Implements KVStore.
     func delete(key: Data) {
         // charge gas to prevent certain attack vectors even though space is being freed
-        gasMeter.consumeGas(amount: gasConfiguration.deleteCost, descriptor: gasDeleteDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.deleteCost, descriptor: gasDeleteDescriptor)
         parent.delete(key: key)
     }
 
@@ -155,8 +155,8 @@ struct GasIterator: Iterator {
     // consumeSeekGas consumes a flat gas cost for seeking and a variable gas cost
     // based on the current value's length.
     mutating func consumeSeekGas() {
-        gasMeter.consumeGas(amount: gasConfiguration.readCostPerByte * Gas(value.count), descriptor: gasValuePerByteDescriptor)
-        gasMeter.consumeGas(amount: gasConfiguration.iterationNextCostFlat, descriptor: gasIterNextCostFlatDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.readCostPerByte * Gas(value.count), descriptor: gasValuePerByteDescriptor)
+        try! gasMeter.consumeGas(amount: gasConfiguration.iterationNextCostFlat, descriptor: gasIterNextCostFlatDescriptor)
     }
 
 }

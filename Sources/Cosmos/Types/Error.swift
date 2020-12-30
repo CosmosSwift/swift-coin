@@ -19,4 +19,6 @@ public enum Error: Swift.Error {
     case noInputs
     case noOutputs
     case inputOutputMismatch
+    case gasOverflow(descriptor: String)
+    case outOfGas(descriptor: String)
 }

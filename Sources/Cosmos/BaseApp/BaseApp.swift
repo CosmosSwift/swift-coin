@@ -93,6 +93,8 @@ open class BaseApp: Sealable {
 
     // The minimum gas prices a validator is willing to accept for processing a
     // transaction. This is mainly used for DoS and spam prevention.
+    // TODO: Maybe make minGasPrices start with empty coins
+    // instead of being nil
     var minGasPrices: DecimalCoins? = nil
 
     // flag for sealing options and parameters to a BaseApp
@@ -143,39 +145,41 @@ open class BaseApp: Sealable {
     // MountStores mounts all IAVL or DB stores to the provided keys in the BaseApp
     // multistore.
     public func mountKeyValueStores(keys: [String: KeyValueStoreKey]) {
-        // TODO: Implement
-        fatalError()
-//        for _, key := range keys {
-//            if !app.fauxMerkleMode {
-//                app.MountStore(key, sdk.StoreTypeIAVL)
-//            } else {
-//                // StoreTypeDB doesn't do anything upon commit, and it doesn't
-//                // retain history, but it's useful for faster simulation.
-//                app.MountStore(key, sdk.StoreTypeDB)
-//            }
-//        }
+        for key in keys.values {
+            if fauxMerkleMode {
+                // StoreTypeDB doesn't do anything upon commit, and it doesn't
+                // retain history, but it's useful for faster simulation.
+                mountStore(key: key, type: .database)
+            } else {
+                mountStore(key: key, type: .iavlTree)
+            }
+        }
     }
     
     // MountStores mounts all IAVL or DB stores to the provided keys in the BaseApp
     // multistore.
     public func mountTransientStores(keys: [String: TransientStoreKey]) {
-        // TODO: Implement
-        fatalError()
-//        for _, key := range keys {
-//            app.MountStore(key, sdk.StoreTypeTransient)
-//        }
+        for key in keys.values {
+            mountStore(key: key, type: .transient)
+        }
     }
+    
+    // MountStore mounts a store to the provided key in the BaseApp multistore,
+    // using the default DB.
+    func mountStore(key: StoreKey, type: StoreType) {
+        commitMultiStore.mountStoreWithDatabase(
+            key: key,
+            type: type,
+            database: nil
+        )
+    }
+
     
     // LoadLatestVersion loads the latest application version. It will panic if
     // called more than once on a running BaseApp.
     public func loadLatestVersion(baseKey: KeyValueStoreKey) throws {
-        // TODO: Implement
-        fatalError()
-//        err := app.storeLoader(app.cms)
-//        if err != nil {
-//            return err
-//        }
-//        return app.initFromMainStore(baseKey)
+        try storeLoader(commitMultiStore)
+        try initFromMainStore(baseKey: baseKey)
     }
 
 
@@ -191,6 +195,12 @@ open class BaseApp: Sealable {
         try commitMultiStore.load(version: version)
         try initFromMainStore(baseKey: baseKey)
     }
+    
+    // LastBlockHeight returns the last committed block height.
+    var lastBlockHeight: Int64? {
+        commitMultiStore.lastCommitID?.version
+    }
+
     
     // initializes the remaining logic from app.cms
     func initFromMainStore(baseKey: KeyValueStoreKey) throws {
@@ -249,4 +259,107 @@ open class BaseApp: Sealable {
     func seal() {
         sealed = true
     }
+    
+    // setCheckState sets the BaseApp's checkState with a cache-wrapped multi-store
+    // (i.e. a CacheMultiStore) and a new Context with the cache-wrapped multi-store,
+    // provided header, and minimum gas prices set. It is set on InitChain and reset
+    // on Commit.
+    func set(checkState header: Header) {
+        let multiStore = commitMultiStore.cacheMultiStore
+        
+        var request = Request(
+            multiStore: multiStore,
+            header: header,
+            isCheckTransaction: true,
+            logger: logger
+        )
+       
+        if let minGasPrices = self.minGasPrices {
+            request.minGasPrices = minGasPrices
+        }
+
+        checkState = State(
+            multiStore: multiStore,
+            request: request
+        )
+    }
+
+    
+    // setDeliverState sets the BaseApp's deliverState with a cache-wrapped multi-store
+    // (i.e. a CacheMultiStore) and a new Context with the cache-wrapped multi-store,
+    // and provided header. It is set on InitChain and BeginBlock and set to nil on
+    // Commit.
+    func set(deliverState header: Header) {
+        let multiStore = commitMultiStore.cacheMultiStore
+        
+        deliverState = State(
+            multiStore: multiStore,
+            request: Request(
+                multiStore: multiStore,
+                header: header,
+                isCheckTransaction: false,
+                logger: logger
+            )
+        )
+    }
+
+    // setConsensusParams memoizes the consensus params.
+    func set(consensusParams: ConsensusParams) {
+        self.consensusParams = consensusParams
+    }
+
+    // setConsensusParams stores the consensus params to the main store.
+    func store(consensusParams: ConsensusParams) {
+        let consensusParamsData: Data
+        
+        do {
+            // TODO: Protobuf was used here.
+            // Maybe just JSON takes care of it
+            consensusParamsData = try JSONEncoder().encode(consensusParams)
+        } catch {
+            fatalError("\(error)")
+        }
+        
+        guard let baseKey = self.baseKey else {
+            fatalError("baseKey not set")
+        }
+        
+        let mainStore = commitMultiStore.keyValueStore(key: baseKey)
+        mainStore.set(key: mainConsensusParamsKey, value: consensusParamsData)
+    }
+
+    // getMaximumBlockGas gets the maximum gas from the consensus params. It panics
+    // if maximum block gas is less than negative one and returns zero if negative
+    // one.
+    var maximumBlockGas: UInt64 {
+        // TODO: Check if `block` really needs to be optional
+        guard let consensusParams = self.consensusParams, consensusParams.block != nil else {
+            return 0
+        }
+
+        let maxGas = consensusParams.block.maxGas
+        
+        if maxGas < -1 {
+            fatalError("invalid maximum block gas: \(maxGas)")
+        } else if maxGas == -1 {
+            return 0
+        } else {
+            return UInt64(maxGas)
+        }
+    }
+
+    func validateHeight(request: RequestBeginBlock) throws {
+        guard request.header.height >= 1 else {
+            throw Cosmos.Error.generic(reason: "invalid height: \(request.header.height)")
+        }
+
+        // TODO: Check this default value
+        let previousHeight = self.lastBlockHeight ?? 0
+        
+        guard request.header.height == previousHeight + 1 else {
+            throw Cosmos.Error.generic(reason: "invalid height: \(request.header.height); expected: \(previousHeight + 1)")
+        }
+    }
+
+
 }

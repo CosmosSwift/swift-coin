@@ -54,12 +54,19 @@ let package = Package(
         .target(
             name: "Cosmos",
             dependencies: [
+                .target(name: "IAVL"),
                 .target(name: "Database"),
                 .target(name: "Tendermint"),
                 .product(name: "ABCI", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ]
+        ),
+        .target(
+            name: "IAVL",
+            dependencies: [
+                .target(name: "Database"),
             ]
         ),
         .target(name: "Database"),

@@ -172,13 +172,13 @@ public final class NameServiceApp: BaseApp, App {
         self.setBeginBlocker(self.beginBlocker)
         self.setEndBlocker(self.endBlocker)
 
-        self.setAnteHandler(
-            Auth.anteHandler(
-                accountKeeper: self.accountKeeper,
-                supplyKeeper: self.supplyKeeper,
-                signatureVerificationGasConsumer: Auth.defaultSignatureVerificationGasConsumer
-            )
-        )
+        if let anteHandler = Auth.anteHandler(
+            accountKeeper: self.accountKeeper,
+            supplyKeeper: self.supplyKeeper,
+            signatureVerificationGasConsumer: Auth.defaultSignatureVerificationGasConsumer
+        ) {
+            self.setAnteHandler(anteHandler)
+        }
 
         self.mountKeyValueStores(keys: self.keys)
         self.mountTransientStores(keys: self.transientKeys)

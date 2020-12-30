@@ -4,19 +4,19 @@ import ABCI
 
 /// Request is an immutable object contains all information needed to
 /// process a request.
-public struct Request {
+public final class Request {
     let multiStore: MultiStore
-    let header: Header
+    var header: Header
     let chainID: String
     let transactionData: Data = Data()
     let logger: Logger
     let voteInfo: [VoteInfo] = []
     let gasMeter: GasMeter
-    let blockGasMeter: GasMeter? = nil
+    var blockGasMeter: GasMeter? = nil
     let checkTransaction: Bool
     // if recheckTx == true, then checkTx must also be true
     let recheckTransaction: Bool = false
-    let minGasPrice: DecimalCoins
+    var minGasPrices: DecimalCoins
     let consensusParams: ConsensusParams? = nil
     public var eventManager:  EventManager
     
@@ -33,7 +33,7 @@ public struct Request {
         self.checkTransaction = isCheckTransaction
         self.logger = logger
         self.gasMeter = InfiniteGasMeter()
-        self.minGasPrice = DecimalCoins()
+        self.minGasPrices = DecimalCoins()
         self.eventManager = EventManager()
     }
 

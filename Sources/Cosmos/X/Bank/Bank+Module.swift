@@ -49,12 +49,13 @@ public final class BankAppModule: BankAppModuleBasic, AppModule {
         keeper.makeHandler()
     }
     
+    // QuerierRoute returns the bank module's querier route name.
     public var querierRoute: String {
-        fatalError()
+        BankKeys.routerKey
     }
     
     public func makeQuerier() -> Querier? {
-        fatalError()
+        keeper.makeQuerier()
     }
 
     // ABCI

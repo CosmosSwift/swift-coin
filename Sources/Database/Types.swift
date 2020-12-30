@@ -24,13 +24,16 @@ public protocol Database {
     func delete(key: Data) throws
     func deleteSync(key: Data) throws
 
+    // TODO: We could use empty Data to signal nil in the iterators.
+    // Think about it.
+    
     // Iterate over a domain of keys in ascending order. End is exclusive.
     // Start must be less than end, or the Iterator is invalid.
     // A nil start is interpreted as an empty byteslice.
     // If end is nil, iterates up to the last item (inclusive).
     // CONTRACT: No writes may happen within a domain while an iterator exists over it.
     // CONTRACT: start, end readonly []byte
-    func iterator(start: Data, end: Data) throws -> Iterator
+    func iterator(start: Data?, end: Data?) throws -> Iterator
 
     // Iterate over a domain of keys in descending order. End is exclusive.
     // Start must be less than end, or the Iterator is invalid.
@@ -38,13 +41,13 @@ public protocol Database {
     // If end is nil, iterates from the last/greatest item (inclusive).
     // CONTRACT: No writes may happen within a domain while an iterator exists over it.
     // CONTRACT: start, end readonly []byte
-    func reverseIterator(start: Data, end: Data) throws -> Iterator
+    func reverseIterator(start: Data?, end: Data?) throws -> Iterator
 
     // Closes the connection.
     func close() throws
 
     // Creates a batch for atomic updates. The caller must call Batch.Close.
-    func newBatch() -> Batch
+    func makeBatch() -> Batch
 
     // For debugging
     func print() throws

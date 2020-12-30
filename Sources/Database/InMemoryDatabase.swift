@@ -60,7 +60,7 @@ public final class InMemoryDatabase: Database {
     }
 
     // NewBatch implements DB.
-    public func newBatch() -> Batch {
+    public func makeBatch() -> Batch {
         // TODO: Implement
 //        return newMemDBBatch(db)
         fatalError()
@@ -68,7 +68,7 @@ public final class InMemoryDatabase: Database {
 
     // Iterator implements DB.
     // Takes out a read-lock on the database until the iterator is closed.
-    public func iterator(start: Data, end: Data) throws -> Iterator {
+    public func iterator(start: Data?, end: Data?) throws -> Iterator {
         // TODO: Implement
 //        return newMemDBIterator(db, start, end, false)
         fatalError()
@@ -76,7 +76,7 @@ public final class InMemoryDatabase: Database {
 
     // ReverseIterator implements DB.
     // Takes out a read-lock on the database until the iterator is closed.
-    public func reverseIterator(start: Data, end: Data) throws -> Iterator {
+    public func reverseIterator(start: Data?, end: Data?) throws -> Iterator {
         // TODO: Implement
 //        return newMemDBIterator(db, start, end, true);, nil
         fatalError()

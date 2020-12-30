@@ -121,7 +121,7 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
         blacklistedAddresses[address.description] != nil
     }
     
-    public func getCoins(request: Request, address: AccountAddress) -> Coins {
+    public func coins(request: Request, address: AccountAddress) -> Coins? {
         // TODO: Implement
         fatalError()
     }
@@ -185,6 +185,6 @@ public protocol SendKeeper: ViewKeeper {
 // ViewKeeper defines a module interface that facilitates read only access to
 // account balances.
 public protocol ViewKeeper {
-    func getCoins(request: Request, address: AccountAddress) -> Coins
+    func coins(request: Request, address: AccountAddress) -> Coins?
     func hasCoins(request: Request, address: AccountAddress, amount: Coins) -> Bool
 }

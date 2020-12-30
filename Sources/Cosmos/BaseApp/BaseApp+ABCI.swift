@@ -1,46 +1,190 @@
 import ABCI
 
 extension BaseApp: ABCIApplication {
-    public func echo(request: RequestEcho) -> ResponseEcho {
-        // TODO: Implement
-        fatalError()
-    }
-    
-    public func info(request: RequestInfo) -> ResponseInfo {
-        // TODO: Implement
-        fatalError()
-    }
-    
+    // InitChain implements the ABCI interface. It runs the initialization logic
+    // directly on the CommitMultiStore.
     public func initChain(request: RequestInitChain) -> ResponseInitChain {
-        // TODO: Implement
-        fatalError()
+        var request = request
+        // stash the consensus params in the cms main store and memoize
+        // TODO: consensusParams is not optional.
+        // Check why this check exists
+//        if let consensusParams = request.consensusParams {
+        set(consensusParams: request.consensusParams)
+        store(consensusParams: request.consensusParams)
+//        }
+
+        let initHeader = Header( 
+            chainID: request.chainID,
+            time: request.time
+        )
+
+        // initialize the deliver state and check state with a correct header
+        set(deliverState: initHeader)
+        set(checkState: initHeader)
+
+        guard let initChainer = self.initChainer else {
+            return ResponseInitChain()
+        }
+
+        // TODO: Find best way to deal with force unwraps
+        // add block gas meter for any genesis transactions (allow infinite gas)
+        deliverState!.request.blockGasMeter = InfiniteGasMeter()
+        var response = initChainer(deliverState!.request, request)
+
+        // sanity check
+        if !request.validators.isEmpty {
+            guard request.validators.count == response.validators.count else {
+                fatalError("len(RequestInitChain.Validators) != len(GenesisValidators) (\(request.validators.count) != \(response.validators.count)")
+            }
+            
+            request.validators.sort()
+            response.validators.sort()
+
+            for (i, validator) in response.validators.enumerated() {
+                guard validator == request.validators[i] else {
+                    fatalError("genesisValidators[\(i)] != req.Validators[\(i)]")
+                }
+            }
+        }
+
+        // NOTE: We don't commit, but BeginBlock for block 1 starts from this
+        // deliverState.
+        return response
     }
-    
+    // Info implements the ABCI interface.
+    public func info(request: RequestInfo) -> ResponseInfo {
+        guard let lastCommitID = commitMultiStore.lastCommitID else {
+            return ResponseInfo(data: name)
+        }
+
+        return ResponseInfo(
+            data: name,
+            lastBlockHeight: lastCommitID.version,
+            lastBlockAppHash: lastCommitID.hash
+        )
+    }
+
     public func query(request: RequestQuery) -> ResponseQuery {
         // TODO: Implement
         fatalError()
     }
     
+    // BeginBlock implements the ABCI application interface.
     public func beginBlock(request: RequestBeginBlock) -> ResponseBeginBlock {
-        // TODO: Implement
-        fatalError()
+        if commitMultiStore.isTracingEnabled {
+            commitMultiStore.set(tracingContext: [
+                "blockHeight": request.header.height,
+            ])
+        }
+
+        do {
+            try validateHeight(request: request)
+        } catch {
+            fatalError("\(error)")
+        }
+
+        // Initialize the DeliverTx state. If this is the first block, it should
+        // already be initialized in InitChain. Otherwise app.deliverState will be
+        // nil, since it is reset on Commit.
+        if let deliverState = deliverState {
+            // In the first block, app.deliverState.ctx will already be initialized
+            // by InitChain. Context is now updated with Header information.
+            deliverState.request.header = request.header
+            // TODO: This call seems pointless, check later.
+            deliverState.request.header.height = request.header.height
+        } else {
+            set(deliverState: request.header)
+        }
+
+        // add block gas meter
+        let gasMeter: GasMeter
+
+        if maximumBlockGas > 0 {
+            gasMeter = BasicGasMeter(limit: maximumBlockGas)
+        } else {
+            gasMeter = InfiniteGasMeter()
+        }
+        
+        guard let deliverState = self.deliverState else {
+            fatalError("deliverState should be set by now")
+        }
+
+        deliverState.request.blockGasMeter = gasMeter
+        var response = ResponseBeginBlock()
+        
+        if let beginBlocker = self.beginBlocker {
+            response = beginBlocker(deliverState.request, request)
+        }
+
+        // set the signed validators for addition to context in deliverTx
+        voteInfos = request.lastCommitInfo.votes
+        return response
     }
     
+    // EndBlock implements the ABCI interface.
+    public func endBlock(request: RequestEndBlock) -> ResponseEndBlock {
+        guard let deliverState = self.deliverState else {
+            return ResponseEndBlock()
+        }
+        
+        if deliverState.multiStore.isTracingEnabled {
+            deliverState.multiStore.set(tracingContext: [:])
+        }
+
+        if let endBlocker = self.endBlocker {
+            return endBlocker(deliverState.request, request)
+        }
+
+        return ResponseEndBlock()
+    }
+
+    // CheckTx implements the ABCI interface and executes a tx in CheckTx mode. In
+    // CheckTx mode, messages are not executed. This means messages are only validated
+    // and only the AnteHandler is executed. State is persisted to the BaseApp's
+    // internal CheckTx state if the AnteHandler passes. Otherwise, the ResponseCheckTx
+    // will contain releveant error information. Regardless of tx execution outcome,
+    // the ResponseCheckTx will contain relevant gas execution context.
     public func checkTx(request: RequestCheckTx) -> ResponseCheckTx {
         // TODO: Implement
         fatalError()
+//        let transaction = try transactionDecoder(request.tx)
+//
+//        if err != nil {
+//            return sdkerrors.ResponseCheckTx(err, 0, 0, app.trace)
+//        }
+//
+//        var mode runTxMode
+//
+//        switch {
+//        case req.Type == abci.CheckTxType_New:
+//            mode = runTxModeCheck
+//
+//        case req.Type == abci.CheckTxType_Recheck:
+//            mode = runTxModeReCheck
+//
+//        default:
+//            panic(fmt.Sprintf("unknown RequestCheckTx type: %s", req.Type))
+//        }
+//
+//        gInfo, result, err := app.runTx(mode, req.Tx, tx)
+//        if err != nil {
+//            return sdkerrors.ResponseCheckTx(err, gInfo.GasWanted, gInfo.GasUsed, app.trace)
+//        }
+//
+//        return abci.ResponseCheckTx{
+//            GasWanted: int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+//            GasUsed:   int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+//            Log:       result.Log,
+//            Data:      result.Data,
+//            Events:    result.Events.ToABCIEvents(),
+//        }
     }
-    
+
     public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
         // TODO: Implement
         fatalError()
     }
-    
-    public func endBlock(request: RequestEndBlock) -> ResponseEndBlock {
-        // TODO: Implement
-        fatalError()
-    }
-    
+
     public func commit() -> ResponseCommit {
         // TODO: Implement
         fatalError()

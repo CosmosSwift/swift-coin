@@ -1,4 +1,5 @@
 import Foundation
+import ABCI
 import Database
 
 public protocol CacheWrapper {
@@ -34,7 +35,7 @@ public protocol CacheWrap {
 // CommitID
 
 // CommitID contains the tree version number and its merkle root.
-public struct CommitID {
+public struct CommitID: Codable {
     let version: Int64
     let hash: Data
     
@@ -60,7 +61,7 @@ public enum StoreType {
     case multi
     case database
     case iavlTree
-    case tansient
+    case transient
 }
 
 public protocol Store: CacheWrapper {
@@ -70,11 +71,20 @@ public protocol Store: CacheWrapper {
 // something that can persist to disk
 public protocol Commiter {
     func commit() -> CommitID
-    func lastCommitID() -> CommitID
+    var lastCommitID: CommitID? { get }
 }
 
 // Stores of MultiStore must implement CommitStore.
 public protocol CommitStore: Commiter, Store {}
+
+// Queryable allows a Store to expose internal state to the abci.Query
+// interface. Multistore can route requests to the proper Store.
+//
+// This is an optional, but useful extension to any CommitStore
+protocol Queryable {
+    func query(queryRequest: RequestQuery) -> ResponseQuery
+}
+
 
 //----------------------------------------
 // MultiStore
@@ -98,39 +108,55 @@ struct StoreRename: Codable {
     }
 }
 
-
-// StoreKey is a key used to index stores in a MultiStore.
-public protocol StoreKey {
-    var name: String { get }
-    var string: String { get }
-}
-
-// KVStoreKey is used for accessing substores.
-// Only the pointer value should ever be used - it functions as a capabilities key.
-public struct KeyValueStoreKey: StoreKey {
-    public let name: String
+extension StoreUpgrades {
+    // IsDeleted returns true if the given key should be deleted
+    func isDeleted(keyName: String) -> Bool {
+        deleted.contains(keyName)
+    }
     
-    public var string: String {
-        // TODO: Here self is the memory address in the Go counterpart
-        // Check what to do here since we're in a struct
-        "KeyValueStoreKey{\(self), \(name)}"
+    // RenamedFrom returns the oldKey if it was renamed
+    // Returns "" if it was not renamed
+    func renamedFrom(keyName: String) -> String? {
+        renamed
+            .first(where: { $0.newKey == keyName })
+            .map(\.oldKey)
     }
 }
 
-// TransientStoreKey is used for indexing transient stores in a MultiStore
-public struct TransientStoreKey: StoreKey {
+
+// StoreKey is a key used to index stores in a MultiStore.
+public class StoreKey: Hashable, CustomStringConvertible {
     public let name: String
     
-    // Constructs new TransientStoreKey
-    // Must return a pointer according to the ocap principle
     init(name: String) {
         self.name = name
     }
 
-    public var string: String {
-        // TODO: Here self is the memory address in the Go counterpart
-        // Check what to do here since we're in a struct
-        "TransientStoreKey{\(self), \(name)}"
+    public var description: String {
+        name
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+    
+    public static func == (lhs: StoreKey, rhs: StoreKey) -> Bool {
+        lhs.name == rhs.name
+    }
+}
+
+// KVStoreKey is used for accessing substores.
+// Only the pointer value should ever be used - it functions as a capabilities key.
+public final class KeyValueStoreKey: StoreKey {
+    public override var description: String {
+        "KeyValueStoreKey(\(ObjectIdentifier(self)), \(name))"
+    }
+}
+
+// TransientStoreKey is used for indexing transient stores in a MultiStore
+public final class TransientStoreKey: StoreKey {
+    public override var description: String {
+        "TransientStoreKey{\(ObjectIdentifier(self)), \(name)}"
     }
 }
 
@@ -144,12 +170,11 @@ public protocol CacheMultiStore: MultiStore {
     func write() 
 }
 
-
 // A non-cache MultiStore.
 public protocol CommitMultiStore: Commiter, MultiStore {
     // Mount a store of type using the given db.
     // If db == nil, the new store will use the CommitMultiStore db.
-    func mountStoreWithDatabase(key: StoreKey, type: StoreType, database: Database)
+    func mountStoreWithDatabase(key: StoreKey, type: StoreType, database: Database?)
 
     // Panics on a nil key.
     func commitStore(key: StoreKey) -> CommitStore?
@@ -235,12 +260,16 @@ public protocol MultiStore: Store {
     // stores will utilize to trace operations. The modified MultiStore is
     // returned.
     // TODO: Check if it's OK to discard the result
+    // TODO: Maybe we don't need to return anything
     @discardableResult
     func set(tracer: Writer?) -> MultiStore
 
     // SetTracingContext sets the tracing context for a MultiStore. It is
     // implied that the caller should update the context when necessary between
     // tracing operations. The modified MultiStore is returned.
+    @discardableResult
+    // TODO: Check if it's OK to discard the result
+    // TODO: Maybe we don't need to return anything
     func set(tracingContext: TraceContext) -> MultiStore
 }
 
@@ -249,7 +278,7 @@ public protocol MultiStore: Store {
 public protocol MultiStorePersistentCache {
     // Wrap and return the provided CommitKVStore with an inter-block (persistent)
     // cache.
-    func getStoreCache(key: StoreKey, store: CommitKeyValueStore) -> CommitKeyValueStore
+    func storeCache(key: StoreKey, store: CommitKeyValueStore) -> CommitKeyValueStore
 
     // Return the underlying CommitKVStore for a StoreKey.
     func unwrap(key: StoreKey) -> CommitKeyValueStore?
