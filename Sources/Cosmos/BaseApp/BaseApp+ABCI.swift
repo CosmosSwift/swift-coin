@@ -117,7 +117,7 @@ extension BaseApp: ABCIApplication {
         }
 
         // set the signed validators for addition to context in deliverTx
-        voteInfos = request.lastCommitInfo.votes
+        voteInfo = request.lastCommitInfo.votes
         return response
     }
     
@@ -145,38 +145,39 @@ extension BaseApp: ABCIApplication {
     // will contain releveant error information. Regardless of tx execution outcome,
     // the ResponseCheckTx will contain relevant gas execution context.
     public func checkTx(request: RequestCheckTx) -> ResponseCheckTx {
+        let transaction: Transaction
+            
+        do {
+            transaction = try transactionDecoder(request.tx)
+        } catch {
+            return ResponseCheckTx(error: error, gasWanted: 0, gasUsed: 0, debug: trace)
+        }
+
+        var mode: RunTransactionMode
+
+        switch request.type {
+        case .new:
+            mode = .check
+        case .recheck:
+            mode = .recheck
+        default:
+            fatalError("unknown RequestCheckTx type: \(request.type)")
+        }
+        
         // TODO: Implement
         fatalError()
-//        let transaction = try transactionDecoder(request.tx)
-//
-//        if err != nil {
-//            return sdkerrors.ResponseCheckTx(err, 0, 0, app.trace)
+//        do {
+//            let (gInfo, result) = try runTransaction(mode, request.tx, transaction)
+//        } catch {
+//            return ResponseCheckTx(error: error, gasWanted: gInfo.gasWanted, gasUsed: gInfo.gasUsed, debug: trace)
 //        }
 //
-//        var mode runTxMode
-//
-//        switch {
-//        case req.Type == abci.CheckTxType_New:
-//            mode = runTxModeCheck
-//
-//        case req.Type == abci.CheckTxType_Recheck:
-//            mode = runTxModeReCheck
-//
-//        default:
-//            panic(fmt.Sprintf("unknown RequestCheckTx type: %s", req.Type))
-//        }
-//
-//        gInfo, result, err := app.runTx(mode, req.Tx, tx)
-//        if err != nil {
-//            return sdkerrors.ResponseCheckTx(err, gInfo.GasWanted, gInfo.GasUsed, app.trace)
-//        }
-//
-//        return abci.ResponseCheckTx{
-//            GasWanted: int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-//            GasUsed:   int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-//            Log:       result.Log,
-//            Data:      result.Data,
-//            Events:    result.Events.ToABCIEvents(),
+//        return ResponseCheckTx(
+//            gasWanted: Int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+//            gasUsed:   Int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+//            log:       result.log,
+//            data:      result.data,
+//            events:    result.events.abciEvents(),
 //        }
     }
 

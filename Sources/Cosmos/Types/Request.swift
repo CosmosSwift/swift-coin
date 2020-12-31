@@ -5,19 +5,27 @@ import ABCI
 /// Request is an immutable object contains all information needed to
 /// process a request.
 public final class Request {
-    let multiStore: MultiStore
+    var multiStore: MultiStore
     var header: Header
     let chainID: String
-    let transactionData: Data = Data()
+    var transactionData: Data = Data()
     let logger: Logger
-    let voteInfo: [VoteInfo] = []
+    var voteInfo: [VoteInfo] = []
     let gasMeter: GasMeter
     var blockGasMeter: GasMeter? = nil
-    let checkTransaction: Bool
-    // if recheckTx == true, then checkTx must also be true
-    let recheckTransaction: Bool = false
+    var checkTransaction: Bool
+    
+    var recheckTransaction: Bool = false {
+        // if recheckTx == true, then checkTx must also be true
+        didSet {
+            if recheckTransaction {
+                checkTransaction = true
+            }
+        }
+    }
+    
     var minGasPrices: DecimalCoins
-    let consensusParams: ConsensusParams? = nil
+    var consensusParams: ConsensusParams? = nil
     public var eventManager:  EventManager
     
     // create a new context
@@ -47,4 +55,16 @@ extension Request {
             gasConfiguration: .keyValue
         )
     }
+    
+    // CacheContext returns a new Context with the multi-store cached and a new
+    // EventManager. The cached context is written to the context when writeCache
+    // is called.
+    @discardableResult
+    func cacheContext() -> () -> Void {
+        let commitMultiStore = multiStore.cacheMultiStore
+        multiStore = commitMultiStore
+        eventManager = EventManager()
+        return commitMultiStore.write
+    }
+
 }

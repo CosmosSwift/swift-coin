@@ -1,5 +1,20 @@
 import Foundation
 
+// GasInfo defines tx execution gas context.
+struct GasInfo {
+    // GasWanted is the maximum units of work we allow this tx to perform.
+    let gasWanted: UInt64
+
+    // GasUsed is the amount of gas actually consumed.
+    let gasUsed: UInt64
+    
+    internal init(gasWanted: UInt64 = 0, gasUsed: UInt64 = 0) {
+        self.gasWanted = gasWanted
+        self.gasUsed = gasUsed
+    }
+}
+
+
 // Result is the union of ResponseFormat and ResponseCheckTx.
 public struct Result {
     // Data is any data returned from message or handler execution. It MUST be length
