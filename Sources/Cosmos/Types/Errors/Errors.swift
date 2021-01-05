@@ -9,11 +9,23 @@ extension CosmosError {
     //nolint
     static let `internal` = register(codespace: undefinedCodespace, code: 1, description: "internal")
     
+    // ErrUnknownRequest to doc
+    static let unknownRequest = register(codespace: rootCodespace, code: 6, description: "unknown request")
+
     // ErrOutOfGas to doc
     static let outOfGas = register(codespace: rootCodespace, code: 11, description: "out of gas")
+    
+    // ErrInvalidRequest defines an ABCI typed error where the request contains
+    // invalid data.
+    static let invalidRequest = register(codespace: rootCodespace, code: 18, description: "invalid request")
+
+    // ErrPanic is only set when we recover from a panic, so we know to
+    // redact potentially sensitive system info
+    static let panic = register(codespace: undefinedCodespace, code: 111222, description: "panic")
+
 }
 
-struct CosmosError: Swift.Error {
+struct CosmosError: Swift.Error, Equatable {
     let codespace: String
     let code: UInt32
     let description: String

@@ -6,6 +6,8 @@ public class Codec {
     
     public init() {}
     
+    public static let codec = Codec()
+    
     func marshalJSON<T: Encodable>(value: T) throws -> Data {
         try encoder.encode(value)
     }
@@ -23,6 +25,52 @@ public class Codec {
         try encoder.encode(value)
     }
     
+    // MarshalBinaryBare encodes the object o according to the Amino spec.
+    // MarshalBinaryBare doesn't prefix the byte-length of the encoding,
+    // so the caller must handle framing.
+    func marshalBinaryBare<T: Encodable>(value: T) throws -> Data {
+        try encoder.encode(value)
+//        // Dereference value if pointer.
+//        var rv, _, isNilPtr = derefPointers(reflect.ValueOf(o))
+//        if isNilPtr {
+//            // NOTE: You can still do so by calling
+//            // `.MarshalBinaryLengthPrefixed(struct{ *SomeType })` or so on.
+//            panic("MarshalBinaryBare cannot marshal a nil pointer directly. Try wrapping in a struct?")
+//        }
+//
+//        // Encode Amino:binary bytes.
+//        var bz []byte
+//        buf := new(bytes.Buffer)
+//        rt := rv.Type()
+//        info, err := cdc.getTypeInfo_wlock(rt)
+//        if err != nil {
+//            return nil, err
+//        }
+//        err = cdc.encodeReflectBinary(buf, info, rv, FieldOptions{BinFieldNum: 1}, true)
+//        if err != nil {
+//            return nil, err
+//        }
+//        bz = buf.Bytes()
+//
+//        // If registered concrete, prepend prefix bytes.
+//        if info.Registered {
+//            pb := info.Prefix.Bytes()
+//            bz = append(pb, bz...)
+//        }
+//
+//        return bz, nil
+    }
+
+    
+    // Panics if error.
+    func mustMarshalBinaryBare<T: Encodable>(value: T) -> Data {
+        do {
+            return try marshalBinaryBare(value: value)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+
     // Like UnmarshalBinaryBare, but will first decode the byte-length prefix.
     // UnmarshalBinaryLengthPrefixed will panic if ptr is a nil-pointer.
     // Returns an error if not all of bz is consumed.

@@ -58,6 +58,43 @@ extension ResponseCheckTx {
     }
 }
 
+extension ResponseDeliverTx {
+    // ResponseDeliverTx returns an ABCI ResponseDeliverTx object with fields filled in
+    // from the given error and gas values.
+    init(
+        error: Swift.Error,
+        gasWanted: UInt64,
+        gasUsed: UInt64,
+        debug: Bool
+    ) {
+        let (space, code, log) = abciInfo(error: error, debug: debug)
+        
+        self.init(
+            code:      code,
+            log:       log,
+            gasWanted: Int64(gasWanted),
+            gasUsed:   Int64(gasUsed),
+            codespace: space
+        )
+    }
+}
+
+extension ResponseQuery {
+    // QueryResult returns a ResponseQuery from an error. It will try to parse ABCI
+    // info from the error.
+    init(error: Swift.Error) {
+        let (space, code, log) = abciInfo(error: error, debug: false)
+        
+        self.init(
+            code: code,
+            log: log,
+            codespace: space
+        )
+    }
+}
+
+
+
 // The debugErrEncoder encodes the error with a stacktrace.
 func debugErrorEncoder(error: Swift.Error) -> String {
     "\(error)"

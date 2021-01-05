@@ -1,3 +1,4 @@
+import Foundation
 import ABCI
 
 extension BaseApp: ABCIApplication {
@@ -51,6 +52,7 @@ extension BaseApp: ABCIApplication {
         // deliverState.
         return response
     }
+    
     // Info implements the ABCI interface.
     public func info(request: RequestInfo) -> ResponseInfo {
         guard let lastCommitID = commitMultiStore.lastCommitID else {
@@ -63,12 +65,25 @@ extension BaseApp: ABCIApplication {
             lastBlockAppHash: lastCommitID.hash
         )
     }
-
-    public func query(request: RequestQuery) -> ResponseQuery {
-        // TODO: Implement
-        fatalError()
-    }
     
+    // FilterPeerByAddrPort filters peers by address/port.
+    private func filterPeer(byAddressPort info: String) -> ResponseQuery {
+        if let filter = addressPeerFilter {
+            return filter(info)
+        }
+        
+        return ResponseQuery()
+    }
+
+    // FilterPeerByIDfilters peers by node ID.
+    func filterPeer(byID info: String) -> ResponseQuery {
+        if let filter = idPeerFilter {
+            return filter(info)
+        }
+        
+        return ResponseQuery()
+    }
+
     // BeginBlock implements the ABCI application interface.
     public func beginBlock(request: RequestBeginBlock) -> ResponseBeginBlock {
         if commitMultiStore.isTracingEnabled {
@@ -164,33 +179,435 @@ extension BaseApp: ABCIApplication {
             fatalError("unknown RequestCheckTx type: \(request.type)")
         }
         
-        // TODO: Implement
-        fatalError()
-//        do {
-//            let (gInfo, result) = try runTransaction(mode, request.tx, transaction)
-//        } catch {
-//            return ResponseCheckTx(error: error, gasWanted: gInfo.gasWanted, gasUsed: gInfo.gasUsed, debug: trace)
-//        }
-//
-//        return ResponseCheckTx(
-//            gasWanted: Int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-//            gasUsed:   Int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-//            log:       result.log,
-//            data:      result.data,
-//            events:    result.events.abciEvents(),
-//        }
-    }
-
-    public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
-        // TODO: Implement
-        fatalError()
-    }
-
-    public func commit() -> ResponseCommit {
-        // TODO: Implement
-        fatalError()
+        let (gasInfo, result) = runTransaction(
+            mode: mode,
+            transactionData: request.tx,
+            transaction: transaction
+        )
+       
+        do {
+            let result = try result.get()
+            
+            return ResponseCheckTx(
+                data: result.data,
+                log: result.log,
+                gasWanted: Int64(gasInfo.gasWanted), // TODO: Should type accept unsigned ints?
+                gasUsed: Int64(gasInfo.gasUsed), // TODO: Should type accept unsigned ints?
+                events: result.events
+            )
+        } catch {
+            return ResponseCheckTx(
+                error: error,
+                gasWanted: gasInfo.gasWanted,
+                gasUsed: gasInfo.gasUsed,
+                debug: trace
+            )
+        }
     }
     
+    // DeliverTx implements the ABCI interface and executes a tx in DeliverTx mode.
+    // State only gets persisted if all messages are valid and get executed successfully.
+    // Otherwise, the ResponseDeliverTx will contain releveant error information.
+    // Regardless of tx execution outcome, the ResponseDeliverTx will contain relevant
+    // gas execution context.
+    public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
+        let transaction: Transaction
+       
+        do {
+            transaction = try transactionDecoder(request.tx)
+        } catch {
+            return ResponseDeliverTx(
+                error: error,
+                gasWanted: 0,
+                gasUsed: 0,
+                debug: trace
+            )
+        }
+
+        let (gasInfo, result) = runTransaction(mode: .deliver, transactionData: request.tx, transaction: transaction)
+        
+        do {
+            let result = try result.get()
+            
+            return ResponseDeliverTx(
+                data:      result.data,
+                log:       result.log,
+                gasWanted: Int64(gasInfo.gasWanted), // TODO: Should type accept unsigned ints?
+                gasUsed:   Int64(gasInfo.gasUsed),   // TODO: Should type accept unsigned ints?
+                events:    result.events
+            )
+        } catch {
+            return ResponseDeliverTx(
+                error: error,
+                gasWanted: gasInfo.gasWanted,
+                gasUsed: gasInfo.gasUsed,
+                debug: trace
+            )
+        }
+
+    }
+    
+    // Commit implements the ABCI interface. It will commit all state that exists in
+    // the deliver state's multi-store and includes the resulting commit ID in the
+    // returned abci.ResponseCommit. Commit will set the check state based on the
+    // latest header and reset the deliver state. Also, if a non-zero halt height is
+    // defined in config, Commit will execute a deferred function call to check
+    // against that height and gracefully halt if it matches the latest committed
+    // height.
+    public func commit() -> ResponseCommit {
+        guard let deliverState = self.deliverState else {
+            fatalError("deliverState should be set by now")
+        }
+        
+        let header = deliverState.request.header
+
+        // Write the DeliverTx state which is cache-wrapped and commit the MultiStore.
+        // The write to the DeliverTx state writes all state transitions to the root
+        // MultiStore (app.cms) so when Commit() is called is persists those values.
+        deliverState.multiStore.write()
+        let commitID = commitMultiStore.commit()
+        logger.debug("Commit synced.\ncommit: \(commitID)")
+
+        // Reset the Check state to the latest committed.
+        //
+        // NOTE: This is safe because Tendermint holds a lock on the mempool for
+        // Commit. Use the header from this latest block.
+        set(checkState: header)
+
+        // empty/reset the deliver state
+        self.deliverState = nil
+
+        var halt: Bool = false
+
+        if haltHeight > 0 && UInt64(header.height) >= haltHeight {
+            halt = true
+        }
+
+        // Check haltTime type, maybe TimeInterval makes more sense.
+        if haltTime > 0 && header.time.timeIntervalSince1970 >= TimeInterval(haltTime) {
+            halt = true
+        }
+
+        if halt {
+            // Halt the binary and allow Tendermint to receive the ResponseCommit
+            // response with the commit ID hash. This will allow the node to successfully
+            // restart and process blocks assuming the halt configuration has been
+            // reset or moved to a more distant value.
+            self.halt()
+        }
+
+        return ResponseCommit(data: commitID.hash)
+    }
+    
+    // halt attempts to gracefully shutdown the node via SIGINT and SIGTERM falling
+    // back on os.Exit if both fail.
+    private func halt() {
+        logger.info("Halting node per configuration.\nheight: \(haltHeight)\ntime: \(haltTime)")
+
+        // TODO: Find out how to implement this in Swift
+//        let p = findProcess(os.getpid())
+//
+//        if err == nil {
+//            // attempt cascading signals in case SIGINT fails (os dependent)
+//            sigIntErr := process.signal(syscall.SIGINT)
+//            sigTermErr := process.signal(syscall.SIGTERM)
+//
+//            if sigIntErr == nil || sigTermErr == nil {
+//                return
+//            }
+//        }
+
+        // Resort to exiting immediately if the process could not be found or killed
+        // via SIGINT/SIGTERM signals.
+        logger.info("failed to send SIGINT/SIGTERM; exiting...")
+        exit(0)
+    }
+
+    // Query implements the ABCI interface. It delegates to CommitMultiStore if it
+    // implements Queryable.
+    public func query(request: RequestQuery) -> ResponseQuery {
+        let path = split(path: request.path)
+        
+        guard !path.isEmpty else {
+            return ResponseQuery(
+                error: CosmosError.wrap(error: CosmosError.unknownRequest, description: "no query path provided")
+            )
+        }
+
+        switch path[0] {
+        // "/app" prefix for special application queries
+        case "app":
+            return handleQueryApp(path: path, request: request)
+
+        case "store":
+            return handleQueryStore(path: path, request: request)
+
+        case "p2p":
+            return handleQueryP2P(path: path)
+
+        case "custom":
+            return handleQueryCustom(path: path, request: request)
+            
+        default:
+            return ResponseQuery(
+                error: CosmosError.wrap(error: CosmosError.unknownRequest, description: "unknown query path")
+            )
+        }
+    }
+
+    func handleQueryApp(path: [Substring], request: RequestQuery) -> ResponseQuery {
+        if path.count >= 2 {
+            switch path[1] {
+            case "simulate":
+                let transactionData = request.data
+
+                let transaction: Transaction
+                
+                do {
+                    transaction = try transactionDecoder(transactionData)
+                } catch {
+                    return ResponseQuery(
+                        error: CosmosError.wrap(error: error, description: "failed to decode tx")
+                    )
+                }
+
+                let gasInfo: GasInfo
+                let result: Result
+                 
+                do {
+                    let (simulateGasInfo, simulateResult) = simulate(
+                        transactionData: transactionData,
+                        transaction: transaction
+                    )
+                    
+                    gasInfo = simulateGasInfo
+                    result = try simulateResult.get()
+                } catch {
+                    return ResponseQuery(
+                        error: CosmosError.wrap(error: error, description: "failed to simulate tx")
+                    )
+                }
+
+                let simulationResponse = SimulationResponse(
+                    gasInfo: gasInfo,
+                    result: result
+                )
+
+                return ResponseQuery(
+                    value: Codec.codec.mustMarshalBinaryBare(value: simulationResponse),
+                    height: request.height,
+                    codespace: CosmosError.rootCodespace
+                )
+
+            case "version":
+                return ResponseQuery(
+                    value: appVersion.data,
+                    height: request.height,
+                    codespace: CosmosError.rootCodespace
+                )
+
+            default:
+                return ResponseQuery(
+                    error: CosmosError.wrap(
+                        error: CosmosError.unknownRequest,
+                        description: "unknown query: \(path)"
+                    )
+                )
+            }
+        }
+
+        return ResponseQuery(
+            error: CosmosError.wrap(
+                error: CosmosError.unknownRequest,
+                description: "expected second parameter to be either 'simulate' or 'version', neither was present"
+            )
+        )
+    }
+
+    func handleQueryStore(path: [Substring], request: RequestQuery) -> ResponseQuery {
+        // "/store" prefix for store queries
+        guard let queryable = commitMultiStore as? Queryable else {
+            return ResponseQuery(
+                error: CosmosError.wrap(
+                    error: CosmosError.unknownRequest,
+                    description: "multistore doesn't support queries"
+                )
+            )
+        }
+
+        var request = request
+        request.path = "/" + path.suffix(from: 1).joined(separator: "/")
+
+        // when a client did not provide a query height, manually inject the latest
+        if request.height == 0 {
+            // TODO: Maybe this should fatalError?
+            request.height = lastBlockHeight ?? 0
+        }
+
+        if request.height <= 1 && request.prove {
+            return ResponseQuery(
+                error: CosmosError.wrap(
+                    error: CosmosError.invalidRequest,
+                    description: "cannot query with proof when height <= 1; please provide a valid height"
+                )
+            )
+        }
+
+        var response = queryable.query(queryRequest: request)
+        response.height = request.height
+        return response
+    }
+
+    func handleQueryP2P(path: [Substring]) -> ResponseQuery {
+        // "/p2p" prefix for p2p queries
+        if path.count >= 4 {
+            let command = path[1]
+            let type = path[2]
+            let argument = path[3]
+            
+            switch command {
+            case "filter":
+                switch type {
+                case "addr":
+                    return filterPeer(byAddressPort: String(argument))
+
+                case "id":
+                    return filterPeer(byID: String(argument))
+                default:
+                    break
+                }
+
+            default:
+                return ResponseQuery(
+                    error: CosmosError.wrap(
+                        error: CosmosError.unknownRequest,
+                        description: "expected second parameter to be 'filter'"
+                    )
+                )
+            }
+        }
+
+        return ResponseQuery(
+            error: CosmosError.wrap(
+                error: CosmosError.unknownRequest,
+                description: "expected path is p2p filter <addr|id> <parameter>"
+            )
+        )
+    }
+
+    func handleQueryCustom(path: [Substring], request: RequestQuery) -> ResponseQuery {
+        // path[0] should be "custom" because "/custom" prefix is required for keeper
+        // queries.
+        //
+        // The QueryRouter routes using path[1]. For example, in the path
+        // "custom/gov/proposal", QueryRouter routes using "gov".
+        if path.count < 2 || path[1] == "" {
+            return ResponseQuery(
+                error: CosmosError.wrap(
+                    error: CosmosError.unknownRequest,
+                    description: "no route for custom query specified"
+                )
+            )
+        }
+
+        // TODO: Maybe change route's path parameter to Substring
+        guard let querier = queryRouter.route(path: String(path[1])) else {
+            return ResponseQuery(
+                error: CosmosError.wrap(
+                    error: CosmosError.unknownRequest,
+                    description: "no custom querier found for route \(path[1])"
+                )
+            )
+        }
+        
+        var request = request
+
+        // when a client did not provide a query height, manually inject the latest
+        if request.height == 0 {
+            // TODO: Maybe this should fatalError if nil?
+            request.height = lastBlockHeight ?? 0
+        }
+
+        if request.height <= 1 && request.prove {
+            return ResponseQuery(
+                error: CosmosError.wrap(
+                    error: CosmosError.invalidRequest,
+                    description: "cannot query with proof when height <= 1; please provide a valid height"
+                )
+            )
+        }
+
+        let cacheMultiStore: MultiStore
+            
+        do {
+            cacheMultiStore = try commitMultiStore.cacheMultiStore(withVersion: request.height)
+        } catch {
+            return ResponseQuery(
+                error: CosmosError.wrap(
+                    error: CosmosError.invalidRequest,
+                    description: "failed to load state at height \(request.height); \(error) (latest height: \(lastBlockHeight ?? 0))"
+                )
+            )
+        }
+        
+        guard let checkState = self.checkState else {
+            fatalError("checkState should be set by now")
+        }
+
+        // cache wrap the commit-multistore for safety
+        let cachedRequest = Request(
+            multiStore: cacheMultiStore,
+            header: checkState.request.header,
+            isCheckTransaction: true,
+            logger: logger
+        )
+        
+        // TODO: Maybe minGasPrices can be not optional?
+        cachedRequest.minGasPrices = self.minGasPrices ?? DecimalCoins()
+
+        // Passes the rest of the path as an argument to the querier.
+        //
+        // For example, in the path "custom/gov/proposal/test", the gov querier gets
+        // []string{"proposal", "test"} as the path.
+        do {
+            let responseData = try querier(
+                cachedRequest,
+                // TODO: Maybe change querier's path parameter to [Substring]
+                path.suffix(from: 2).map(String.init),
+                request
+            )
+            
+            return ResponseQuery(
+                value: responseData,
+                height: request.height
+            )
+        } catch {
+            let (space, code, log) = abciInfo(error: error, debug: false)
+            
+            return ResponseQuery(
+                code: code,
+                log: log,
+                height: request.height,
+                codespace: space
+            )
+        }
+    }
+
+    // splitPath splits a string path using the delimiter '/'.
+    //
+    // e.g. "this/is/funny" becomes []string{"this", "is", "funny"}
+    func split(path requestPath: String) -> [Substring] {
+        let path = requestPath.split(separator: "/")
+
+        // first element is empty string
+        if !path.isEmpty && path[0] == "" {
+            return Array(path.dropFirst())
+        }
+
+        return path
+    }
+
+
     public func listSnapshots() -> ResponseListSnapshots {
         // TODO: Implement
         fatalError()

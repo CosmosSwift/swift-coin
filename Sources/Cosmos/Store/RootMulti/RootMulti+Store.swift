@@ -367,6 +367,7 @@ final class RootMultiStore: CommitMultiStore {
     // CacheMultiStore cache-wraps the multi-store and returns a CacheMultiStore.
     // It implements the MultiStore interface.
     var cacheMultiStore: CacheMultiStore {
+        // TODO: Implement
         fatalError()
 //        CacheMultiStore(
 //            database,
@@ -381,7 +382,9 @@ final class RootMultiStore: CommitMultiStore {
     // attempts to load stores at a given version (height). An error is returned if
     // any store cannot be loaded. This should only be used for querying and
     // iterating at past heights.
-//    func (rs *Store) CacheMultiStoreWithVersion(version int64) (types.CacheMultiStore, error) {
+    func cacheMultiStore(withVersion version: Int64) throws -> CacheMultiStore {
+        // TODO: Implement
+        fatalError()
 //        cachedStores := make(map[types.StoreKey]types.CacheWrapper)
 //        for key, store := range rs.stores {
 //            switch store.GetStoreType() {
@@ -405,8 +408,8 @@ final class RootMultiStore: CommitMultiStore {
 //        }
 //
 //        return cachemulti.NewStore(rs.db, cachedStores, rs.keysByName, rs.traceWriter, rs.traceContext), nil
-//    }
-//
+    }
+
     // GetStore returns a mounted Store for a given StoreKey. If the StoreKey does
     // not exist, it will panic. If the Store is wrapped in an inter-block cache, it
     // will be unwrapped prior to being returned.

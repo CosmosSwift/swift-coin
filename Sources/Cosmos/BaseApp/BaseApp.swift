@@ -1,5 +1,6 @@
 import Foundation
 import Logging
+import Crypto
 import ABCI
 import Database
 
@@ -340,7 +341,10 @@ open class BaseApp: Sealable {
     // one.
     var maximumBlockGas: UInt64 {
         // TODO: Check if `block` really needs to be optional
-        guard let consensusParams = self.consensusParams, consensusParams.block != nil else {
+        guard
+            let consensusParams = self.consensusParams,
+            consensusParams.block != nil
+        else {
             return 0
         }
 
@@ -367,6 +371,21 @@ open class BaseApp: Sealable {
             throw Cosmos.Error.generic(reason: "invalid height: \(request.header.height); expected: \(previousHeight + 1)")
         }
     }
+    
+    // validateBasicTxMsgs executes basic validator calls for messages.
+    func validateBasic(transactionMessages: [Message]) throws {
+        guard !transactionMessages.isEmpty else {
+            throw CosmosError.wrap(
+                error: CosmosError.invalidRequest,
+                description: "must contain at least one message"
+            )
+        }
+
+        for message in transactionMessages {
+            try message.validateBasic()
+        }
+    }
+
     
     // Returns the applications's deliverState if app is in runTxModeDeliver,
     // otherwise it returns the application's checkstate.
@@ -400,6 +419,26 @@ open class BaseApp: Sealable {
 
         return request
     }
+    
+    // cacheTxContext returns a new context based off of the provided context with
+    // a cache wrapped multi-store.
+    func cache(transactionRequest: Request, transactionData: Data) -> (Request, CacheMultiStore) {
+        let request = transactionRequest
+        let multiStore = request.multiStore
+        
+        // TODO: https://github.com/cosmos/cosmos-sdk/issues/2824
+        let multiStoreCache = multiStore.cacheMultiStore
+        
+        if multiStoreCache.isTracingEnabled {
+            multiStoreCache.set(tracingContext: [
+                "txHash": "\(SHA256.hash(data: transactionData))"
+            ])
+        }
+        
+        request.multiStore = multiStoreCache
+        return (request, multiStoreCache)
+    }
+
 
     // runTx processes a transaction within a given execution mode, encoded transaction
     // bytes, and the decoded transaction itself. All state transitions occur through
@@ -416,12 +455,12 @@ open class BaseApp: Sealable {
         // NOTE: GasWanted should be returned by the AnteHandler. GasUsed is
         // determined by the GasMeter. We need access to the context to get the gas
         // meter so we initialize upfront.
-        var gasWanted: UInt64
+        var gasWanted: UInt64 = 0
 
-        let request = contextForTransaction(mode: mode, transactionData: transactionData)
+        var request = contextForTransaction(mode: mode, transactionData: transactionData)
         let multiStore = request.multiStore
         
-        guard let blockGasMeter = request.blockGasMeter else {
+        guard var blockGasMeter = request.blockGasMeter else {
             fatalError("blockGasMeter should be set by now.")
         }
 
@@ -446,129 +485,202 @@ open class BaseApp: Sealable {
             startingGas = blockGasMeter.gasConsumed
         }
         
-        // TODO: Implement
-        fatalError()
-//        defer {
-//                // TODO: Check if this works as expect.
-//                // The original implementation called recover
-//                // We don't have panic in Swift so we use regular throws
-//                switch error {
-//                // TODO: Use ErrOutOfGas instead of ErrorOutOfGas which would allow us
-//                // to keep the stracktrace.
-//                case CosmosError.outOfGas:
-//                    let error = CosmosError.wrap(
-//                        CosmosError.outOfGas,
-//                        "out of gas in location: \(error); gasWanted: \(gasWanted), gasUsed: \(request.gasMeter.gasConsumed)"
-//                    )
-//
-//                default:
-//                    let error = CosmosError.wrap(
-//                        panic,
-//                        "recovered: \(error)\nstack:\n\(debug.stack)"
-//                    )
-//                }
-//
-//                result = nil
-//            }
-//
-//            let gasInfo = GasInfo(
-//                gasWanted: gasWanted,
-//                gasUsed: request.gasMeter.gasConsumed
-//            )
-//        }
-//
-//        // If BlockGasMeter() panics it will be caught by the above recover and will
-//        // return an error - in any case BlockGasMeter will consume gas past the limit.
-//        //
-//        // NOTE: This must exist in a separate defer function for the above recovery
-//        // to recover from this one.
-//        defer {
-//            if mode == .deliver {
-//                request.blockGasMeter.consumeGas(
-//                    request.gasMeter.gasConsumedToLimit, "block gas meter"
-//                )
-//
-//                if request.blockGasMeter.gasConsumed < startingGas {
-//                    fatalError(GasOverflowError(descriptor: "tx gas summation"))
-//                }
-//            }
-//        }
-//
-//        let messages = transaction.messages
-//
-//        do {
-//            try validateBasic(transactionMessages: messages)
-//        } catch {
-//            return (GasInfo(), .failure(error))
-//        }
-//
-//        if let anteHandler = self.anteHandler {
-//            var anteRequest: Request
-//            var multiStoreCache: CacheMultiStore
-//
-//            // Cache wrap context before AnteHandler call in case it aborts.
-//            // This is required for both CheckTx and DeliverTx.
-//            // Ref: https://github.com/cosmos/cosmos-sdk/issues/2772
-//            //
-//            // NOTE: Alternatively, we could require that AnteHandler ensures that
-//            // writes do not happen if aborted/failed.  This may have some
-//            // performance benefits, but it'll be more difficult to get right.
-//            (anteRequest, multiStoreCache) = cacheTransactionRequest(
-//                request: request,
-//                transactionData: transactionData
-//            )
-//
-//            anteRequest.eventManager = EventManager()
-//
-//            do {
-//                let newRequest = try anteHandler(anteRequest, transaction, mode == .simulate)
-//
-//                if !newRequest.isZero {
-//                    // At this point, newCtx.MultiStore() is cache-wrapped, or something else
-//                    // replaced by the AnteHandler. We want the original multistore, not one
-//                    // which was cache-wrapped for the AnteHandler.
-//                    //
-//                    // Also, in the case of the tx aborting, we need to track gas consumed via
-//                    // the instantiated gas meter in the AnteHandler, so we update the context
-//                    // prior to returning.
-//                    request = newRequest
-//                    request.multiStore = multiStore
-//                }
-//
-//                // GasMeter expected to be set in AnteHandler
-//                gasWanted = request.gasMeter.limit
-//            } catch {
-//                return (gasInfo, .failure(error))
-//            }
-//
-//            multiStoreCache.write()
-//        }
-//
-//        // Create a new Context based off of the existing Context with a cache-wrapped
-//        // MultiStore in case message processing fails. At this point, the MultiStore
-//        // is doubly cached-wrapped.
-//        let (runMessageRequest, multiStoreCache) = cache(
-//            transactionRequest: request,
-//            transactionData: transactionData
-//        )
-//
-//        do {
-//            // Attempt to execute all messages and only update state if all messages pass
-//            // and we're in DeliverTx. Note, runMsgs will never return a reference to a
-//            // Result if any single message fails or does not have a registered Handler.
-//            let result = try runMessages(
-//                request: runMessageRequest,
-//                messages: messages,
-//                mode: mode
-//            )
-//
-//            if mode == .deliver {
-//                multiStoreCache.write()
-//            }
-//
-//            return (gasInfo, .success(result))
-//        } catch {
-//            return (gasInfo, .failure(error))
-//        }
+        do {
+            // If `consumeGas` throws it will be caught by the catch below and will
+            // return an error - in any case BlockGasMeter will consume gas past the limit.
+            // TODO: Check how to mimic defer here
+            func deferred() throws {
+                if mode == .deliver {
+                    try blockGasMeter.consumeGas(
+                        amount: request.gasMeter.gasConsumedToLimit, descriptor: "block gas meter"
+                    )
+
+                    if blockGasMeter.gasConsumed < startingGas {
+                        throw GasOverflowError(descriptor: "tx gas summation")
+                    }
+                }
+            }
+            
+            let messages = transaction.messages
+
+            do {
+                try validateBasic(transactionMessages: messages)
+            } catch {
+                try deferred()
+                return (GasInfo(), .failure(error))
+            }
+
+            if let anteHandler = self.anteHandler {
+                // Cache wrap context before AnteHandler call in case it aborts.
+                // This is required for both CheckTx and DeliverTx.
+                // Ref: https://github.com/cosmos/cosmos-sdk/issues/2772
+                //
+                // NOTE: Alternatively, we could require that AnteHandler ensures that
+                // writes do not happen if aborted/failed.  This may have some
+                // performance benefits, but it'll be more difficult to get right.
+                let (anteRequest, multiStoreCache) = cache(
+                    transactionRequest: request,
+                    transactionData: transactionData
+                )
+
+                anteRequest.eventManager = EventManager()
+
+                do {
+                    if let newRequest = try anteHandler(anteRequest, transaction, mode == .simulate) {
+                        // At this point, newCtx.MultiStore() is cache-wrapped, or something else
+                        // replaced by the AnteHandler. We want the original multistore, not one
+                        // which was cache-wrapped for the AnteHandler.
+                        //
+                        // Also, in the case of the tx aborting, we need to track gas consumed via
+                        // the instantiated gas meter in the AnteHandler, so we update the context
+                        // prior to returning.
+                        request = newRequest
+                        request.multiStore = multiStore
+                    }
+
+                    // GasMeter expected to be set in AnteHandler
+                    gasWanted = request.gasMeter.limit
+                } catch {
+                    try deferred()
+                    return (GasInfo(), .failure(error))
+                }
+
+                multiStoreCache.write()
+            }
+
+            // Create a new Context based off of the existing Context with a cache-wrapped
+            // MultiStore in case message processing fails. At this point, the MultiStore
+            // is doubly cached-wrapped.
+            let (runMessageRequest, multiStoreCache) = cache(
+                transactionRequest: request,
+                transactionData: transactionData
+            )
+
+            do {
+                // Attempt to execute all messages and only update state if all messages pass
+                // and we're in DeliverTx. Note, runMsgs will never return a reference to a
+                // Result if any single message fails or does not have a registered Handler.
+                let result = try runMessages(
+                    request: runMessageRequest,
+                    messages: messages,
+                    mode: mode
+                )
+
+                if mode == .deliver {
+                    multiStoreCache.write()
+                }
+
+                return (GasInfo(), .success(result))
+            } catch {
+                try deferred()
+                return (GasInfo(), .failure(error))
+            }
+
+            // TODO: Check if this works as expect.
+            // The original implementation called recover
+            // We don't have panic in Swift so we use regular catch
+        } catch {
+            let cosmosError: Swift.Error
+            
+            // TODO: Use ErrOutOfGas instead of ErrorOutOfGas which would allow us
+            // to keep the stracktrace.
+             
+            // TODO: We should probably make CosmosError a protocol and have structs
+            // that implement the protocol
+            if let error = error as? CosmosError, error == CosmosError.outOfGas {
+                cosmosError = CosmosError.wrap(
+                    error: CosmosError.outOfGas,
+                    description: "out of gas in location: \(error); gasWanted: \(gasWanted), gasUsed: \(request.gasMeter.gasConsumed)"
+                )
+            } else {
+                cosmosError = CosmosError.wrap(
+                    error: CosmosError.panic,
+                    // TODO: Print stack trace
+//                    description: "recovered: \(error)\nstack:\n\(debug.stack)"
+                    description: "recovered: \(error)\n"
+                )
+            }
+
+            let gasInfo = GasInfo(
+                gasWanted: gasWanted,
+                gasUsed: request.gasMeter.gasConsumed
+            )
+        
+            return (gasInfo, .failure(cosmosError))
+        }
+    }
+    
+    // runMsgs iterates through a list of messages and executes them with the provided
+    // Context and execution mode. Messages will only be executed during simulation
+    // and DeliverTx. An error is returned if any single message fails or if a
+    // Handler does not exist for a given message route. Otherwise, a reference to a
+    // Result is returned. The caller must not commit state if an error is returned.
+    func runMessages(request: Request, messages: [Message], mode: RunTransactionMode) throws -> Result {
+        var messageLogs: [ABCIMessageLog] = []
+        var data = Data()
+        var events: [Event] = []
+
+        // NOTE: GasWanted is determined by the AnteHandler and GasUsed by the GasMeter.
+        for (i, message) in messages.enumerated() {
+            // skip actual execution for (Re)CheckTx mode
+            if mode == .check || mode == .recheck {
+                break
+            }
+
+            let messageRoute = message.route
+            
+            guard let handler = router.route(request: request, path: messageRoute) else {
+                throw CosmosError.wrap(
+                    error: CosmosError.unknownRequest,
+                    description: "unrecognized message route: \(messageRoute); message index: \(i)"
+                )
+            }
+
+            let messageResult: Result
+            
+            do {
+                messageResult = try handler(request, message)
+            } catch {
+                throw CosmosError.wrap(
+                    error: error,
+                    description: "failed to execute message; message index: \(i)"
+                )
+            }
+            
+            var messageEvents: Events = [
+                Event(
+                    type: EventType.message,
+                    attributes: [
+                        Attribute(
+                            key: AttributeKey.action,
+                            value: message.type
+                        )
+                    ]
+                )
+            ]
+            
+            messageEvents.append(contentsOf: messageResult.events)
+
+            // append message events, data and logs
+            //
+            // Note: Each message result's data must be length-prefixed in order to
+            // separate each result.
+            events.append(contentsOf: messageEvents)
+            data.append(contentsOf: messageResult.data)
+            
+            let log = ABCIMessageLog(
+                messageIndex: UInt16(i),
+                log: messageResult.log,
+                events: messageEvents
+            )
+            
+            messageLogs.append(log)
+        }
+
+        return Result(
+            data: data,
+            log: messageLogs.description.trimmingCharacters(in: .whitespaces),
+            events: events
+        )
     }
 }

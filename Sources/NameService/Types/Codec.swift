@@ -1,6 +1,5 @@
 import Cosmos
 
-
 extension Codec {
     // RegisterCodec registers concrete types on codec
     static func register(codec: Codec) {

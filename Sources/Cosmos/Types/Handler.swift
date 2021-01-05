@@ -3,7 +3,7 @@ public typealias Handler = (_ request: Request, _ message: Message) throws -> Re
 
 // AnteHandler authenticates transactions, before their internal messages are handled.
 // If newCtx.IsZero(), ctx is used instead.
-public typealias AnteHandler = (_ request: Request, _ transaction: Transaction, _ simulate: Bool) throws -> Request
+public typealias AnteHandler = (_ request: Request, _ transaction: Transaction, _ simulate: Bool) throws -> Request?
 
 // AnteDecorator wraps the next AnteHandler to perform custom pre- and post-processing.
 protocol AnteDecorator {

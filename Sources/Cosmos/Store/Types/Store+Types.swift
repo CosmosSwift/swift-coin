@@ -246,7 +246,7 @@ public protocol MultiStore: Store {
 
     // CacheMultiStoreWithVersion cache-wraps the underlying MultiStore where
     // each stored is loaded at a specific version (height).
-//    func cacheMultiStoreWithVersion(version: Int64) throws -> CacheMultiStore
+    func cacheMultiStore(withVersion version: Int64) throws -> CacheMultiStore
 
     // Convenience for fetching substores.
     // If the store does not exist, panics.

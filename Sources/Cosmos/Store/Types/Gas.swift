@@ -11,6 +11,18 @@ let gasDeleteDescriptor = "Delete"
 // Gas measured by the SDK
 public typealias Gas = UInt64
 
+// ErrorOutOfGas defines an error thrown when an action results in out of gas.
+struct OutOfGas: Swift.Error {
+    let descriptor: String
+}
+
+// ErrorGasOverflow defines an error thrown when an action results gas consumption
+// unsigned integer overflow.
+struct GasOverflowError: Swift.Error {
+    let descriptor: String
+}
+
+
 // GasMeter interface to track gas consumption
 public protocol GasMeter {
     var gasConsumed: Gas { get }
