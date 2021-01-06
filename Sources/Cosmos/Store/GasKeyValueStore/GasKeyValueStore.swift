@@ -69,14 +69,14 @@ extension GasKeyValueStore: KeyValueStore {
     }
 
     // Implements KVStore.
-    func cacheWrap() -> CacheWrap {
+    var cacheWrap: CacheWrap {
         fatalError("cannot CacheWrap a GasKVStore")
     }
 
     // CacheWrapWithTrace implements the KVStore interface.
-//    func cacheWrapWithTrace(_ io.Writer, _ types.TraceContext) -> CacheWrap {
-//        fatalError("cannot CacheWrapWithTrace a GasKVStore")
-//    }
+    func cacheWrapWithTrace(writer: Writer, traceContext: TraceContext) -> CacheWrap {
+        fatalError("cannot CacheWrapWithTrace a GasKVStore")
+    }
 
     func iterator(start: Data?, end: Data?, ascending: Bool) -> Iterator {
         let parentIterator: Iterator

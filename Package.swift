@@ -19,6 +19,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("master")),
+        .package(name: "iAVLPlus", url: "https://github.com/CosmosSwift/swift-iavlplus", .branch("master")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
@@ -57,6 +58,7 @@ let package = Package(
                 .target(name: "IAVL"),
                 .target(name: "Database"),
                 .target(name: "Tendermint"),
+                .product(name: "iAVLPlus", package: "iAVLPlus"),
                 .product(name: "ABCI", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
                 .product(name: "Logging", package: "swift-log"),

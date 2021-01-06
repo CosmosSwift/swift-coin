@@ -105,14 +105,22 @@ extension IAVLStore {
     }
 
     // Implements Store.
-//    func (st *Store) CacheWrap() types.CacheWrap {
-//        return cachekv.NewStore(st)
-//    }
+    var cacheWrap: CacheWrap {
+        BaseCacheKeyValueStore(parent: self)
+    }
+
+    // CacheWrapWithTrace implements the Store interface.
+    func cacheWrapWithTrace(writer: Writer, traceContext: TraceContext) -> CacheWrap {
+        // TODO: Implement
+        fatalError()
+//        let parent = TraceKeyValueStore(
+//            store: self,
+//            writer: writer,
+//            traceContext: traceContext
+//        )
 //
-//    // CacheWrapWithTrace implements the Store interface.
-//    func (st *Store) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types.CacheWrap {
-//        return cachekv.NewStore(tracekv.NewStore(st, w, tc))
-//    }
+//        return BaseCacheKeyValueStore(parent: parent)
+    }
 
     // Implements types.KVStore.
     func set(key: Data, value: Data) {

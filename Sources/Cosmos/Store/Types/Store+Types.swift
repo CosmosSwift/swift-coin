@@ -2,13 +2,11 @@ import Foundation
 import ABCI
 import Database
 
-public protocol CacheWrapper {
-    // CacheWrap cache wraps.
-//        var cacheWrap: CacheWrap { get }
 
-    // CacheWrapWithTrace cache wraps with tracing enabled.
-//    func cacheWrapWithTrace(writer: io.Writer, traceContext: TraceContext) -> CacheWrap
-}
+// CacheKVStore cache-wraps a KVStore.  After calling .Write() on
+// the CacheKVStore, all previously created CacheKVStores on the
+// object expire.
+protocol CacheKeyValueStore: KeyValueStore, CacheWrap {}
 
 // Stores of MultiStore must implement CommitStore.
 public protocol CommitKeyValueStore: CommitStore, KeyValueStore {}
@@ -20,15 +18,17 @@ public protocol CommitKeyValueStore: CommitStore, KeyValueStore {}
 // IAVLStore.CacheWrap() returns a CacheKVStore. CacheWrap should not return
 // a Committer, since Commit cache-wraps make no sense. It can return KVStore,
 // HeapStore, SpaceStore, etc.
-public protocol CacheWrap {
+public protocol CacheWrap: CacheWrapper {
     // Write syncs with the underlying store.
     func write()
+}
 
+public protocol CacheWrapper {
     // CacheWrap recursively wraps again.
-    func cacheWrap() -> CacheWrap
+    var cacheWrap: CacheWrap { get }
 
     // CacheWrapWithTrace recursively wraps again with tracing enabled.
-//    CacheWrapWithTrace(w io.Writer, tc TraceContext) CacheWrap
+    func cacheWrapWithTrace(writer: Writer, traceContext: TraceContext) -> CacheWrap
 }
 
 //----------------------------------------
@@ -165,10 +165,7 @@ public final class TransientStoreKey: StoreKey {
 public typealias TraceContext = [String: Any]
 
 // From MultiStore.CacheMultiStore()....
-public protocol CacheMultiStore: MultiStore {
-    // Writes operations to underlying KVStore
-    func write() 
-}
+public protocol CacheMultiStore: MultiStore, CacheWrap {}
 
 // A non-cache MultiStore.
 public protocol CommitMultiStore: Commiter, MultiStore {

@@ -352,14 +352,14 @@ final class RootMultiStore: CommitMultiStore {
     }
 
     // Implements CacheWrapper/Store/CommitStore.
-//    func (rs *Store) CacheWrap() types.CacheWrap {
-//        return rs.CacheMultiStore().(types.CacheWrap)
-//    }
-//
-//    // CacheWrapWithTrace implements the CacheWrapper interface.
-//    func (rs *Store) CacheWrapWithTrace(_ io.Writer, _ types.TraceContext) types.CacheWrap {
-//        return rs.CacheWrap()
-//    }
+    var cacheWrap: CacheWrap {
+        cacheMultiStore
+    }
+ 
+    // CacheWrapWithTrace implements the CacheWrapper interface.
+    func cacheWrapWithTrace(writer: Writer, traceContext: TraceContext) -> CacheWrap {
+        cacheWrap
+    }
     
     //----------------------------------------
     // +MultiStore
@@ -367,15 +367,19 @@ final class RootMultiStore: CommitMultiStore {
     // CacheMultiStore cache-wraps the multi-store and returns a CacheMultiStore.
     // It implements the MultiStore interface.
     var cacheMultiStore: CacheMultiStore {
-        // TODO: Implement
-        fatalError()
-//        CacheMultiStore(
-//            database,
-//            stores,
-//            keysByName//,
-////            traceWriter,
-////            traceContext
-//        )
+        var stores: [StoreKey: CacheWrapper] = [:]
+        
+        for (key, value) in self.stores {
+            stores[key] = value
+        }
+
+        return BaseCacheMultiStore(
+            database: database,
+            stores: stores,
+            keys: keysByName,
+            traceWriter: traceWriter,
+            traceContext: traceContext
+        )
     }
 
     // CacheMultiStoreWithVersion is analogous to CacheMultiStore except that it
@@ -473,18 +477,20 @@ final class RootMultiStore: CommitMultiStore {
         case .multi:
             fatalError("recursive MultiStores not yet supported")
         case .iavlTree:
-            var store: CommitKeyValueStore = try IAVLStore(
-                database: database,
-                commitId: id,
-                isLazyLoadingEnabled: isLazyLoadingEnabled
-            )
-
-            if let cache = interBlockCache {
-                // Wrap and get a CommitKVStore with inter-block caching. Note, this should
-                // only wrap the primary CommitKVStore, not any store that is already
-                // cache-wrapped as that will create unexpected behavior.
-                store = cache.storeCache(key: key, store: store)
-            }
+            let store = TransientStore()
+            // TODO: Implement actual iAVL store
+//            var store: CommitKeyValueStore = try IAVLStore(
+//                database: database,
+//                commitId: id,
+//                isLazyLoadingEnabled: isLazyLoadingEnabled
+//            )
+//
+//            if let cache = interBlockCache {
+//                // Wrap and get a CommitKVStore with inter-block caching. Note, this should
+//                // only wrap the primary CommitKVStore, not any store that is already
+//                // cache-wrapped as that will create unexpected behavior.
+//                store = cache.storeCache(key: key, store: store)
+//            }
 
             return store
         case .database:
@@ -495,8 +501,6 @@ final class RootMultiStore: CommitMultiStore {
             }
 
             return TransientStore()
-        default:
-            fatalError("unrecognized store type \(parameters.type)")
         }
     }
 

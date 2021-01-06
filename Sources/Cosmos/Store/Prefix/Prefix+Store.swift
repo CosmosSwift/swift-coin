@@ -74,17 +74,19 @@ public final class PrefixStore: KeyValueStore {
 //    func (s Store) GetStoreType() types.StoreType {
 //        return s.parent.GetStoreType()
 //    }
-//
-//    // Implements CacheWrap
-//    func (s Store) CacheWrap() types.CacheWrap {
-//        return cachekv.NewStore(s)
-//    }
-//
-//    // CacheWrapWithTrace implements the KVStore interface.
-//    func (s Store) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types.CacheWrap {
+
+    // Implements CacheWrap
+    public var cacheWrap: CacheWrap {
+        BaseCacheKeyValueStore(parent: self)
+    }
+
+    // CacheWrapWithTrace implements the KVStore interface.
+    public func cacheWrapWithTrace(writer: Writer, traceContext: TraceContext) -> CacheWrap {
+        // TODO: Implement
+        fatalError()
 //        return cachekv.NewStore(tracekv.NewStore(s, w, tc))
-//    }
-//
+    }
+
 //    // Implements KVStore
 //    func (s Store) Get(key []byte) []byte {
 //        res := s.parent.Get(s.key(key))

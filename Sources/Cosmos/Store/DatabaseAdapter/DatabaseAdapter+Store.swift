@@ -69,14 +69,21 @@ class DatabaseAdapterStore: KeyValueStore {
         .database
     }
     
-    // TODO: Implement
     // CacheWrap cache wraps the underlying store.
-//    func (dsa Store) CacheWrap() types.CacheWrap {
-//        return cachekv.NewStore(dsa)
-//    }
+    var cacheWrap: CacheWrap {
+        BaseCacheKeyValueStore(parent: self)
+    }
+    
+    // CacheWrapWithTrace implements KVStore.
+    func cacheWrapWithTrace(writer: Writer, traceContext: TraceContext) -> CacheWrap {
+        // TODO: Implement
+        fatalError()
+//        let parent = TraceKeyValueStore(
+//            store: self,
+//            writer: writer,
+//            traceContext: traceContext
+//        )
 //
-//    // CacheWrapWithTrace implements KVStore.
-//    func (dsa Store) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types.CacheWrap {
-//        return cachekv.NewStore(tracekv.NewStore(dsa, w, tc))
-//    }
+//        return BaseCacheKeyValueStore(parent: parent)
+    }
 }

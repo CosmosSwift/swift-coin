@@ -197,7 +197,14 @@ extension NameServiceApp {
     }
     
     public func initChainer(request: Request, initChainRequest: RequestInitChain) -> ResponseInitChain {
-        let genesisState: GenesisState = codec.mustUnmarshalJSON(data: initChainRequest.appStateBytes)
+        let genesisState: GenesisState
+        
+        if initChainRequest.appStateBytes.isEmpty {
+            genesisState = [:]
+        } else {
+            genesisState = codec.mustUnmarshalJSON(data: initChainRequest.appStateBytes)
+        }
+        
         return moduleManager.initGenesis(request: request, genesisState: genesisState)
     }
 

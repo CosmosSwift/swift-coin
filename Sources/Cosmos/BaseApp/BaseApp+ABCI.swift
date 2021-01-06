@@ -28,9 +28,13 @@ extension BaseApp: ABCIApplication {
         }
 
         // TODO: Find best way to deal with force unwraps
+        guard let deliverState = self.deliverState else {
+            fatalError("deliverState should be set by now")
+        }
+        
         // add block gas meter for any genesis transactions (allow infinite gas)
-        deliverState!.request.blockGasMeter = InfiniteGasMeter()
-        var response = initChainer(deliverState!.request, request)
+        deliverState.request.blockGasMeter = InfiniteGasMeter()
+        var response = initChainer(deliverState.request, request)
 
         // sanity check
         if !request.validators.isEmpty {
