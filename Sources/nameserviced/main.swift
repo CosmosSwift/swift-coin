@@ -68,9 +68,16 @@ func exportApp(
     )
 }
 
+let codec = NameServiceApp.makeCodec()
+
 NameServiceApp.configure()
 ServerContext.defaultHome = NameServiceApp.defaultNodeHome
-ServerContext.codec = NameServiceApp.makeCodec()
+
+InitCommand.codec = codec
+InitCommand.moduleBasicManager = NameServiceApp.moduleBasics
+InitCommand.defaultHome = NameServiceApp.defaultNodeHome
+
+
 ServerContext.makeApp = makeApp
 ServerContext.exportApp = exportApp
 

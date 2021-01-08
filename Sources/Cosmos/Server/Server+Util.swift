@@ -1,8 +1,10 @@
 import Logging
 import ArgumentParser
+import Tendermint
 
 // server context
 public class ServerContext {
+    public static var configuration: Tendermint.Configuration = .default
     public static var logger: Logger = Logger(label: "Cosmos Server")
     public static var codec: Codec = Codec()
     public static var defaultHome: String = ""

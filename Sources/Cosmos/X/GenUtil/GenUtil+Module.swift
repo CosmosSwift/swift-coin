@@ -8,7 +8,7 @@ public class GenUtilAppModuleBasic: AppModuleBasic {
     
     public func register(codec: Codec) {}
     
-    public func defaultGenesis() -> RawMessage {
+    public func defaultGenesis() -> RawMessage? {
         // TODO: Implement
         fatalError()
     }

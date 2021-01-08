@@ -18,7 +18,7 @@ public struct NameServiceAppModuleBasic: AppModuleBasic {
 
     // DefaultGenesis returns default genesis state as raw bytes for the nameservice
     // module.
-    public func defaultGenesis() -> RawMessage {
+    public func defaultGenesis() -> RawMessage? {
         Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
     }
 
@@ -68,7 +68,7 @@ public struct NameServiceAppModule: AppModule {
 
     // DefaultGenesis returns default genesis state as raw bytes for the nameservice
     // module.
-    public func defaultGenesis() -> RawMessage {
+    public func defaultGenesis() -> RawMessage? {
         Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
     }
 

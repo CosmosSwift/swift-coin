@@ -11,9 +11,8 @@ public class StakingAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
-    public func defaultGenesis() -> RawMessage {
-        // TODO: Implement
-        fatalError()
+    public func defaultGenesis() -> RawMessage? {
+        Codec.stakingCodec.mustMarshalJSON(value: StakingGenesisState.default)
     }
     
     public func validateGenesis(rawMessage: RawMessage) throws {

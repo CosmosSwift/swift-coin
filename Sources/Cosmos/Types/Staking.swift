@@ -1,3 +1,8 @@
+// staking constants
+
+// default bond denomination
+let defaultBondDenomination = "stake"
+
 // BondStatus is the status of a validator
 enum BondStatus: Int {
     case unbonded = 0x00

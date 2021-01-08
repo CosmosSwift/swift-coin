@@ -9,9 +9,8 @@ public struct ParamsAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
-    public func defaultGenesis() -> RawMessage {
-        // TODO: Implement
-        fatalError()
+    public func defaultGenesis() -> RawMessage? {
+        RawMessage()
     }
     
     public func validateGenesis(rawMessage: RawMessage) throws {

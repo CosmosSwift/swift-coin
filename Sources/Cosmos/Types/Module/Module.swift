@@ -9,7 +9,7 @@ public protocol AppModuleBasic {
     func register(codec: Codec)
 
     // genesis
-    func defaultGenesis() -> RawMessage
+    func defaultGenesis() -> RawMessage?
     func validateGenesis(rawMessage: RawMessage) throws
 
     // client functionality

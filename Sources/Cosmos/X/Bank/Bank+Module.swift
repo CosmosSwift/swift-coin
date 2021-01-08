@@ -11,7 +11,7 @@ public class BankAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
-    public func defaultGenesis() -> RawMessage {
+    public func defaultGenesis() -> RawMessage? {
         // TODO: Implement
         fatalError()
     }

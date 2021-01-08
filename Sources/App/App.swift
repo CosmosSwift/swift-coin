@@ -14,7 +14,7 @@ public final class NameServiceApp: BaseApp, App {
     private static let appName = "nameservice"
     public let codec: Codec = makeCodec()
     
-    static let moduleBasics = BasicManager(
+    public static let moduleBasics = BasicManager(
         GenUtilAppModuleBasic(),
         AuthAppModuleBasic(),
         BankAppModuleBasic(),
