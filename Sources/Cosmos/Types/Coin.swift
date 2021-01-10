@@ -43,7 +43,17 @@ public struct Coins: Codable {
     public init(coins: [Coin] = []) {
         self.coins = coins
     }
-     
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.coins = try container.decode([Coin].self)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(coins)
+    }
+   
     var count: Int {
         coins.count
     }

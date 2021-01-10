@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 import Logging
 import Tendermint
 import ABCI
@@ -20,7 +21,7 @@ public typealias ExportApp = (
     _ height: Int64,
     _ forZeroHeight: Bool,
     _ jailWhiteList: [String]
-) throws -> (RawMessage, [GenesisValidator])
+) throws -> (JSON, [GenesisValidator])
 
 extension ServerContext {
     public static func makeDatabase(path: String) throws -> Database {

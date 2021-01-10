@@ -1,3 +1,4 @@
+import JSON
 import Tendermint
 import Cosmos
 
@@ -7,7 +8,7 @@ extension NameServiceApp {
     public func exportAppStateAndValidators(
         forZeroHeight: Bool,
         jailWhiteList: [String]
-    ) throws -> (RawMessage, [GenesisValidator]) {
+    ) throws -> (JSON, [GenesisValidator]) {
         // TODO: Implement
         fatalError()
         

@@ -4,7 +4,7 @@ import Tendermint
 extension GenesisDocument {
     // ExportGenesisFile creates and writes the genesis configuration to disk. An
     // error is returned if building or writing the configuration to file fails.
-    func exportGenesisFile(atPath genesisFilePath: String) throws {
+    mutating func exportGenesisFile(atPath genesisFilePath: String) throws {
         try validateAndComplete()
         try save(atFilePath: genesisFilePath)
     }

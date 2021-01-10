@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 import Logging
 import ABCI
 import Database
@@ -189,10 +190,10 @@ public final class NameServiceApp: BaseApp, App {
     }
 }
 
-typealias GenesisState = [String: RawMessage]
+typealias GenesisState = [String: JSON]
 
 extension NameServiceApp {
-    static func newDefaultGenesisState() -> GenesisState {
+    static func newDefaultGenesisState() -> JSON {
         moduleBasics.defaultGenesis()
     }
     

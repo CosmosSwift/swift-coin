@@ -58,7 +58,7 @@ public enum Bech32Prefix {
 
 // Address is a common interface for different types of addresses used by the SDK
 public protocol Address: Codable, CustomStringConvertible {
-    func equals(other: Address) -> Bool
+    func equals(_ other: Address) -> Bool
     var isEmpty: Bool { get }
     func marshal() throws -> Data
     func marshalJSON() throws -> Data
@@ -127,7 +127,7 @@ public struct AccountAddress: Equatable, Address {
 
 
     // Returns boolean for whether two ValAddresses are Equal
-    public func equals(other: Address) -> Bool {
+    public func equals(_ other: Address) -> Bool {
         if self.isEmpty && other.isEmpty {
             return true
         }
@@ -253,7 +253,7 @@ public struct ValidatorAddress: Address {
     }
 
     // Returns boolean for whether two ValAddresses are Equal
-    public func equals(other: Address) -> Bool {
+    public func equals(_ other: Address) -> Bool {
         if self.isEmpty && other.isEmpty {
             return true
         }
@@ -378,7 +378,7 @@ public struct ConsensusAddress: Address {
     }
 
     // Returns boolean for whether two ValAddresses are Equal
-    public func equals(other: Address) -> Bool {
+    public func equals(_ other: Address) -> Bool {
         if self.isEmpty && other.isEmpty {
             return true
         }

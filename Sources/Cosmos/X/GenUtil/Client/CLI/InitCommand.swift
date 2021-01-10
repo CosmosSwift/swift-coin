@@ -1,10 +1,28 @@
 import Foundation
+import JSON
 import ArgumentParser
 import Tendermint
 
 struct InitCommandError: Swift.Error, CustomStringConvertible {
     var description: String
 }
+
+struct PrintInfo: Codable {
+    let moniker: String
+    let chainID: String
+    let nodeID: String
+    let genesisTransactionsDirectory: String
+    let appState: JSON
+    
+    private enum CodingKeys: String, CodingKey {
+        case moniker
+        case chainID = "chain_id"
+        case nodeID = "node_id"
+        case genesisTransactionsDirectory = "gentxs_dir"
+        case appState = "app_message"
+    }
+}
+
 
 // InitCmd returns a command that initializes all files needed for Tendermint
 // and the respective application.
@@ -57,16 +75,7 @@ public struct InitCommand: ParsableCommand {
             throw InitCommandError(description: "genesis.json file already exists: \(genesisFilePath)")
         }
         
-        let appState: Data
-        
-        do {
-            appState = try Self.codec.marshalJSONIndent(value: Self.moduleBasicManager.defaultGenesis())
-        } catch {
-            throw CosmosError.wrap(
-                error: error,
-                description: "Failed to marshall default genesis state"
-            )
-        }
+        let appState = Self.moduleBasicManager.defaultGenesis()
 
         guard FileManager.default.fileExists(atPath: genesisFilePath) else {
             throw InitCommandError(description: "genesisFile does not exist")
@@ -96,9 +105,29 @@ public struct InitCommand: ParsableCommand {
             )
         }
 
-//        let toPrint = newPrintInfo(Config.moniker, chainID, nodeID, "", appState)
+        let printInfo = PrintInfo(
+            moniker: configuration.moniker,
+            chainID: chainID,
+            nodeID: nodeID,
+            genesisTransactionsDirectory: "",
+            appState: appState
+        )
+        
         let configurationFilePath = configuration.rootDirectory + "/config/config.toml"
         configuration.writeConfigurationFile(atPath: configurationFilePath)
-//        return displayInfo(cdc, toPrint)
+        try display(info: printInfo)
+    }
+    
+    private func display(info: PrintInfo) throws {
+        let encoder = JSONEncoder()
+       
+        encoder.outputFormatting = [
+            .prettyPrinted,
+            .sortedKeys,
+            .withoutEscapingSlashes
+        ]
+        
+        let data = try encoder.encode(info)
+        print(data.string)
     }
 }

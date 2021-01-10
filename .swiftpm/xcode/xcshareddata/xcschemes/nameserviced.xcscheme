@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "init mynode -o"
+            argument = "start"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

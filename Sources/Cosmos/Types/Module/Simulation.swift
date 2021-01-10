@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 
 // AppModuleSimulation defines the standard functions that every module should expose
 // for the SDK blockchain simulator
@@ -37,7 +38,7 @@ struct SimulationState {
     // random number
     let random: RandomNumber
     // genesis state
-    let genState: [String: RawMessage]
+    let genesisState: [String: JSON]
     // simulation accounts
     let accounts: [Account]
     // initial coins per account
@@ -45,11 +46,11 @@ struct SimulationState {
     // number of initially bonded accounts
     let numBonded: Int64
     // genesis timestamp
-    let genTimestamp: Date
+    let genesisTimestamp: Date
     // staking unbond time stored to use it as the slashing maximum evidence duration
     let unbondTime: TimeInterval
     // simulated parameter changes from modules
-    let paramChanges: [ParameterChange]
+    let parameterChanges: [ParameterChange]
     // proposal content generator functions with their default weight and app sim key
     let contents: [WeightedProposalContent]
 }

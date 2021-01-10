@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 
 //------------------------------------------------------------
 // core types for a genesis definition
@@ -8,36 +9,45 @@ import Foundation
 
 // GenesisValidator is an initial validator.
 public struct GenesisValidator: Codable {
-    let address: Address
-    // TODO: Sort out PublicKey being a protocol or not
-//    let publicKey: PublicKey
+    var address: Address
+    let publicKey: PublicKey
     let power: Int64
     let name: String
     
     private enum CodingKeys: String, CodingKey {
         case address
-//        case publicKey = "pub_key"
+        case publicKey = "pub_key"
         case power
         case name
+    }
+    
+    public init(from decoder: Decoder) throws {
+        // TODO: Implement
+        fatalError()
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        // TODO: Implement
+        fatalError()
     }
 }
 
 // GenesisDoc defines the initial conditions for a tendermint blockchain, in particular its validator set.
 public struct GenesisDocument: Codable {
     // MaxChainIDLen is a maximum length of the chain ID.
-    static let maxChainIDLength = 50
+    static let maximumChainIDLength = 50
     
     let genesisTime: Date
     public var chainID: String
-//    let consensusParams: ConsensusParams?
-    public var validators: [GenesisValidator]
+    var consensusParameters: ConsensusParameters?
+    public var validators: [GenesisValidator]?
     let appHash: Data
-    public var appState: Data
+    public var appState: JSON
     
     private enum CodingKeys: String, CodingKey {
         case genesisTime = "genesis_time"
         case chainID = "chain_id"
-//        case consensusParams = "consensus_params"
+        case consensusParameters = "consensus_params"
         case validators
         case appHash = "app_hash"
         case appState = "app_state"
@@ -48,7 +58,11 @@ public struct GenesisDocument: Codable {
 
     // GenesisDocFromJSON unmarshalls JSON data into a GenesisDoc.
     public init(jsonData: Data) throws {
-        let genesisDocument = try JSONDecoder().decode(GenesisDocument.self, from: jsonData)
+        let decoder = JSONDecoder()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        var genesisDocument = try decoder.decode(GenesisDocument.self, from: jsonData)
         try genesisDocument.validateAndComplete()
         self = genesisDocument
     }
@@ -86,14 +100,28 @@ public struct GenesisDocument: Codable {
 
 extension GenesisDocument {
     // SaveAs is a utility method for saving GenensisDoc as a JSON file.
-    public func save(atFilePath: String) throws {
-        // TODO: Implement
-        fatalError()
-//        genDocBytes, err := cdc.MarshalJSONIndent(genDoc, "", "  ")
-//        if err != nil {
-//            return err
-//        }
-//        return tmos.WriteFile(file, genDocBytes, 0644)
+    public func save(atFilePath path: String) throws {
+        let encoder = JSONEncoder()
+        
+        encoder.outputFormatting = [
+            .prettyPrinted,
+            .sortedKeys,
+            .withoutEscapingSlashes
+        ]
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        encoder.dateEncodingStrategy = .formatted(dateFormatter)
+        
+        let data = try encoder.encode(self)
+        let url = URL(fileURLWithPath: path)
+        try data.write(to: url)
+        
+        // TODO: Check if this is required
+//        try! FileManager.default.setAttributes(
+//            [.posixPermissions: NSNumber(value: Int16(0644))],
+//            ofItemAtPath: path
+//        )
     }
 
     // ValidatorHash returns the hash of the validator set contained in the GenesisDoc
@@ -110,38 +138,46 @@ extension GenesisDocument {
 
     // ValidateAndComplete checks that all necessary fields are present
     // and fills in defaults for optional fields left empty
-    public func validateAndComplete() throws {
-        // TODO: Implement
-        fatalError()
-//        if genDoc.ChainID == "" {
-//            return errors.New("genesis doc must include non-empty chain_id")
+    public mutating func validateAndComplete() throws {
+        struct ValidationError: Error, CustomStringConvertible {
+            let description: String
+        }
+        
+        if chainID == "" {
+            throw ValidationError(description: "genesis doc must include non-empty chain_id")
+        }
+        
+        if chainID.count > Self.maximumChainIDLength {
+            throw ValidationError(description: "chain_id in genesis doc is too long (max: \(Self.maximumChainIDLength)")
+        }
+
+        if let consensusParameters = self.consensusParameters {
+            try consensusParameters.validate()
+        } else {
+            self.consensusParameters = .default
+        }
+        
+        var validators = self.validators ?? []
+
+        for (i, validator) in validators.enumerated() {
+            if validator.power == 0 {
+                throw ValidationError(description: "the genesis file cannot contain validators with no voting power: \(validator)")
+            }
+            
+            if validator.address.count > 0 && validator.publicKey.address != validator.address {
+                throw ValidationError(description: "incorrect address for validator \(validator) in the genesis file, should be \(validator.publicKey.address)")
+            }
+            
+            if validator.address.isEmpty {
+                validators[i].address = validator.publicKey.address
+            }
+        }
+        
+        self.validators = validators
+
+        // TODO: Check if this is necessary
+//        if genesisTime == 0 {
+//            genesisTime = Date()
 //        }
-//        if len(genDoc.ChainID) > MaxChainIDLen {
-//            return errors.Errorf("chain_id in genesis doc is too long (max: %d)", MaxChainIDLen)
-//        }
-//
-//        if genDoc.ConsensusParams == nil {
-//            genDoc.ConsensusParams = DefaultConsensusParams()
-//        } else if err := genDoc.ConsensusParams.Validate(); err != nil {
-//            return err
-//        }
-//
-//        for i, v := range genDoc.Validators {
-//            if v.Power == 0 {
-//                return errors.Errorf("the genesis file cannot contain validators with no voting power: %v", v)
-//            }
-//            if len(v.Address) > 0 && !bytes.Equal(v.PubKey.Address(), v.Address) {
-//                return errors.Errorf("incorrect address for validator %v in the genesis file, should be %v", v, v.PubKey.Address())
-//            }
-//            if len(v.Address) == 0 {
-//                genDoc.Validators[i].Address = v.PubKey.Address()
-//            }
-//        }
-//
-//        if genDoc.GenesisTime.IsZero() {
-//            genDoc.GenesisTime = tmtime.Now()
-//        }
-//
-//        return nil
     }
 }

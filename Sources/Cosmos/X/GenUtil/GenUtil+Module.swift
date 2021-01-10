@@ -1,3 +1,4 @@
+import JSON
 import ABCI
 
 // AppModuleBasic defines the basic application module used by the genutil module.
@@ -8,12 +9,12 @@ public class GenUtilAppModuleBasic: AppModuleBasic {
     
     public func register(codec: Codec) {}
     
-    public func defaultGenesis() -> RawMessage? {
-        // TODO: Implement
-        fatalError()
+    public func defaultGenesis() -> JSON? {
+        let data = Codec.genUtilCodec.mustMarshalJSON(value: GenUtilGenesisState.default)
+        return Codec.genUtilCodec.mustUnmarshalJSON(data: data)
     }
     
-    public func validateGenesis(rawMessage: RawMessage) throws {
+    public func validateGenesis(json: JSON) throws {
         // TODO: Implement
         fatalError()
     }
@@ -40,7 +41,7 @@ public final class GenUtilAppModule: GenUtilAppModuleBasic, AppModule {
 
     // InitGenesis performs genesis initialization for the genutil module. It returns
     // no validator updates.
-    public func initGenesis(request: Request, rawMessage: RawMessage) -> [ValidatorUpdate] {
+    public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
         // TODO: Implement
         fatalError()
 //        var genesisState GenesisState
@@ -50,7 +51,7 @@ public final class GenUtilAppModule: GenUtilAppModuleBasic, AppModule {
 
     // ExportGenesis returns the exported genesis state as raw bytes for the genutil
     // module.
-    public func exportGenesis(request: Request) -> RawMessage {
+    public func exportGenesis(request: Request) -> JSON {
         // TODO: Implement
         fatalError()
 //        return am.DefaultGenesis()

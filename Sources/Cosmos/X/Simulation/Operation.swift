@@ -1,4 +1,5 @@
 import Foundation
+import JSON
 
 // Operation runs a state machine transition, and ensures the transition
 // happened as expected.  The operation could be running and testing a fuzzed
@@ -30,7 +31,7 @@ public struct OperationMessage: Codable {
     // success
     let ok: Bool
     // JSON encoded msg
-    let message: RawMessage
+    let message: JSON
 }
 
 //________________________________________________________________________

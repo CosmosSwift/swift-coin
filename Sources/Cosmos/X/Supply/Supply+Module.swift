@@ -1,3 +1,4 @@
+import JSON
 import ABCI
 
 // AppModuleBasic defines the basic application module used by the supply module.
@@ -11,12 +12,12 @@ public class SupplyAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
-    public func defaultGenesis() -> RawMessage? {
-        // TODO: Implement
-        fatalError()
+    public func defaultGenesis() -> JSON? {
+        let data = Codec.supplyCodec.mustMarshalJSON(value: SupplyGenesisState.default)
+        return Codec.supplyCodec.mustUnmarshalJSON(data: data)
     }
     
-    public func validateGenesis(rawMessage: RawMessage) throws {
+    public func validateGenesis(json: JSON) throws {
         // TODO: Implement
         fatalError()
     }
@@ -69,11 +70,11 @@ public final class SupplyAppModule: SupplyAppModuleBasic, AppModule {
     }
    
     // Genesis
-    public func initGenesis(request: Request, rawMessage: RawMessage) -> [ValidatorUpdate] {
+    public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
         fatalError()
     }
     
-    public func exportGenesis(request: Request) -> RawMessage {
+    public func exportGenesis(request: Request) -> JSON {
         fatalError()
     }
 }

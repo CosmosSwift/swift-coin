@@ -7,7 +7,6 @@ import Tendermint
 // and a pubkey for authentication purposes.
 //
 // Many complex conditions can be used in the concrete struct which implements Account.
-// TODO: Renamed from exported.Account to ExportedAccount investigate better name.
 public protocol Account: Codable, CustomStringConvertible {
     var address: AccountAddress { get }
     // errors if already set.
@@ -30,3 +29,26 @@ public protocol Account: Codable, CustomStringConvertible {
     // the current time.
     func spendableCoins(blockTime: TimeInterval) -> Coins
 }
+
+// GenesisAccounts defines a slice of GenesisAccount objects
+typealias GenesisAccounts = [GenesisAccount]
+
+extension GenesisAccounts {
+    // Contains returns true if the given address exists in a slice of GenesisAccount
+    // objects.
+    func contains(address: Address) -> Bool {
+        for account in self {
+            if account.address.equals(address) {
+                return true
+            }
+        }
+
+        return false
+    }
+}
+
+// GenesisAccount defines a genesis account that embeds an Account with validation capabilities.
+protocol GenesisAccount: Account {
+    func validate() throws
+}
+

@@ -1,3 +1,4 @@
+import JSON
 import ABCI
 import Cosmos
 
@@ -18,13 +19,15 @@ public struct NameServiceAppModuleBasic: AppModuleBasic {
 
     // DefaultGenesis returns default genesis state as raw bytes for the nameservice
     // module.
-    public func defaultGenesis() -> RawMessage? {
-        Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
+    public func defaultGenesis() -> JSON? {
+        let data = Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
+        return Codec.moduleCodec.mustUnmarshalJSON(data: data)
     }
 
     // ValidateGenesis performs genesis state validation for the nameservice module.
-    public func validateGenesis(rawMessage: RawMessage) throws {
-        let genesisState: GenesisState = try Codec.moduleCodec.unmarshalJSON(data: rawMessage)
+    public func validateGenesis(json: JSON) throws {
+        let data = Codec.moduleCodec.mustMarshalJSON(value: json)
+        let genesisState: GenesisState = try Codec.moduleCodec.unmarshalJSON(data: data)
         try genesisState.validate()
     }
 
@@ -68,13 +71,15 @@ public struct NameServiceAppModule: AppModule {
 
     // DefaultGenesis returns default genesis state as raw bytes for the nameservice
     // module.
-    public func defaultGenesis() -> RawMessage? {
-        Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
+    public func defaultGenesis() -> JSON? {
+        let data = Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
+        return Codec.moduleCodec.mustUnmarshalJSON(data: data)
     }
 
     // ValidateGenesis performs genesis state validation for the nameservice module.
-    public func validateGenesis(rawMessage: RawMessage) throws {
-        let genesisState: GenesisState = try Codec.moduleCodec.unmarshalJSON(data: rawMessage)
+    public func validateGenesis(json: JSON) throws {
+        let data = Codec.moduleCodec.mustMarshalJSON(value: json)
+        let genesisState: GenesisState = try Codec.moduleCodec.unmarshalJSON(data: data)
         try genesisState.validate()
     }
     
@@ -103,8 +108,9 @@ public struct NameServiceAppModule: AppModule {
     
     // InitGenesis performs genesis initialization for the nameservice module. It returns
     // no validator updates.
-    public func initGenesis(request: Request, rawMessage: RawMessage) -> [ValidatorUpdate] {
-        let genesisState: GenesisState = Codec.moduleCodec.mustUnmarshalJSON(data: rawMessage)
+    public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
+        let data = Codec.moduleCodec.mustMarshalJSON(value: json)
+        let genesisState: GenesisState = Codec.moduleCodec.mustUnmarshalJSON(data: data)
         GenesisState.initGenesis(request: request, keeper: keeper, data: genesisState)
         // TODO: Add default parameters to ValidatorUpdate and make the labels visible.
         return []
@@ -112,9 +118,10 @@ public struct NameServiceAppModule: AppModule {
     
     // ExportGenesis returns the exported genesis state as raw bytes for the nameservice
     // module.
-    public func exportGenesis(request: Request) -> RawMessage {
+    public func exportGenesis(request: Request) -> JSON {
         let genesisState = GenesisState.exportGenesis(request: request, keeper: keeper)
-        return Codec.moduleCodec.mustMarshalJSON(value: genesisState)
+        let data = Codec.moduleCodec.mustMarshalJSON(value: genesisState)
+        return Codec.moduleCodec.mustUnmarshalJSON(data: data)
     }
     
     // BeginBlock returns the begin blocker for the nameservice module.

@@ -1,7 +1,6 @@
 import Foundation
+import JSON
 import ABCI
-
-public typealias RawMessage = Data
 
 // AppModuleBasic is the standard form for basic non-dependant elements of an application module.
 public protocol AppModuleBasic {
@@ -9,8 +8,8 @@ public protocol AppModuleBasic {
     func register(codec: Codec)
 
     // genesis
-    func defaultGenesis() -> RawMessage?
-    func validateGenesis(rawMessage: RawMessage) throws
+    func defaultGenesis() -> JSON?
+    func validateGenesis(json: JSON) throws
 
     // client functionality
 //    func registerRESTRoutes(cliContext: context.CLIContext, *mux.Router)
@@ -41,24 +40,24 @@ extension BasicManager {
     }
 
     // DefaultGenesis provides default genesis information for all modules
-    public func defaultGenesis() -> [String: RawMessage] {
-        var genesis: [String: RawMessage] = [:]
+    public func defaultGenesis() -> JSON {
+        var genesis: [String: JSON] = [:]
         
         for basic in values {
             genesis[basic.name] = basic.defaultGenesis()
         }
         
-        return genesis
+        return .object(genesis)
     }
 
     // ValidateGenesis performs genesis state validation for all modules
-    func validateGenesis(genesis: [String: RawMessage]) throws {
+    func validateGenesis(genesis: [String: JSON]) throws {
         for basic in values {
-            guard let rawMessage = genesis[basic.name] else {
+            guard let json = genesis[basic.name] else {
                 continue
             }
             
-            try basic.validateGenesis(rawMessage: rawMessage)
+            try basic.validateGenesis(json: json)
         }
     }
 
@@ -90,8 +89,8 @@ extension BasicManager {
 
 // AppModuleGenesis is the standard form for an application module genesis functions
 public protocol AppModuleGenesis: AppModuleBasic {
-    func initGenesis(request: Request, rawMessage: RawMessage) -> [ValidatorUpdate]
-    func exportGenesis(request: Request) -> RawMessage
+    func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate]
+    func exportGenesis(request: Request) -> JSON
 }
 
 // AppModule is the standard form for an application module
@@ -196,11 +195,11 @@ public class ModuleManager {
     }
 
     // InitGenesis performs init genesis functionality for modules
-    public func initGenesis(request: Request, genesisState: [String: RawMessage]) -> ResponseInitChain {
+    public func initGenesis(request: Request, genesisState: [String: JSON]) -> ResponseInitChain {
         var validatorUpdates: [ValidatorUpdate] = []
         
         for moduleName in orderInitGenesis {
-            guard let rawMessage = genesisState[moduleName] else {
+            guard let json = genesisState[moduleName] else {
                 continue
             }
             
@@ -208,7 +207,7 @@ public class ModuleManager {
                 continue
             }
             
-            let moduleValUpdates = module.initGenesis(request: request, rawMessage: rawMessage)
+            let moduleValUpdates = module.initGenesis(request: request, json: json)
 
             // use these validator updates if provided, the module manager assumes
             // only one module will update the validator set

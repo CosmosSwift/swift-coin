@@ -1,3 +1,4 @@
+import JSON
 import Tendermint
 import ABCI
 
@@ -27,7 +28,7 @@ public protocol App {
     func exportAppStateAndValidators(
         forZeroHeight: Bool,
         jailWhiteList: [String]
-    ) throws -> (RawMessage, [GenesisValidator])
+    ) throws -> (JSON, [GenesisValidator])
 
     // All the registered module account addreses.
     static var moduleAccountAddresses: [String: Bool] { get }

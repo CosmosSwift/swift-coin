@@ -76,11 +76,13 @@ let package = Package(
             name: "Tendermint",
             dependencies: [
                 .target(name: "Bech32"),
+                .target(name: "JSON"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(name: "Bech32"),
+        .target(name: "JSON"),
     ]
 )
 

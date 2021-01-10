@@ -1,4 +1,5 @@
 import ABCI
+import JSON
 
 // AppModuleBasic defines the basic application module used by the staking module.
 public class StakingAppModuleBasic: AppModuleBasic {
@@ -11,11 +12,13 @@ public class StakingAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
-    public func defaultGenesis() -> RawMessage? {
-        Codec.stakingCodec.mustMarshalJSON(value: StakingGenesisState.default)
+    public func defaultGenesis() -> JSON? {
+        // TODO: Find a way to encode directly to JSON
+        let data = Codec.stakingCodec.mustMarshalJSON(value: StakingGenesisState.default)
+        return Codec.stakingCodec.mustUnmarshalJSON(data: data)
     }
     
-    public func validateGenesis(rawMessage: RawMessage) throws {
+    public func validateGenesis(json: JSON) throws {
         // TODO: Implement
         fatalError()
     }
@@ -71,11 +74,11 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
     }
    
     // Genesis
-    public func initGenesis(request: Request, rawMessage: RawMessage) -> [ValidatorUpdate] {
+    public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
         fatalError()
     }
     
-    public func exportGenesis(request: Request) -> RawMessage {
+    public func exportGenesis(request: Request) -> JSON {
         fatalError()
     }
 }

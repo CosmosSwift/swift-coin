@@ -1,3 +1,5 @@
+import JSON
+
 // AppModuleBasic defines the basic application module used by the params module.
 public struct ParamsAppModuleBasic: AppModuleBasic {
     public init() {}
@@ -9,11 +11,11 @@ public struct ParamsAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
-    public func defaultGenesis() -> RawMessage? {
-        RawMessage()
+    public func defaultGenesis() -> JSON? {
+        nil
     }
     
-    public func validateGenesis(rawMessage: RawMessage) throws {
+    public func validateGenesis(json: JSON) throws {
         // TODO: Implement
         fatalError()
     }

@@ -1,3 +1,4 @@
+import JSON
 import ArgumentParser
 import Logging
 import Tendermint
@@ -49,7 +50,7 @@ func exportApp(
     height: Int64,
     forZeroHeight: Bool,
     jailWhiteList: [String]
-) throws -> (RawMessage, [GenesisValidator]) {
+) throws -> (JSON, [GenesisValidator]) {
     let app = try NameServiceApp(
         logger: logger,
         database: database,
