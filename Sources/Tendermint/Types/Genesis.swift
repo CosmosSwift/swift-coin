@@ -10,25 +10,41 @@ import JSON
 // GenesisValidator is an initial validator.
 public struct GenesisValidator: Codable {
     var address: Address
-    let publicKey: PublicKey
+//    let publicKey: PublicKey
     let power: Int64
     let name: String
     
     private enum CodingKeys: String, CodingKey {
         case address
-        case publicKey = "pub_key"
+//        case publicKey = "pub_key"
         case power
         case name
     }
     
     public init(from decoder: Decoder) throws {
-        // TODO: Implement
-        fatalError()
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let address = try container.decode(Address.self, forKey: .address)
+        let powerString = try container.decode(String.self, forKey: .power)
+        let name = try container.decode(String.self, forKey: .name)
+        
+        guard let power = Int64(powerString) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .power,
+                in: container,
+                debugDescription: "Invalid power"
+            )
+        }
+        
+        self.address = address
+        self.power = power
+        self.name = name
     }
     
     public func encode(to encoder: Encoder) throws {
-        // TODO: Implement
-        fatalError()
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
+        try container.encode("\(power)", forKey: .power)
+        try container.encode(name, forKey: .name)
     }
 }
 
@@ -42,7 +58,7 @@ public struct GenesisDocument: Codable {
     var consensusParameters: ConsensusParameters?
     public var validators: [GenesisValidator]?
     let appHash: Data
-    public var appState: JSON
+    public var appState: JSON?
     
     private enum CodingKeys: String, CodingKey {
         case genesisTime = "genesis_time"
@@ -164,13 +180,13 @@ extension GenesisDocument {
                 throw ValidationError(description: "the genesis file cannot contain validators with no voting power: \(validator)")
             }
             
-            if validator.address.count > 0 && validator.publicKey.address != validator.address {
-                throw ValidationError(description: "incorrect address for validator \(validator) in the genesis file, should be \(validator.publicKey.address)")
-            }
-            
-            if validator.address.isEmpty {
-                validators[i].address = validator.publicKey.address
-            }
+//            if validator.address.count > 0 && validator.publicKey.address != validator.address {
+//                throw ValidationError(description: "incorrect address for validator \(validator) in the genesis file, should be \(validator.publicKey.address)")
+//            }
+//
+//            if validator.address.isEmpty {
+//                validators[i].address = validator.publicKey.address
+//            }
         }
         
         self.validators = validators
