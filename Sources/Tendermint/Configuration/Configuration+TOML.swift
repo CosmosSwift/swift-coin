@@ -57,20 +57,20 @@ extension Configuration {
         ##### additional base config options #####
 
         # Path to the JSON file containing the initial validator set and other meta data
-        genesis_file = "\(base.genesis).json"
+        genesis_file = "\(base.genesis)"
 
         # Path to the JSON file containing the private key to use as a validator in the consensus protocol
-        priv_validator_key_file = "\(base.privateValidatorKey).json"
+        priv_validator_key_file = "\(base.privateValidatorKey)"
 
         # Path to the JSON file containing the last sign state of a validator
-        priv_validator_state_file = "\(base.privateValidatorState).json"
+        priv_validator_state_file = "\(base.privateValidatorState)"
 
         # TCP or UNIX socket address for Tendermint to listen on for
         # connections from an external PrivValidator process
         priv_validator_laddr = "\(base.privateValidatorListenAddress)"
 
         # Path to the JSON file containing the private key to use for node authentication in the p2p protocol
-        node_key_file = "\(base.nodeKey).json"
+        node_key_file = "\(base.nodeKey)"
 
         # Mechanism to connect to the ABCI application: socket | grpc
         abci = "\(base.abci)"
@@ -185,7 +185,7 @@ extension Configuration {
         upnp = \(p2p.upnp)
 
         # Path to address book
-        addr_book_file = "\(p2p.addressBook).json"
+        addr_book_file = "\(p2p.addressBook)"
 
         # Set true for strict address routability rules
         # Set false for private or local networks

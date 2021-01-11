@@ -11,12 +11,13 @@ public struct ParamsAppModuleBasic: AppModuleBasic {
         fatalError()
     }
     
+    /// DefaultGenesis returns default genesis state as raw bytes for the params
+    /// module.
     public func defaultGenesis() -> JSON? {
         nil
     }
     
+    /// ValidateGenesis performs genesis state validation for the params module.
     public func validateGenesis(json: JSON) throws {
-        // TODO: Implement
-        fatalError()
     }
 }

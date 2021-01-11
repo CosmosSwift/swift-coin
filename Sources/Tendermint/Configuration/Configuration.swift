@@ -357,7 +357,7 @@ extension RPCConfiguration {
     static var `default`: RPCConfiguration {
         RPCConfiguration(
             rootDirectory: "",
-            listenAddress: "tcp://127.0.0.1:26657",
+            listenAddress: "tcp://0.0.0.0:26657", // instead of "tcp://127.0.0.1:26657" for usage in docker
             corsAllowedOrigins: [],
             corsAllowedMethods: ["HEAD", "GET", "POST"],
             corsAllowedHeaders: ["Origin", "Accept", "Content-Type", "X-Requested-With", "X-Server-Time"],

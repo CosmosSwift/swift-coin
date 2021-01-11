@@ -27,12 +27,8 @@ extension Tendermint.Configuration {
             mode: 0777
         )
 
-        // TODO: Implement
-//        let validatorPublicKey = try FilePrivateValidator.loadOrGenerate(
-//            privateValidatorKeyFile,
-//            privateValidatorStateFile
-//        ).publicKey
-        // TODO: Return validatorPublicKey
-        return (nodeID, nil)
+        let validatorPublicKey = try FilePrivateValidator.loadOrGenerateFilePrivateValidatorKey(atPath: privateValidatorKeyFile).publicKey
+        try FilePrivateValidator.loadOrGenerateFilePrivateValidatorState(atPath: privateValidatorStateFile)
+        return (nodeID, validatorPublicKey)
     }
 }
