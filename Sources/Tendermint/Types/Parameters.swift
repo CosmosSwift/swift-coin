@@ -90,7 +90,7 @@ struct BlockParameters: Codable {
 struct EvidenceParameters: Codable {
     // only accept new evidence more recent than this
     let maximumAgeNumberBlocks: Int64
-    let maximumAgeDuration: TimeInterval
+    let maximumAgeDuration: Time
     
     private enum CodingKeys: String, CodingKey {
         case maximumAgeNumberBlocks = "max_age_num_blocks"
@@ -99,7 +99,7 @@ struct EvidenceParameters: Codable {
     
     init(
         maximumAgeNumberBlocks: Int64,
-        maximumAgeDuration: TimeInterval
+        maximumAgeDuration: Time
     ) {
         self.maximumAgeNumberBlocks = maximumAgeNumberBlocks
         self.maximumAgeDuration = maximumAgeDuration
@@ -127,7 +127,7 @@ struct EvidenceParameters: Codable {
         }
         
         self.maximumAgeNumberBlocks = maximumAgeNumberBlocks
-        self.maximumAgeDuration = maximumAgeDuration
+        self.maximumAgeDuration = .milliSecond(maximumAgeDuration)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -175,13 +175,51 @@ extension BlockParameters {
     }
 }
 
-extension TimeInterval {
-    static let nanosecond: TimeInterval = 1
-    static let microsecond: TimeInterval = 1000 * nanosecond
-    static let millisecond: TimeInterval = 1000 * microsecond
-    static let second: TimeInterval = 1000 * millisecond
-    static let minute: TimeInterval = 60 * second
-    static let hour: TimeInterval = 60 * minute
+enum Time: RawRepresentable, Codable, CustomStringConvertible {
+    case nanoSecond(TimeInterval)
+    case microSecond(TimeInterval)
+    case milliSecond(TimeInterval)
+    case second(TimeInterval)
+    case minute(TimeInterval)
+    case hour(TimeInterval)
+    
+    init?(rawValue: Double) {
+        self = .nanoSecond(rawValue)
+    }
+    
+    var rawValue: TimeInterval {
+        switch self {
+        case .nanoSecond(let value):
+            return value
+        case .microSecond(let value):
+            return value * 1000
+        case .milliSecond(let value):
+            return value * 1000 * 1000
+        case .second(let value):
+            return value * 1000 * 1000 * 1000
+        case .minute(let value):
+            return value * 1000 * 1000 * 1000 * 60
+        case .hour(let value):
+            return value * 1000 * 1000 * 1000 * 60 * 60
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .nanoSecond(let value):
+            return "\(value)ns"
+        case .microSecond(let value):
+            return "\(value)us"
+        case .milliSecond(let value):
+            return "\(value)ms"
+        case .second(let value):
+            return "\(value)s"
+        case .minute(let value):
+            return "\(value)m"
+        case .hour(let value):
+            return "\(value)h"
+        }
+    }
 }
 
 extension EvidenceParameters {
@@ -189,7 +227,7 @@ extension EvidenceParameters {
     static var `default`: EvidenceParameters {
         EvidenceParameters(
             maximumAgeNumberBlocks: 100000, // 27.8 hrs at 1block/s,
-            maximumAgeDuration: 48 * .hour
+            maximumAgeDuration: .hour(48)
         )
     }
 }
@@ -230,7 +268,7 @@ extension ConsensusParameters {
             throw ValidationError(description: "evidenceParams.MaxAgeNumBlocks must be greater than 0. Got \(evidence.maximumAgeNumberBlocks)")
         }
 
-        if evidence.maximumAgeDuration <= 0 {
+        if evidence.maximumAgeDuration.rawValue <= 0 {
             throw ValidationError(description: "evidenceParams.MaxAgeDuration must be grater than 0 if provided, Got \(evidence.maximumAgeDuration)")
         }
 

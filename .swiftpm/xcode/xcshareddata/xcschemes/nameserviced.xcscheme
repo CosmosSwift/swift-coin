@@ -55,6 +55,10 @@
             argument = "start"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "init newnode -o"
+            isEnabled = "NO">
+         </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
