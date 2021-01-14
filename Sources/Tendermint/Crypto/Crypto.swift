@@ -12,7 +12,7 @@ public enum Crypto {
 }
 
 public class PublicKey: Codable, Equatable {
-    var address: Address {
+    public var address: Address {
         fatalError("PublicKey must be subclassed.")
     }
     
@@ -20,7 +20,7 @@ public class PublicKey: Codable, Equatable {
         fatalError("PublicKey must be subclassed.")
     }
     
-    func verify(message: Data, signature: Data) -> Bool {
+    public func verify(message: Data, signature: Data) -> Bool {
         fatalError("PublicKey must be subclassed.")
     }
     
@@ -34,13 +34,13 @@ public class PrivateKey: Codable, Equatable {
         fatalError("PublicKey must be subclassed.")
     }
 
-    var publicKey: PublicKey {
+    public var publicKey: PublicKey {
         fatalError("PublicKey must be subclassed.")
     }
     
     init() {}
     
-    func sign(message: Data) throws -> Data {
+    public func sign(message: Data) throws -> Data {
         fatalError("PublicKey must be subclassed.")
     }
     

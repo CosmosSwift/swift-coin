@@ -85,7 +85,11 @@ public enum FilePrivateValidator {
         let privateKey = Ed25519PrivateKey.generate()
         let filePrivateValidatorKey = FilePrivateValidatorKey(privateKey: privateKey)
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .withoutEscapingSlashes
+        encoder.outputFormatting = [
+            .prettyPrinted,
+            .sortedKeys,
+            .withoutEscapingSlashes
+        ]
         let jsonData = try encoder.encode(filePrivateValidatorKey)
         let url = URL(fileURLWithPath: path)
         try jsonData.write(to: url)
@@ -102,7 +106,11 @@ public enum FilePrivateValidator {
     private static func generateFilePrivateValidatorState(atPath path: String) throws -> FilePrivateValidatorState {
         let filePrivateValidatorState = FilePrivateValidatorState(height: "0", round: 0, step: 0)
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .withoutEscapingSlashes
+        encoder.outputFormatting = [
+            .prettyPrinted,
+            .sortedKeys,
+            .withoutEscapingSlashes
+        ]
         let jsonData = try encoder.encode(filePrivateValidatorState)
         let url = URL(fileURLWithPath: path)
         try jsonData.write(to: url)
