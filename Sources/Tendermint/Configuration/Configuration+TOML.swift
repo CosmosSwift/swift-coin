@@ -239,7 +239,7 @@ extension Configuration {
 
         recheck = \(memoryPool.recheck)
         broadcast = \(memoryPool.broadcast)
-        wal_dir = "\(memoryPool.walPath).json"
+        wal_dir = "\(memoryPool.walPath)"
 
         # Maximum number of transactions in the mempool
         size = \(memoryPool.size)
@@ -268,7 +268,7 @@ extension Configuration {
         ##### consensus configuration options #####
         [consensus]
 
-        wal_file = "\(consensus.walPath).json"
+        wal_file = "\(consensus.walPath)"
 
         timeout_propose = "\(consensus.timeoutPropose)"
         timeout_propose_delta = "\(consensus.timeoutProposeDelta)"
