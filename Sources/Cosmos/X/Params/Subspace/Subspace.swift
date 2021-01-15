@@ -53,7 +53,7 @@ public struct Subspace {
             fatalError("SetKeyTable() called on already initialized Subspace")
         }
 
-        for (key, value) in table.map {
+        for (key, value) in keyTable.map {
             copy.table.map[key] = value
         }
 

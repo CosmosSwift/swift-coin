@@ -3,7 +3,7 @@ import Database
 
 // Store is similar with tendermint/tendermint/libs/db/prefix_db
 // both gives access only to the limited subset of the store
-// for convinience or safety
+// for convenience or safety
 public final class PrefixStore: KeyValueStore {
     let parent: KeyValueStore
     let prefix: Data
@@ -14,33 +14,29 @@ public final class PrefixStore: KeyValueStore {
     }
 
     public func get(key: Data) -> Data? {
-        // TODO: Implement
-        fatalError()
+        parent.get(key: key)
+
     }
     
     public func has(key: Data) -> Bool {
-        // TODO: Implement
-        fatalError()
+        parent.has(key: key)
+
     }
     
     public func set(key: Data, value: Data) {
-        // TODO: Implement
-        fatalError()
+        parent.set(key: key, value: value)
     }
     
     public func delete(key: Data) {
-        // TODO: Implement
-        fatalError()
+        parent.delete(key: key)
     }
     
     public func iterator(start: Data?, end: Data?) -> Iterator {
-        // TODO: Implement
-        fatalError()
+        iterator(start: start, end: end)
     }
     
     public func reverseIterator(start: Data?, end: Data?) -> Iterator {
-        // TODO: Implement
-        fatalError()
+        reverseIterator(start: start, end: end)
     }
     
     public var storeType: StoreType {
