@@ -90,7 +90,7 @@ struct BlockParameters: Codable {
 struct EvidenceParameters: Codable {
     // only accept new evidence more recent than this
     let maximumAgeNumberBlocks: Int64
-    let maximumAgeDuration: Time
+    let maximumAgeDuration: Int64
     
     private enum CodingKeys: String, CodingKey {
         case maximumAgeNumberBlocks = "max_age_num_blocks"
@@ -99,7 +99,7 @@ struct EvidenceParameters: Codable {
     
     init(
         maximumAgeNumberBlocks: Int64,
-        maximumAgeDuration: Time
+        maximumAgeDuration: Int64
     ) {
         self.maximumAgeNumberBlocks = maximumAgeNumberBlocks
         self.maximumAgeDuration = maximumAgeDuration
@@ -118,7 +118,7 @@ struct EvidenceParameters: Codable {
             )
         }
         
-        guard let maximumAgeDuration = TimeInterval(maximumAgeDurationString) else {
+        guard let maximumAgeDuration = Int64(maximumAgeDurationString) else {
             throw DecodingError.dataCorruptedError(
                 forKey: .maximumAgeDuration,
                 in: container,
@@ -127,7 +127,7 @@ struct EvidenceParameters: Codable {
         }
         
         self.maximumAgeNumberBlocks = maximumAgeNumberBlocks
-        self.maximumAgeDuration = .milliSecond(maximumAgeDuration)
+        self.maximumAgeDuration = maximumAgeDuration
     }
     
     func encode(to encoder: Encoder) throws {
@@ -227,7 +227,7 @@ extension EvidenceParameters {
     static var `default`: EvidenceParameters {
         EvidenceParameters(
             maximumAgeNumberBlocks: 100000, // 27.8 hrs at 1block/s,
-            maximumAgeDuration: .hour(48)
+            maximumAgeDuration: 48 * 60 * 60 * 1000 // 48 hours in millisecs
         )
     }
 }
@@ -268,7 +268,7 @@ extension ConsensusParameters {
             throw ValidationError(description: "evidenceParams.MaxAgeNumBlocks must be greater than 0. Got \(evidence.maximumAgeNumberBlocks)")
         }
 
-        if evidence.maximumAgeDuration.rawValue <= 0 {
+        if evidence.maximumAgeDuration <= 0 {
             throw ValidationError(description: "evidenceParams.MaxAgeDuration must be grater than 0 if provided, Got \(evidence.maximumAgeDuration)")
         }
 

@@ -10,20 +10,27 @@ import JSON
 // GenesisValidator is an initial validator.
 public struct GenesisValidator: Codable {
     var address: Address
-//    let publicKey: PublicKey
+    let publicKey: Ed25519PublicKey // TODO: should be an abstract PublicKey, but need to work out how to make it codable
     let power: Int64
     let name: String
     
     private enum CodingKeys: String, CodingKey {
         case address
-//        case publicKey = "pub_key"
+        case publicKey = "pub_key"
         case power
         case name
+    }
+    public init(address: Address, publicKey: Ed25519PublicKey, power: Int64, name: String) {
+        self.address = address
+        self.publicKey = publicKey
+        self.power = power
+        self.name = name
     }
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let address = try container.decode(Address.self, forKey: .address)
+        let addressString = try container.decode(String.self, forKey: .address)
+        let publicKey = try container.decode(Ed25519PublicKey.self, forKey: .publicKey)
         let powerString = try container.decode(String.self, forKey: .power)
         let name = try container.decode(String.self, forKey: .name)
         
@@ -34,15 +41,24 @@ public struct GenesisValidator: Codable {
                 debugDescription: "Invalid power"
             )
         }
+        guard let address = Data(hexEncoded: addressString) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .power,
+                in: container,
+                debugDescription: "Invalid Address"
+            )
+        }
         
         self.address = address
+        self.publicKey = publicKey
         self.power = power
         self.name = name
     }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(address, forKey: .address)
+        try container.encode(address.hexEncodedString(options: [.upperCase]), forKey: .address)
+        try container.encode(publicKey, forKey: .publicKey)
         try container.encode("\(power)", forKey: .power)
         try container.encode(name, forKey: .name)
     }

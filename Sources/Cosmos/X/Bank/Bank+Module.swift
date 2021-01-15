@@ -59,21 +59,43 @@ public final class BankAppModule: BankAppModuleBasic, AppModule {
         keeper.makeQuerier()
     }
 
-    // ABCI
+    // MARK: ABCI
+    /// BeginBlock performs a no-op.
     public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {
-        fatalError()
     }
     
+    /// EndBlock returns the end blocker for the bank module. It returns no validator
+    /// updates.
     public func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> [ValidatorUpdate] {
-        fatalError()
+        []
     }
    
-    // Genesis
+    // MARK: Genesis
+    /// InitGenesis performs genesis initialization for the bank module. It returns
+    /// no validator updates.
     public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
-        fatalError()
+        let data = Codec.bankCodec.mustMarshalJSON(value: json)
+        let genesisState: BankGenesisState = Codec.bankCodec.mustUnmarshalJSON(data: data)
+        keeper.initGenesis(request: request, state: genesisState)
+        return []
+//        func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
+//            start := time.Now()
+//            var genesisState types.GenesisState
+//            cdc.MustUnmarshalJSON(data, &genesisState)
+//            telemetry.MeasureSince(start, "InitGenesis", "crisis", "unmarshal")
+//
+//            am.keeper.InitGenesis(ctx, &genesisState)
+//            return []abci.ValidatorUpdate{}
+//        }
     }
     
+    /// ExportGenesis returns the exported genesis state as raw bytes for the bank
+    /// module.
     public func exportGenesis(request: Request) -> JSON {
         fatalError()
+//        func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
+//            gs := am.keeper.ExportGenesis(ctx)
+//            return cdc.MustMarshalJSON(gs)
+//        }
     }
 }

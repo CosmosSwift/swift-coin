@@ -42,11 +42,37 @@ public final class GenUtilAppModule: GenUtilAppModuleBasic, AppModule {
     // InitGenesis performs genesis initialization for the genutil module. It returns
     // no validator updates.
     public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
-        // TODO: Implement
-        fatalError()
-//        var genesisState GenesisState
-//        ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-//        return InitGenesis(ctx, ModuleCdc, am.stakingKeeper, am.deliverTx, genesisState)
+
+        let data = Codec.bankCodec.mustMarshalJSON(value: json)
+        let genesisState: GenUtilGenesisState = Codec.bankCodec.mustUnmarshalJSON(data: data)
+        if (genesisState.genesisTransactions.isEmpty) {
+            return []
+        } else {
+            // TODO: Implement
+            fatalError()
+        }
+//        // InitGenesis performs genesis initialization for the genutil module. It returns
+//        // no validator updates.
+//        func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
+//            var genesisState types.GenesisState
+//            cdc.MustUnmarshalJSON(data, &genesisState)
+//            validators, err := InitGenesis(ctx, am.stakingKeeper, am.deliverTx, genesisState, am.txEncodingConfig)
+//            if err != nil {
+//                panic(err)
+//            }
+//            return validators
+//        }
+//        // InitGenesis - initialize accounts and deliver genesis transactions
+//        func InitGenesis(
+//            ctx sdk.Context, stakingKeeper types.StakingKeeper,
+//            deliverTx deliverTxfn, genesisState types.GenesisState,
+//            txEncodingConfig client.TxEncodingConfig,
+//        ) (validators []abci.ValidatorUpdate, err error) {
+//            if len(genesisState.GenTxs) > 0 {
+//                validators, err = DeliverGenTxs(ctx, genesisState.GenTxs, stakingKeeper, deliverTx, txEncodingConfig)
+//            }
+//            return
+//        }
     }
 
     // ExportGenesis returns the exported genesis state as raw bytes for the genutil

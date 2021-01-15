@@ -61,9 +61,12 @@ public struct InitCommand: ParsableCommand {
         }
 
         let nodeID: String
+        let vpk: PublicKey? // TODO: this should be replaced when we can properly unserialize a PublicKey from an Ed25519PublicKey
+        let validatorPublicKey: Ed25519PublicKey
         
         do {
-            (nodeID, _) = try configuration.initializeNodeValidatorFiles()
+            (nodeID, vpk) = try configuration.initializeNodeValidatorFiles()
+            validatorPublicKey = vpk as! Ed25519PublicKey
         } catch {
             throw error
         }
@@ -93,7 +96,8 @@ public struct InitCommand: ParsableCommand {
         }
 
         genesisDocument.chainID = chainID
-        genesisDocument.validators = []
+        
+        genesisDocument.validators = [GenesisValidator(address: validatorPublicKey.address, publicKey: validatorPublicKey, power: 100, name: "LocalValidator_\(chainID)")] // TODO: here, should put the validator provided
         genesisDocument.appState = appState
         
         do {

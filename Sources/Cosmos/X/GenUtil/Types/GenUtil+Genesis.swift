@@ -1,8 +1,8 @@
 import JSON
 
 // GenesisState defines the raw genesis transaction in JSON
-struct GenUtilGenesisState: Codable {
-    let genesisTransactions: [JSON]
+public struct GenUtilGenesisState: Codable {
+    public let genesisTransactions: [JSON]
     
     private enum CodingKeys: String, CodingKey {
         case genesisTransactions = "gentxs"

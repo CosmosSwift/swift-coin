@@ -1,5 +1,5 @@
 // GenesisState is the bank state that must be provided at genesis.
-struct BankGenesisState: Codable {
+public struct BankGenesisState: Codable {
     let sendEnabled: Bool
     
     private enum CodingKeys: String, CodingKey {
@@ -12,7 +12,7 @@ struct BankGenesisState: Codable {
     }
 }
 
-extension BankGenesisState {
+public extension BankGenesisState {
     // DefaultGenesisState returns a default genesis state
     static var `default`: BankGenesisState {
         BankGenesisState(sendEnabled: true)
