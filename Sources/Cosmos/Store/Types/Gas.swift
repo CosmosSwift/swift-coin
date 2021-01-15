@@ -99,6 +99,13 @@ extension GasConfiguration {
             iterationNextCostFlat: 30
         )
     }
+    
+    // TransientGasConfig returns a default gas config for TransientStores.
+    static var transient: GasConfiguration {
+        // TODO: define gasconfig for transient stores
+        .keyValue
+    }
+
 }
 
 

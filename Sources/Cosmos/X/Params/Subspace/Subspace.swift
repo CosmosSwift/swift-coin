@@ -69,6 +69,16 @@ public struct Subspace {
             prefix: name + "/".data
         )
     }
+    
+    // Returns a transient store for modification
+    func transientStore(request: Request) -> KeyValueStore {
+        // append here is safe, appends within a function won't cause
+        // weird side effects when its singlethreaded
+        PrefixStore(
+            parent: request.transientStore(key: transientKey),
+            prefix: name + "/".data
+        )
+    }
 
     // Get queries for a parameter by key from the Subspace's KVStore and sets the
     // value to the provided pointer. If the value does not exist, it will panic.
@@ -83,4 +93,42 @@ public struct Subspace {
             fatalError("\(error)")
         }
     }
+    
+    // checkType verifies that the provided key and value are comptable and registered.
+    func checkType(key: Data, value: Any) {
+        guard let attribute = table.map[key.string] else {
+            fatalError("parameter \(key.string) not registered")
+        }
+
+        let type = attribute.type
+        let valueType = Swift.type(of: value)
+
+        if type != valueType {
+            fatalError("type mismatch with registered table")
+        }
+    }
+
+    
+    // Set stores a value for given a parameter key assuming the parameter type has
+    // been registered. It will panic if the parameter type has not been registered
+    // or if the value cannot be encoded. A change record is also set in the Subspace's
+    // transient KVStore to mark the parameter as modified.
+    func set<T: Encodable>(request: Request, key: Data, value: T) {
+        checkType(key: key, value: value)
+        let store = keyValueStore(request: request)
+
+        let data: Data
+        
+        do {
+            data = try codec.marshalJSON(value: value)
+        } catch {
+            fatalError("\(error)")
+        }
+
+        store.set(key: key, value: data)
+
+        let transientStore = self.transientStore(request: request)
+        transientStore.set(key: key, value: Data())
+    }
+
 }

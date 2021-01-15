@@ -78,24 +78,13 @@ public final class BankAppModule: BankAppModuleBasic, AppModule {
         let genesisState: BankGenesisState = Codec.bankCodec.mustUnmarshalJSON(data: data)
         keeper.initGenesis(request: request, state: genesisState)
         return []
-//        func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
-//            start := time.Now()
-//            var genesisState types.GenesisState
-//            cdc.MustUnmarshalJSON(data, &genesisState)
-//            telemetry.MeasureSince(start, "InitGenesis", "crisis", "unmarshal")
-//
-//            am.keeper.InitGenesis(ctx, &genesisState)
-//            return []abci.ValidatorUpdate{}
-//        }
     }
     
     /// ExportGenesis returns the exported genesis state as raw bytes for the bank
     /// module.
     public func exportGenesis(request: Request) -> JSON {
-        fatalError()
-//        func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
-//            gs := am.keeper.ExportGenesis(ctx)
-//            return cdc.MustMarshalJSON(gs)
-//        }
+        let state = keeper.exportGenesis(request: request)
+        let data = Codec.bankCodec.mustMarshalJSON(value: state)
+        return Codec.bankCodec.mustUnmarshalJSON(data: data)
     }
 }

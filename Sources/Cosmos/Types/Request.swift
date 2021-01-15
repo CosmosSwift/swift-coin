@@ -47,7 +47,12 @@ public final class Request {
 
 }
 
+// ----------------------------------------------------------------------------
+// Store / Caching
+// ----------------------------------------------------------------------------
+
 extension Request {
+    // KVStore fetches a KVStore from the MultiStore.
     public func keyValueStore(key: StoreKey) -> KeyValueStore {
         GasKeyValueStore(
             parent: multiStore.keyValueStore(key: key),
@@ -55,6 +60,16 @@ extension Request {
             gasConfiguration: .keyValue
         )
     }
+    
+    // TransientStore fetches a TransientStore from the MultiStore.
+    public func transientStore(key: StoreKey) -> KeyValueStore {
+        GasKeyValueStore(
+            parent: multiStore.keyValueStore(key: key),
+            gasMeter: gasMeter,
+            gasConfiguration: .transient
+        )
+    }
+
     
     // CacheContext returns a new Context with the multi-store cached and a new
     // EventManager. The cached context is written to the context when writeCache

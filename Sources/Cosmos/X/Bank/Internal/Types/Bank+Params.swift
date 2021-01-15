@@ -13,7 +13,7 @@ extension KeyTable {
         guard value is Bool else {
             throw Cosmos.Error.generic(reason: "invalid parameter type: \(value)")
         }
-}
+    }
 
 
     // ParamKeyTable type declaration for parameters

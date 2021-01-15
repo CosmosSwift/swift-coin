@@ -1,21 +1,21 @@
 // GenesisState is the bank state that must be provided at genesis.
 public struct BankGenesisState: Codable {
-    let sendEnabled: Bool
+    let isSendEnabled: Bool
     
     private enum CodingKeys: String, CodingKey {
-        case sendEnabled = "send_enabled"
+        case isSendEnabled = "send_enabled"
     }
     
     // NewGenesisState creates a new genesis state.
-    init(sendEnabled: Bool) {
-        self.sendEnabled = sendEnabled
+    init(isSendEnabled: Bool) {
+        self.isSendEnabled = isSendEnabled
     }
 }
 
 public extension BankGenesisState {
     // DefaultGenesisState returns a default genesis state
     static var `default`: BankGenesisState {
-        BankGenesisState(sendEnabled: true)
+        BankGenesisState(isSendEnabled: true)
     }
 }
 
