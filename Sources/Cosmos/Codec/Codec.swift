@@ -21,8 +21,8 @@ public class Codec {
         }
     }
 
-    public func mustMarshalBinaryLengthPrefixed<T: Encodable>(value: T) throws -> Data {
-        try encoder.encode(value)
+    public func mustMarshalBinaryLengthPrefixed<T: Encodable>(value: T) -> Data {
+        try! encoder.encode(value)
     }
     
     // MarshalBinaryBare encodes the object o according to the Amino spec.

@@ -5,7 +5,7 @@ public struct StakingGenesisState: Codable {
     let parameters: StakingParameters
     let lastTotalPower: Int = 0
     let lastValidatorPowers: [LastValidatorPower] = []
-    let validators: [Validator]
+    let validators: [Validator]?
 //    let delegations: Delegations
 //    let unbondingDelegations: [UnbondingDelegation]
 //    let redelegations: [Redelegation]

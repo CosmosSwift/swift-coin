@@ -82,7 +82,13 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
     public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
         let data = Codec.stakingCodec.mustMarshalJSON(value: json)
         let genesisState: StakingGenesisState = Codec.stakingCodec.mustUnmarshalJSON(data: data)
-        return keeper.initGenesis(request: request, state: genesisState)
+        
+        return keeper.initGenesis(
+            request: request,
+            accountKeeper: accountKeeper,
+            supplyKeeper: supplyKeeper,
+            data: genesisState
+        )
     }
     
     public func exportGenesis(request: Request) -> JSON {

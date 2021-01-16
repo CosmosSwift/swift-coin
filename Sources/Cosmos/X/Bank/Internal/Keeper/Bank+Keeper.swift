@@ -30,7 +30,7 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
         paramSpace: Subspace,
         blacklistedAddresses: [String: Bool]
     ) {
-        let paramSpace = paramSpace.with(keyTable: .paramKeyTable())
+        let paramSpace = paramSpace.with(keyTable: .paramKeyTable)
         
         super.init(
             accountKeeper: accountKeeper,

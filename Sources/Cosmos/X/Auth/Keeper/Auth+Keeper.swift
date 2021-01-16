@@ -24,7 +24,7 @@ public struct AccountKeeper {
         self.key = key
         self.proto = proto
         self.codec = codec
-        self.paramSubspace = paramstore.with(keyTable: .paramKeyTable())
+        self.paramSubspace = paramstore.with(keyTable: .paramKeyTable)
     }
 
     public func accountWithAddress(request: Request, address: AccountAddress) -> Account? {

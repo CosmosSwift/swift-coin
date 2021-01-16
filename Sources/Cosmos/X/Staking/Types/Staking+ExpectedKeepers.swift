@@ -123,70 +123,69 @@ import Foundation
 
 // StakingHooks event hooks for staking validator object (noalias)
 public protocol StakingHooks {
-//    // TODO: Implement
-//    // Must be called when a validator is created
-//    func afterValidatorCreated(
-//        request: Request,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    // Must be called when a validator's state changes
-//    func beforeValidatorModified(
-//        request: Request,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    // Must be called when a validator is deleted
-//    func afterValidatorRemoved(
-//        request: Request,
-//        consensusAddress: ConsensusAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//
-//    // Must be called when a validator is bonded
-//    func afterValidatorBonded(
-//        request: Request,
-//        consensusAddress: ConsensusAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    // Must be called when a validator begins unbonding
-//    func afterValidatorBeginUnbonding(
-//        request: Request,
-//        consensusAddress: ConsensusAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//
-//    // Must be called when a delegation is created
-//    func beforeDelegationCreated(
-//        request: Request,
-//        delegationAddress: AccountAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    // Must be called when a delegation's shares are modified
-//    func beforeDelegationSharesModified(
-//        request: Request,
-//        delegationAddress: AccountAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    // Must be called when a delegation is removed
-//    func beforeDelegationRemoved(
-//        request: Request,
-//        delegationAddress: AccountAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    func afterDelegationModified(
-//        request: Request,
-//        delegationAddress: AccountAddress,
-//        validatorAddress: ValidatorAddress
-//    )
-//    
-//    func beforeValidatorSlashed(
-//        request: Request,
-//        validatorAddress: ValidatorAddress,
-//        fraction: Decimal
-//    )
+    // Must be called when a validator is created
+    func afterValidatorCreated(
+        request: Request,
+        validatorAddress: ValidatorAddress
+    )
+    
+    // Must be called when a validator's state changes
+    func beforeValidatorModified(
+        request: Request,
+        validatorAddress: ValidatorAddress
+    )
+    
+    // Must be called when a validator is deleted
+    func afterValidatorRemoved(
+        request: Request,
+        consensusAddress: ConsensusAddress,
+        validatorAddress: ValidatorAddress
+    )
+
+    // Must be called when a validator is bonded
+    func afterValidatorBonded(
+        request: Request,
+        consensusAddress: ConsensusAddress,
+        validatorAddress: ValidatorAddress
+    )
+    
+    // Must be called when a validator begins unbonding
+    func afterValidatorBeginUnbonding(
+        request: Request,
+        consensusAddress: ConsensusAddress,
+        validatorAddress: ValidatorAddress
+    )
+
+    // Must be called when a delegation is created
+    func beforeDelegationCreated(
+        request: Request,
+        delegationAddress: AccountAddress,
+        validatorAddress: ValidatorAddress
+    )
+    
+    // Must be called when a delegation's shares are modified
+    func beforeDelegationSharesModified(
+        request: Request,
+        delegationAddress: AccountAddress,
+        validatorAddress: ValidatorAddress
+    )
+    
+    // Must be called when a delegation is removed
+    func beforeDelegationRemoved(
+        request: Request,
+        delegationAddress: AccountAddress,
+        validatorAddress: ValidatorAddress
+    )
+    
+    func afterDelegationModified(
+        request: Request,
+        delegationAddress: AccountAddress,
+        validatorAddress: ValidatorAddress
+    )
+    
+    func beforeValidatorSlashed(
+        request: Request,
+        validatorAddress: ValidatorAddress,
+        fraction: Decimal
+    )
 }

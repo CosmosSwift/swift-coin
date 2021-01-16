@@ -10,3 +10,11 @@ extension StakingKeeper {
     }
 
 }
+
+// set the params
+extension StakingKeeper {
+    func setParameters(request: Request, parameters: StakingParameters) {
+        paramstore.setParameterSet(request: request, parameterSet: parameters)
+    }
+}
+

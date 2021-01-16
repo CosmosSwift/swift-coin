@@ -21,4 +21,16 @@ public func mustSortJSON(data: Data) -> Data {
     }
 }
 
+let formatter: DateFormatter = {
+    let formatter = DateFormatter()
+    // Slight modification of the RFC3339Nano but it right pads all zeros and drops the time zone info
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.000000000"
+    return formatter
+}()
 
+// Formats a time.Time into a []byte that can be sorted
+func formatDateData(date: Date) -> Data {
+    // TODO: This code used to do some more stuff, UTC and Round.
+    // return []byte(t.UTC().Round(0).Format(SortableTimeFormat))
+    formatter.string(from: date).data
+}

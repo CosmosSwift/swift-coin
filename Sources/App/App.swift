@@ -161,7 +161,7 @@ public final class NameServiceApp: BaseApp, App {
             BankKeys.moduleName,
             NameServiceKeys.moduleName,
             SupplyKeys.moduleName,
-                GenUtilKeys.moduleName
+            GenUtilKeys.moduleName
         )
 
         self.moduleManager.registerRoutes(

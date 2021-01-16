@@ -17,7 +17,7 @@ extension KeyTable {
 
 
     // ParamKeyTable type declaration for parameters
-    public static func paramKeyTable() -> KeyTable {
+    public static var paramKeyTable: KeyTable {
          KeyTable(pairs: ParameterSetPair(
             key: paramStoreKeySendEnabled,
             value: false,

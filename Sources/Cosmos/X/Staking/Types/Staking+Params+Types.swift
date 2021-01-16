@@ -75,19 +75,18 @@ extension StakingParameters {
     }
 }
 
-func validateUnbondingTime(i: Any) throws {
-    // TODO: Implement
-    fatalError()
-//    v, ok := i.(time.Duration)
-//    if !ok {
-//        return fmt.Errorf("invalid parameter type: %T", i)
-//    }
-//
-//    if v <= 0 {
-//        return fmt.Errorf("unbonding time must be positive: %d", v)
-//    }
-//
-//    return nil
+struct ValidationError: Swift.Error, CustomStringConvertible {
+    let description: String
+}
+
+func validateUnbondingTime(encodable: AnyEncodable) throws {
+    guard let value = encodable.value as? TimeInterval else {
+        throw ValidationError(description: "invalid parameter type: \(encodable)")
+    }
+
+    if value <= 0 {
+        throw ValidationError(description: "unbonding time must be positive: \(value)")
+    }
 }
 
 func validateMaxValidators(i: Any) throws {

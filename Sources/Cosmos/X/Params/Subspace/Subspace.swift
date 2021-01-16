@@ -22,8 +22,10 @@ public enum ParamsKeys {
 // recording whether the parameter has been changed or not
 public struct Subspace {
     let codec: Codec
-    let key: StoreKey // []byte -> []byte, stores parameter
-    let transientKey: StoreKey // []byte -> bool, stores parameter change
+    // []byte -> []byte, stores parameter
+    let key: StoreKey
+    // []byte -> bool, stores parameter change
+    let transientKey: StoreKey
     let name: Data
     var table: KeyTable
     
@@ -94,7 +96,7 @@ public struct Subspace {
         }
     }
     
-    // checkType verifies that the provided key and value are comptable and registered.
+    // checkType verifies that the provided key and value are compatible and registered.
     func checkType(key: Data, value: Any) {
         guard let attribute = table.map[key.string] else {
             fatalError("parameter \(key.string) not registered")
@@ -131,4 +133,23 @@ public struct Subspace {
         transientStore.set(key: key, value: Data())
     }
 
+    // SetParamSet iterates through each ParamSetPair and sets the value with the
+    // corresponding parameter key in the Subspace's KVStore.
+    func setParameterSet(request: Request, parameterSet: ParameterSet) {
+        for pair in parameterSet.parameterSetPairs {
+            // pair.Field is a pointer to the field, so indirecting the ptr.
+            // go-amino automatically handles it but just for sure,
+            // since SetStruct is meant to be used in InitGenesis
+            // so this method will not be called frequently
+            let value = pair.value
+
+            do {
+                try pair.validatorFunction(value)
+            } catch {
+                fatalError("value from ParamSetPair is invalid: \(error)")
+            }
+            
+            set(request: request, key: pair.key, value: value)
+        }
+    }
 }
