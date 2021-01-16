@@ -74,8 +74,15 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
     }
    
     // Genesis
+    /// InitGenesis sets the pool and parameters for the provided keeper.  For each
+    /// validator in data, it sets that validator in the keeper along with manually
+    /// setting the indexes. In addition, it also sets any delegations found in
+    /// data. Finally, it updates the bonded validators.
+    /// Returns final validator set after applying all declaration and delegations
     public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
-        fatalError()
+        let data = Codec.stakingCodec.mustMarshalJSON(value: json)
+        let genesisState: StakingGenesisState = Codec.stakingCodec.mustUnmarshalJSON(data: data)
+        return keeper.initGenesis(request: request, state: genesisState)
     }
     
     public func exportGenesis(request: Request) -> JSON {

@@ -1,9 +1,11 @@
+import ABCI
+
 // GenesisState - all staking state that must be provided at genesis
-struct StakingGenesisState: Codable {
+public struct StakingGenesisState: Codable {
     let parameters: StakingParameters
     let lastTotalPower: Int = 0
     let lastValidatorPowers: [LastValidatorPower] = []
-//    let validators: Validators
+    let validators: [Validator]
 //    let delegations: Delegations
 //    let unbondingDelegations: [UnbondingDelegation]
 //    let redelegations: [Redelegation]
@@ -13,7 +15,7 @@ struct StakingGenesisState: Codable {
         case parameters = "params"
         case lastTotalPower = "last_total_power"
         case lastValidatorPowers = "last_validator_powers"
-//        case validators
+        case validators
 //        case delegations
 //        case unbondingDelegations = "unbonding_delegations"
 //        case redelegations
@@ -22,18 +24,18 @@ struct StakingGenesisState: Codable {
     
     // NewGenesisState creates a new GenesisState instanc e
     init(
-        parameters: StakingParameters
-//        validators: [Validator] = [],
+        parameters: StakingParameters,
+        validators: [Validator] = []
 //        delegations: [Delegation] = []
     ) {
         self.parameters = parameters
-//        self.validators = validators
+        self.validators = validators
 //        self.delegations = delegations
     }
 }
 
 // LastValidatorPower required for validator set update logic
-struct LastValidatorPower: Codable {
+public struct LastValidatorPower: Codable {
     let address: ValidatorAddress
     let power: Int64
 }

@@ -8,7 +8,7 @@ import Tendermint
 // delegation whose number of bond shares is based on the amount of coins delegated
 // divided by the current exchange rate. Voting power can be calculated as total
 // bonded shares multiplied by exchange rate.
-struct Validator  {
+struct Validator: Codable  {
     // address of the validator's operator; bech encoded in JSON
     let operatorAddress: ValidatorAddress
     // the consensus public key of the validator; bech encoded in JSON

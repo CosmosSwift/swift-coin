@@ -14,21 +14,20 @@ public final class PrefixStore: KeyValueStore {
     }
 
     public func get(key: Data) -> Data? {
-        parent.get(key: key)
-
+        parent.get(key: prefix + key)
     }
     
     public func has(key: Data) -> Bool {
-        parent.has(key: key)
+        parent.has(key: prefix + key)
 
     }
     
     public func set(key: Data, value: Data) {
-        parent.set(key: key, value: value)
+        parent.set(key: prefix + key, value: value)
     }
     
     public func delete(key: Data) {
-        parent.delete(key: key)
+        parent.delete(key: prefix + key)
     }
     
     public func iterator(start: Data?, end: Data?) -> Iterator {
