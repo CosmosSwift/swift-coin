@@ -137,9 +137,8 @@ extension StakingKeeper {
                     fatalError("validator \(lastValidatorPower.address) not found")
                 }
                 
-                var update = validator.abciValidatorUpdate
                 // keep the next-val-set offset, use the last power for the first block
-                update.power = lastValidatorPower.power
+                var update = ValidatorUpdate(publicKey: validator.abciValidatorUpdate.publicKey, power: lastValidatorPower.power)
                 validatorUpdates.append(update)
             }
         } else {

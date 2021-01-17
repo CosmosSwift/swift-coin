@@ -17,4 +17,3 @@ extension StakingKeeper {
         paramstore.setParameterSet(request: request, parameterSet: parameters)
     }
 }
-

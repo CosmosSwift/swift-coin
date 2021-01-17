@@ -30,7 +30,7 @@ public class StakingKeeper { //: ValidatorSet, DelegationSet {
         self.storeKey = key
         self.codec = codec
         self.supplyKeeper = supplyKeeper
-        self.paramstore = paramstore
+        self.paramstore = paramstore.with(keyTable: KeyTable(pairs: StakingParameters.default.parameterSetPairs))
     }
 
     // Set the validator hooks

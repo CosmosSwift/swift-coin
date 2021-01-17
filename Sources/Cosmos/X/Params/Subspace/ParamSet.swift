@@ -21,7 +21,7 @@ public struct ParameterSetPair {
 }
 
 // ParamSetPairs Slice of KeyFieldPair
-typealias ParameterSetPairs = [ParameterSetPair]
+public typealias ParameterSetPairs = [ParameterSetPair]
 
 // ParamSet defines an interface for structs containing parameters for a module
 protocol ParameterSet {

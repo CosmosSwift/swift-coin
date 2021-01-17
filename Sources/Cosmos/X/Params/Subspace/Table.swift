@@ -12,7 +12,7 @@ public struct KeyTable {
         self.map = map
     }
     
-    public init(pairs: ParameterSetPair...) {
+    public init(pairs: ParameterSetPairs) {
         var keyTable = KeyTable(map: [:])
 
         for paramSetPair in pairs {
@@ -20,6 +20,10 @@ public struct KeyTable {
         }
 
         self = keyTable
+    }
+    
+    public init(pairs: ParameterSetPair...) {
+        self.init(pairs: pairs)
     }
     
     // RegisterType registers a single ParamSetPair (key-type pair) in a KeyTable.
