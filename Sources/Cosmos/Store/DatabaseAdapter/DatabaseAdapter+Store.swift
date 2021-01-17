@@ -12,56 +12,32 @@ class DatabaseAdapterStore: KeyValueStore {
     
     // Get wraps the underlying DB's Get method panicing on error.
     func get(key: Data) -> Data? {
-        do {
-            return try database.get(key: key)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! database.get(key: key)
     }
         
     // Has wraps the underlying DB's Has method panicing on error.
     func has(key: Data) -> Bool {
-        do {
-            return try database.has(key: key)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! database.has(key: key)
     }
 
     // Set wraps the underlying DB's Set method panicing on error.
     func set(key: Data, value: Data) {
-        do {
-            return try database.set(key: key, value: value)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! database.set(key: key, value: value)
     }
 
     // Delete wraps the underlying DB's Delete method panicing on error.
     func delete(key: Data) {
-        do {
-            return try database.delete(key: key)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! database.delete(key: key)
     }
 
     // Iterator wraps the underlying DB's Iterator method panicing on error.
     func iterator(start: Data?, end: Data?) -> Iterator {
-        do {
-            return try database.iterator(start: start, end: end)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! database.iterator(start: start, end: end)
     }
 
     // ReverseIterator wraps the underlying DB's ReverseIterator method panicing on error.
     func reverseIterator(start: Data?, end: Data?) -> Iterator {
-        do {
-            return try database.reverseIterator(start: start, end: end)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! database.reverseIterator(start: start, end: end)
     }
 
     // GetStoreType returns the type of the store.

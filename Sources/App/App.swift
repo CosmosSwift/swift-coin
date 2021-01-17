@@ -27,7 +27,7 @@ public final class NameServiceApp: BaseApp, App {
     
     static let moduleAccountPermissions: [String: [String]] = [
         AuthKeys.feeCollectorName: [],
-        StakingKeys.bondedPoolName:    [SupplyPermissions.burner, SupplyPermissions.staking],
+        StakingKeys.bondedPoolName: [SupplyPermissions.burner, SupplyPermissions.staking],
         StakingKeys.notBondedPoolName: [SupplyPermissions.burner, SupplyPermissions.staking],
     ]
    

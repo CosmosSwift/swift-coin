@@ -81,69 +81,48 @@ struct ValidationError: Swift.Error, CustomStringConvertible {
 
 func validateUnbondingTime(encodable: AnyEncodable) throws {
     guard let value = encodable.value as? TimeInterval else {
-        throw ValidationError(description: "invalid parameter type: \(encodable)")
+        throw ValidationError(description: "invalid parameter type: \(type(of: encodable.value))")
     }
 
-    if value <= 0 {
+    guard value > 0 else {
         throw ValidationError(description: "unbonding time must be positive: \(value)")
     }
 }
 
-func validateMaxValidators(i: Any) throws {
-    // TODO: Implement
-    fatalError()
-//    v, ok := i.(uint16)
-//    if !ok {
-//        return fmt.Errorf("invalid parameter type: %T", i)
-//    }
-//
-//    if v == 0 {
-//        return fmt.Errorf("max validators must be positive: %d", v)
-//    }
-//
-//    return nil
+func validateMaxValidators(encodable: AnyEncodable) throws {
+    guard let value = encodable.value as? UInt16 else {
+        throw ValidationError(description: "invalid parameter type: \(type(of: encodable.value))")
+    }
+
+    guard value != 0 else {
+        throw ValidationError(description: "max validators must be positive: \(value)")
+    }
 }
 
-func validateMaxEntries(i: Any) throws {
-    // TODO: Implement
-    fatalError()
-//    v, ok := i.(uint16)
-//    if !ok {
-//        return fmt.Errorf("invalid parameter type: %T", i)
-//    }
-//
-//    if v == 0 {
-//        return fmt.Errorf("max entries must be positive: %d", v)
-//    }
-//
-//    return nil
+func validateMaxEntries(encodable: AnyEncodable) throws {
+    guard let value = encodable.value as? UInt16 else {
+        throw ValidationError(description: "invalid parameter type: \(type(of: encodable.value))")
+    }
+
+    guard value != 0 else {
+        throw ValidationError(description: "max entries must be positive: \(value)")
+    }
 }
 
-func validateHistoricalEntries(i: Any) throws {
-    // TODO: Implement
-    fatalError()
-//    _, ok := i.(uint16)
-//    if !ok {
-//        return fmt.Errorf("invalid parameter type: %T", i)
-//    }
-//
-//    return nil
+func validateHistoricalEntries(encodable: AnyEncodable) throws {
+    guard encodable.value is UInt16 else {
+        throw ValidationError(description: "invalid parameter type: \(type(of: encodable.value))")
+    }
 }
 
-func validateBondDenomination(i: Any) throws {
-    // TODO: Implement
-    fatalError()
-//    v, ok := i.(string)
-//    if !ok {
-//        return fmt.Errorf("invalid parameter type: %T", i)
-//    }
-//
-//    if strings.TrimSpace(v) == "" {
-//        return errors.New("bond denom cannot be blank")
-//    }
-//    if err := sdk.ValidateDenom(v); err != nil {
-//        return err
-//    }
-//
-//    return nil
+func validateBondDenomination(encodable: AnyEncodable) throws {
+    guard let value = encodable.value as? String else {
+        throw ValidationError(description: "invalid parameter type: \(type(of: encodable.value))")
+    }
+    
+    guard !value.trimmingCharacters(in: .whitespaces).isEmpty else {
+        throw ValidationError(description: "bond denom cannot be blank")
+    }
+    
+    try Coins.validate(denomination: value)
 }

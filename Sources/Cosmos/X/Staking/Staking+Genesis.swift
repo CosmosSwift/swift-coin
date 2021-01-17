@@ -13,8 +13,8 @@ extension StakingKeeper {
         data: StakingGenesisState
     ) -> [ValidatorUpdate] {
         var validatorUpdates: [ValidatorUpdate] = []
-        var bondedTokens = 0
-        var notBondedTokens = 0
+        var bondedTokens: UInt = 0
+        var notBondedTokens: UInt = 0
 
         // We need to pretend to be "n blocks before genesis", where "n" is the
         // validator update delay, so that e.g. slashing periods are correctly
@@ -45,9 +45,9 @@ extension StakingKeeper {
 
             switch validator.status {
             case .bonded:
-                bondedTokens = bondedTokens + validator.tokens
+                bondedTokens += validator.tokens
             case .unbonding, .unbonded:
-                notBondedTokens = notBondedTokens + validator.tokens
+                notBondedTokens += validator.tokens
             }
         }
 

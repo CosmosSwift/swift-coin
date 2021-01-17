@@ -29,7 +29,7 @@ public struct GenesisValidator: Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let addressString = try container.decode(String.self, forKey: .address)
+        let address = try container.decode(HexadecimalData.self, forKey: .address)
         let publicKey = try container.decode(Ed25519PublicKey.self, forKey: .publicKey)
         let powerString = try container.decode(String.self, forKey: .power)
         let name = try container.decode(String.self, forKey: .name)
@@ -41,14 +41,7 @@ public struct GenesisValidator: Codable {
                 debugDescription: "Invalid power"
             )
         }
-        guard let address = Data(hexEncoded: addressString) else {
-            throw DecodingError.dataCorruptedError(
-                forKey: .power,
-                in: container,
-                debugDescription: "Invalid Address"
-            )
-        }
-        
+
         self.address = address
         self.publicKey = publicKey
         self.power = power
@@ -57,7 +50,7 @@ public struct GenesisValidator: Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(address.hexEncodedString(options: [.upperCase]), forKey: .address)
+        try container.encode(address, forKey: .address)
         try container.encode(publicKey, forKey: .publicKey)
         try container.encode("\(power)", forKey: .power)
         try container.encode(name, forKey: .name)

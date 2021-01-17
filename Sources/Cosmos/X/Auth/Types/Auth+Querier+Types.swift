@@ -4,7 +4,7 @@ extension AuthKeys {
 }
 
 // QueryAccountParams defines the params for querying accounts.
-struct QueryAccountParams: Codable {
+struct QueryAccountParameters: Codable {
     let address: AccountAddress
     
     // NewQueryAccountParams creates a new instance of QueryAccountParams.

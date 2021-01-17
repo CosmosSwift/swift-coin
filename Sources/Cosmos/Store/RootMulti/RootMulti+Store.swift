@@ -569,15 +569,11 @@ extension RootMultiStore {
     static let codec = Codec()
 
     static func latestVersion(database: Database)  -> Int64 {
-        do {
-            guard let latestBytes = try database.get(key: latestVersionKey.data) else {
-                return 0
-            }
-            
-            return try codec.unmarshalBinaryLengthPrefixed(data: latestBytes)
-        } catch {
-            fatalError("\(error)")
+        guard let latestBytes = try! database.get(key: latestVersionKey.data) else {
+            return 0
         }
+        
+        return try! codec.unmarshalBinaryLengthPrefixed(data: latestBytes)
     }
     
     //// Commits each store and returns a new commitInfo.

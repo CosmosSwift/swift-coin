@@ -230,15 +230,11 @@ open class BaseApp: Sealable {
         //
         // TODO: assert that InitChain hasn't yet been called.
 //        if let consensusParamsData = mainStore.get(key: mainConsensusParamsKey) {
-//            do {
-                // TODO: Check this protobuf decoding.
-//                let consensusParams: ConsensusParams = try proto.unmarshal(data: consensusParamsData)
-                // TODO: If JSONDecoder is enough, we need to make ConsensusParams Codable
-//                let consensusParams = try JSONDecoder().decode(ConsensusParams.self, from: consensusParamsData)
-//                self.consensusParams = consensusParams
-//            } catch {
-//                fatalError("\(error)")
-//            }
+//             TODO: Check this protobuf decoding.
+//            let consensusParams: ConsensusParams = try! proto.unmarshal(data: consensusParamsData)
+//             TODO: If JSONDecoder is enough, we need to make ConsensusParams Codable
+//            let consensusParams = try! JSONDecoder().decode(ConsensusParams.self, from: consensusParamsData)
+//            self.consensusParams = consensusParams
 //        }
 
         // needed for the export command which inits from store but never calls initchain
@@ -318,16 +314,10 @@ open class BaseApp: Sealable {
 
     // setConsensusParams stores the consensus params to the main store.
     func store(consensusParams: ConsensusParams) {
-        let consensusParamsData: Data
-        
-        do {
-            // TODO: Protobuf was used here.
-            // Maybe just JSON takes care of it
-            consensusParamsData = try JSONEncoder().encode(consensusParams)
-        } catch {
-            fatalError("\(error)")
-        }
-        
+        // TODO: Protobuf was used here.
+        // Maybe just JSON takes care of it
+        let consensusParamsData = try! JSONEncoder().encode(consensusParams)
+
         guard let baseKey = self.baseKey else {
             fatalError("baseKey not set")
         }

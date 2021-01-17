@@ -96,11 +96,7 @@ extension BaseApp: ABCIApplication {
             ])
         }
 
-        do {
-            try validateHeight(request: request)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! validateHeight(request: request)
 
         // Initialize the DeliverTx state. If this is the first block, it should
         // already be initialized in InitChain. Otherwise app.deliverState will be

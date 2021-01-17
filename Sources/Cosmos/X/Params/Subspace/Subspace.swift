@@ -89,11 +89,7 @@ public struct Subspace {
         // TODO: Check this force unwrap!
         let data = store.get(key: key)!
 
-        do {
-            return try codec.unmarshalJSON(data: data)
-        } catch {
-            fatalError("\(error)")
-        }
+        return try! codec.unmarshalJSON(data: data)
     }
     
     // checkType verifies that the provided key and value are compatible and registered.
@@ -119,14 +115,7 @@ public struct Subspace {
         checkType(key: key, value: value)
         let store = keyValueStore(request: request)
 
-        let data: Data
-        
-        do {
-            data = try codec.marshalJSON(value: value)
-        } catch {
-            fatalError("\(error)")
-        }
-
+        let data = try! codec.marshalJSON(value: value)
         store.set(key: key, value: data)
 
         let transientStore = self.transientStore(request: request)

@@ -14,11 +14,7 @@ public func sortJSON(data: Data) throws -> Data {
 // MustSortJSON is like SortJSON but panic if an error occurs, e.g., if
 // the passed JSON isn't valid.
 public func mustSortJSON(data: Data) -> Data {
-    do {
-        return try sortJSON(data: data)
-    } catch {
-       fatalError("\(error)")
-    }
+    try! sortJSON(data: data)
 }
 
 let formatter: DateFormatter = {

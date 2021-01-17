@@ -29,7 +29,7 @@ extension NodeKey {
     // PubKeyToID returns the ID corresponding to the given PubKey.
     // It's the hex-encoding of the pubKey.Address().
     static func id(from publicKey: PublicKey) -> ID {
-        publicKey.address.hexEncodedString()
+        publicKey.address.rawValue.hexEncodedString()
     }
 }
 

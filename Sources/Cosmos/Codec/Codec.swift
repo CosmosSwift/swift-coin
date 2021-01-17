@@ -14,11 +14,7 @@ public class Codec {
 
     // MustMarshalJSON panics if an error occurs. Besides tha behaves exactly like MarshalJSON.
     public func mustMarshalJSON<T: Encodable>(value: T) -> Data {
-        do {
-            return try marshalJSON(value: value)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! marshalJSON(value: value)
     }
 
     public func mustMarshalBinaryLengthPrefixed<T: Encodable>(value: T) -> Data {
@@ -61,41 +57,37 @@ public class Codec {
 //        return bz, nil
     }
 
-    
     // Panics if error.
     func mustMarshalBinaryBare<T: Encodable>(value: T) -> Data {
-        do {
-            return try marshalBinaryBare(value: value)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! marshalBinaryBare(value: value)
     }
 
     // Like UnmarshalBinaryBare, but will first decode the byte-length prefix.
     // UnmarshalBinaryLengthPrefixed will panic if ptr is a nil-pointer.
     // Returns an error if not all of bz is consumed.
     public func unmarshalBinaryLengthPrefixed<T: Decodable>(data: Data) throws -> T {
-        if data.isEmpty {
-            throw Cosmos.Error.decodingError(reason: "UnmarshalBinaryLengthPrefixed cannot decode empty bytes")
-        }
-
-        // Read byte-length prefix.
-        let (u64, n) = data.uvarint()
-        
-        if n < 0 {
-            throw Cosmos.Error.decodingError(reason: "Error reading msg byte-length prefix: got code \(n)")
-        }
-        
-        if u64 > UInt64(data.count - n) {
-            throw Cosmos.Error.decodingError(reason: "Not enough bytes to read in UnmarshalBinaryLengthPrefixed, want \(u64) more bytes but only have \(data.count - n)")
-        } else if u64 < UInt64(data.count - n) {
-            throw Cosmos.Error.decodingError(reason: "Bytes left over in UnmarshalBinaryLengthPrefixed, should read \(u64) more bytes but have \(data.count - n)")
-        }
-        
-        let data = data.prefix(n)
-
-        // Decode.
-        return try unmarshalBinaryBare(data: data)
+        try decoder.decode(T.self, from: data)
+//        if data.isEmpty {
+//            throw Cosmos.Error.decodingError(reason: "UnmarshalBinaryLengthPrefixed cannot decode empty bytes")
+//        }
+//
+//        // Read byte-length prefix.
+//        let (u64, n) = data.uvarint()
+//
+//        if n < 0 {
+//            throw Cosmos.Error.decodingError(reason: "Error reading msg byte-length prefix: got code \(n)")
+//        }
+//
+//        if u64 > UInt64(data.count - n) {
+//            throw Cosmos.Error.decodingError(reason: "Not enough bytes to read in UnmarshalBinaryLengthPrefixed, want \(u64) more bytes but only have \(data.count - n)")
+//        } else if u64 < UInt64(data.count - n) {
+//            throw Cosmos.Error.decodingError(reason: "Bytes left over in UnmarshalBinaryLengthPrefixed, should read \(u64) more bytes but have \(data.count - n)")
+//        }
+//
+//        let data = data.prefix(n)
+//
+//        // Decode.
+//        return try unmarshalBinaryBare(data: data)
     }
     
     public func unmarshalJSON<T: Decodable>(data: Data) throws -> T {
@@ -103,11 +95,7 @@ public class Codec {
     }
     
     public func mustUnmarshalJSON<T: Decodable>(data: Data) -> T {
-        do {
-           return try decoder.decode(T.self, from: data)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! decoder.decode(T.self, from: data)
     }
     
     // UnmarshalBinaryBare will panic if ptr is a nil-pointer.
@@ -122,19 +110,11 @@ public class Codec {
     
     // Panics if error.
     public func mustUnmarshalBinaryLength<T: Decodable>(data: Data) -> T {
-        do {
-            return try decoder.decode(T.self, from: data)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! decoder.decode(T.self, from: data)
     }
     
     public func mustUnmarshalBinaryLengthPrefixed<T: Decodable>(data: Data) -> T {
-        do {
-            return try decoder.decode(T.self, from: data)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! decoder.decode(T.self, from: data)
     }
 
     

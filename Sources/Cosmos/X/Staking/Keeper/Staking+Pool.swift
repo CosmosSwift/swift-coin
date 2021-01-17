@@ -14,25 +14,35 @@ extension StakingKeeper {
             moduleName: StakingKeys.notBondedPoolName
         )
     }
-//
-//    // bondedTokensToNotBonded transfers coins from the bonded to the not bonded pool within staking
-//    func bondedTokensToNotBonded(request: Request, tokens sdk.Int) {
-//        coins := sdk.NewCoins(sdk.NewCoin(k.BondDenom(ctx), tokens))
-//        err := k.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.BondedPoolName, types.NotBondedPoolName, coins)
-//        if err != nil {
-//            panic(err)
-//        }
-//    }
-//
-//    // notBondedTokensToBonded transfers coins from the not bonded to the bonded pool within staking
-//    func notBondedTokensToBonded(request: Request, tokens sdk.Int) {
-//        coins := sdk.NewCoins(sdk.NewCoin(k.BondDenom(ctx), tokens))
-//        err := k.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.NotBondedPoolName, types.BondedPoolName, coins)
-//        if err != nil {
-//            panic(err)
-//        }
-//    }
-//
+
+    // bondedTokensToNotBonded transfers coins from the bonded to the not bonded pool within staking
+    func bondedTokensToNotBonded(request: Request, tokens: UInt) {
+        let coins = Coins(coins: [Coin(denomination: bondDenomination(request: request), amount: tokens)])
+        
+        // TODO: Implement
+        fatalError()
+//        try! supplyKeeper.sendCoinsFromModuleToModule(
+//            request: request,
+//            StakingKeys.bondedPoolName,
+//            StakingKeys.notBondedPoolName,
+//            coins
+//        )
+    }
+
+    // notBondedTokensToBonded transfers coins from the not bonded to the bonded pool within staking
+    func notBondedTokensToBonded(request: Request, tokens: UInt) {
+        let coins = Coins(coins: [Coin(denomination: bondDenomination(request: request), amount: tokens)])
+        
+        // TODO: Implement
+        fatalError()
+//        try! supplyKeeper.sendCoinsFromModuleToModule(
+//            request: request,
+//            StakingKeys.notBondedPoolName,
+//            StakingKeys.bondedPoolName,
+//            coins
+//        )
+    }
+
 //    // burnBondedTokens removes coins from the bonded pool module account
 //    func burnBondedTokens(request: Request, amount: Int) error {
 //        if !amt.IsPositive() {

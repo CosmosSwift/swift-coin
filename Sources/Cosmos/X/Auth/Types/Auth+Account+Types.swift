@@ -5,12 +5,12 @@ import Tendermint
 // This can be extended by embedding within in your AppAccount.
 // However one doesn't have to use BaseAccount as long as your struct
 // implements Account.
-public class BaseAccount {
-    var address: AccountAddress
-    var coins: Coins
-    var publicKey: PublicKey?
-    var accountNumber: UInt64
-    var sequence: UInt64
+public class BaseAccount: Account, GenesisAccount {
+    public var address: AccountAddress
+    public var coins: Coins
+    public var publicKey: PublicKey?
+    public var accountNumber: UInt64
+    public var sequence: UInt64
     
     // NewBaseAccount creates a new BaseAccount object
     init(
@@ -27,7 +27,7 @@ public class BaseAccount {
         self.sequence = sequence
     }
     
-    func set(address: AccountAddress) throws {
+    public func set(address: AccountAddress) throws {
         guard address.isEmpty else {
             throw Cosmos.Error.generic(reason: "cannot override BaseAccount address")
         }
@@ -35,25 +35,40 @@ public class BaseAccount {
         self.address = address
     }
 
-    func set(publicKey: PublicKey) throws {
+    public func set(publicKey: PublicKey) throws {
         self.publicKey = publicKey
     }
     
-    func set(accountNumber: UInt64) throws {
+    public func set(accountNumber: UInt64) throws {
         self.accountNumber = accountNumber
     }
     
-    func set(sequence: UInt64) throws {
+    public func set(sequence: UInt64) throws {
         self.sequence = sequence
     }
     
-    func set(coins: Coins) throws {
+    public func set(coins: Coins) throws {
         self.coins = coins
     }
     
+    // Validate checks for errors on the account fields
+    func validate() throws {
+        struct ValidationError: Swift.Error, CustomStringConvertible {
+            let description: String
+        }
+        
+        if
+            let publicKey = self.publicKey,
+            publicKey.address.rawValue != address.data
+        {
+            throw ValidationError(description: "pubkey and address pair is invalid")
+        }
+    }
+
+    
     // SpendableCoins returns the total set of spendable coins. For a base account,
     // this is simply the base coins.
-    func spendableCoins(blockTime: TimeInterval) -> Coins {
+    public func spendableCoins(blockTime: TimeInterval) -> Coins {
         coins
     }
     
@@ -73,7 +88,7 @@ public class BaseAccount {
         }
     }
 
-    var description: String {
+    public var description: String {
         // TODO: Deal with force try and force unwrap.
         let data = try! encodeYAML()
         return String(data: data, encoding: .utf8)!
@@ -106,9 +121,7 @@ public class BaseAccount {
 //
 //        return string(bz), err
     }
-
 }
-
 
 // ProtoBaseAccount - a prototype function for BaseAccount
 public func protoBaseAccount() -> Account {

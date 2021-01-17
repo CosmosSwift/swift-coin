@@ -67,16 +67,12 @@ extension IAVLStore {
     // Commit commits the current store state and returns a CommitID with the new
     // version and hash.
     func commit() -> CommitID {
-        do {
-            let (hash, version) = try tree.saveVersion()
-            
-            return CommitID(
-                version: version,
-                hash: hash
-            )
-        } catch {
-           fatalError("\(error)")
-        }
+        let (hash, version) = try! tree.saveVersion()
+        
+        return CommitID(
+            version: version,
+            hash: hash
+        )
     }
 
     // Implements Committer.

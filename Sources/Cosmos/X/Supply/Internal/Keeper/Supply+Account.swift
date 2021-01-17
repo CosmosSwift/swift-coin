@@ -11,34 +11,28 @@ extension SupplyKeeper {
     // GetModuleAccountAndPermissions gets the module account from the auth account store and its
     // registered permissions
     func moduleAccountAndPermissions(request: Request, moduleName: String) -> (ModuleAccount?, [String]) {
-        // TODO: Implement
-        fatalError()
-//        let (moduleAddress, permissions) = moduleAddressAndPermissions(moduleName: moduleName)
-//
-//        guard let address = moduleAddress else {
-//            return (nil, [])
-//        }
-//
-//        if let account = accountKeeper.account(request: request, address: address) {
-//            guard let moduleAccount = account as? ModuleAccount else {
-//                fatalError("account is not a module account")
-//            }
-//
-//            return (moduleAccount, permissions)
-//        }
-//
-//
-//        // create a new module account
-//        let moduleAccount = ModuleAccount(
-//            name: moduleName,
-//            permissions: permissions
-//        )
-//
-//        // set the account number
-//        let moduleAccountInterface = accountKeeper.account(request: request, account: moduleAccount)
-//        setModuleAccount(request: request, moduleAccount: moduleAccountInterface)
-//
-//        return (moduleAccountInterface, permissions)
+        let (moduleAddress, permissions) = moduleAddressAndPermissions(moduleName: moduleName)
+
+        guard let address = moduleAddress else {
+            return (nil, [])
+        }
+
+        if let moduleAccount: ModuleAccount = accountKeeper.account(request: request, address: address) {
+            return (moduleAccount, permissions)
+        }
+
+        // create a new module account
+        let moduleAccount = ModuleAccount(
+            name: moduleName,
+            permissions: permissions
+        )
+
+        // set the account number
+        let moduleAccountInterface = accountKeeper.makeAccount(request: request, account: moduleAccount) as! ModuleAccount
+        // TODO: Check this force cast.
+        setModuleAccount(request: request, moduleAccount: moduleAccountInterface)
+
+        return (moduleAccountInterface, permissions)
     }
 
     // GetModuleAccount gets the module account from the auth account store
@@ -53,9 +47,7 @@ extension SupplyKeeper {
     
     // SetModuleAccount sets the module account to the auth account store
     func setModuleAccount(request: Request, moduleAccount: ModuleAccount) {
-        // TODO: Implement
-        fatalError()
-//        accountKeeper.setAccount(request: Request, account: moduleAccount)
+        accountKeeper.setAccount(request: request, account: moduleAccount)
     }
 
 }

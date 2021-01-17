@@ -10,18 +10,16 @@ public final class ModuleAccount: BaseAccount {
     // NewEmptyModuleAccount creates a empty ModuleAccount from a string
     public init(name: String, permissions: [String]) {
         let moduleAddress = ModuleAccount.moduleAddress(name: name)
+        try! SupplyPermissions.validate(permissions: permissions)
 
-        do {
-            try SupplyPermissions.validate(permissions: permissions)
-        } catch {
-            fatalError("\(error)")
-        }
-        
         self.name = name
         self.permissions = permissions
         super.init(address: moduleAddress)
     }
-
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
+    }
 }
 
 
@@ -29,6 +27,6 @@ public final class ModuleAccount: BaseAccount {
 extension ModuleAccount {
     // NewModuleAddress creates an AccAddress from the hash of the module's name
     public static func moduleAddress(name: String) -> AccountAddress {
-        AccountAddress(data: Crypto.addressHash(data: name.data))
+        AccountAddress(data: Crypto.addressHash(data: name.data).rawValue)
     }
 }

@@ -15,10 +15,10 @@ let defaultBondDenomination = "stake"
 let validatorUpdateDelay: Int64 = 1
 
 // PowerReduction is the amount of staking tokens required for 1 unit of consensus-engine power
-let powerReduction = 1_000_000
+let powerReduction: UInt = 1_000_000
 
 // TokensToConsensusPower - convert input tokens to potential consensus-engine power
-func tokensToConsensusPower(tokens: Int) -> Int64 {
+func tokensToConsensusPower(tokens: UInt) -> Int64 {
     // TODO: Check if there's more to it than just Int division
     // (tokens.Quo(PowerReduction)).Int64()
     Int64(tokens / powerReduction)

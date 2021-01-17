@@ -3,11 +3,11 @@ import Foundation
 // An address is a []byte, but hex-encoded even in JSON.
 // []byte leaves us the option to change the address length.
 // Use an alias so Unmarshal methods (with ptr receivers) are available too.
-public typealias Address = Data
+public typealias Address = HexadecimalData
 
 public enum Crypto {
     public static func addressHash(data: Data) -> Address {
-        return TMHash.sumTruncated(data: data)
+        Address(TendermintHash.sumTruncated(data: data))
     }
 }
 

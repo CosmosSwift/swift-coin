@@ -1,7 +1,7 @@
 import Foundation
 import Crypto
 
-enum TMHash {
+enum TendermintHash {
     private static let truncatedSize = 20
 
     // SumTruncated returns the first 20 bytes of SHA256 of the bz.

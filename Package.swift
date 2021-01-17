@@ -79,6 +79,7 @@ let package = Package(
                 .target(name: "JSON"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "ABCI", package: "ABCI"),
             ]
         ),
         .target(name: "Bech32"),

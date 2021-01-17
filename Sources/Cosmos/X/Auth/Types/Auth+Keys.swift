@@ -1,3 +1,5 @@
+import Foundation
+
 public enum AuthKeys {
     // module name
     public static let moduleName = "auth"
@@ -10,4 +12,15 @@ public enum AuthKeys {
 
     // QuerierRoute is the querier route for acc
     public static let querierRoute = storeKey
+}
+
+// AddressStoreKeyPrefix prefix for account-by-address store
+let addressStoreKeyPrefix = Data([0x01])
+
+// param key for global account number
+let globalAccountNumberKey = "globalAccountNumber".data
+
+// AddressStoreKey turn an address to key used to get it from the account store
+func addressStoreKey(address: AccountAddress) -> Data {
+    addressStoreKeyPrefix + address.data
 }

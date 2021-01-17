@@ -35,7 +35,7 @@ extension BaseCacheKeyValueStore {
     func get(key: Data) -> Data? {
         let value: Data?
         
-        if let cacheValue = cache[key.string] {
+        if let cacheValue = cache[key.hexEncodedString()] {
             value = cacheValue.value
         } else {
             value = parent.get(key: key)
@@ -226,14 +226,14 @@ extension BaseCacheKeyValueStore {
         deleted: Bool,
         dirty: Bool
     ) {
-        cache[key.string] = CacheValue(
+        cache[key.hexEncodedString()] = CacheValue(
             value: value,
             deleted: deleted,
             dirty: dirty
         )
         
         if dirty {
-            unsortedCache[key.string] = true
+            unsortedCache[key.hexEncodedString()] = true
         }
     }
 }

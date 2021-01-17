@@ -1,3 +1,5 @@
+import Foundation
+
 // AccountKeeper encodes/decodes accounts using the go-amino (binary)
 // encoding/decoding library.
 public struct AccountKeeper {
@@ -26,44 +28,33 @@ public struct AccountKeeper {
         self.codec = codec
         self.paramSubspace = paramstore.with(keyTable: .paramKeyTable)
     }
+}
 
-    public func accountWithAddress(request: Request, address: AccountAddress) -> Account? {
-        // TODO: Implement
-        fatalError()
-//        let account = proto()
-//
-//        do {
-//            try account.set(address: address)
-//            return self.account(request: request, address: address)
-//        } catch {
-//            fatalError("\(error)")
-//        }
-    }
-    
-    public func account(request: Request, address: AccountAddress) -> Account? {
-        fatalError()
-//        let store = request.keyValueStore(key: key)
-//
-//        guard let data = store.get(key: AddressStoreKey(address)) else {
-//            return nil
-//        }
-//
-//        return decodeAccount(data: data)
-    }
-    
-    public func allAccounts(request: Request) -> [Account] {
-        // TODO: Implement
-        fatalError()
-    }
-    
-    public func setAccount(request: Request, account: Account) {
-        // TODO: Implement
-        fatalError()
-    }
-    
-    public func iterateAccounts(request: Request, process: (Account) -> Bool) {
-        // TODO: Implement
-        fatalError()
+extension AccountKeeper {
+    // GetNextAccountNumber returns and increments the global account number counter.
+    // If the global account number is not set, it initializes it with value 0.
+    func nextAccountNumber(request: Request) -> UInt64 {
+        var accountNumber: UInt64
+        let store = request.keyValueStore(key: key)
+        
+        if let data = store.get(key: globalAccountNumberKey) {
+            accountNumber = try! codec.unmarshalBinaryLengthPrefixed(data: data)
+        } else {
+            // initialize the account numbers
+            accountNumber = 0
+        }
+
+        let data = codec.mustMarshalBinaryLengthPrefixed(value: accountNumber + 1)
+        store.set(key: globalAccountNumberKey, value: data)
+        return accountNumber
     }
 }
 
+// -----------------------------------------------------------------------------
+// Misc.
+
+extension AccountKeeper {
+    func decodeAccount<A: Account>(data: Data) -> A {
+        try! codec.unmarshalBinaryBare(data: data)
+    }
+}

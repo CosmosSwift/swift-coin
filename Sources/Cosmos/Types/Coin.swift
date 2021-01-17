@@ -325,10 +325,6 @@ extension Coins {
     }
 
     static func mustValidate(denomination: String) {
-        do {
-            try validate(denomination: denomination)
-        } catch {
-            fatalError("\(error)")
-        }
+        try! validate(denomination: denomination)
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 import Bech32
 
 // Constants defined here are the defaults value for address.
@@ -198,16 +199,11 @@ public struct AccountAddress: Equatable, Address {
             return ""
         }
 
-        do {
-            return try Bech32.convertAndEncode(
-                humanReadablePart: Configuration.bech32AccountAddressPrefix,
-                data: data
-            )
-        } catch {
-           fatalError("\(error)")
-        }
+        return try! Bech32.convertAndEncode(
+            humanReadablePart: Configuration.bech32AccountAddressPrefix,
+            data: data
+        )
     }
-
 }
 
 // ----------------------------------------------------------------------------
@@ -324,14 +320,10 @@ public struct ValidatorAddress: Address {
             return ""
         }
 
-        do {
-            return try Bech32.convertAndEncode(
-                humanReadablePart: Configuration.bech32ValidatorAddressPrefix,
-                data: data
-            )
-        } catch {
-           fatalError("\(error)")
-        }
+        return try! Bech32.convertAndEncode(
+            humanReadablePart: Configuration.bech32ValidatorAddressPrefix,
+            data: data
+        )
     }
 }
 
@@ -449,14 +441,10 @@ public struct ConsensusAddress: Address {
             return ""
         }
 
-        do {
-            return try Bech32.convertAndEncode(
-                humanReadablePart: Configuration.bech32ConsensusAddressPrefix,
-                data: data
-            )
-        } catch {
-           fatalError("\(error)")
-        }
+        return try! Bech32.convertAndEncode(
+            humanReadablePart: Configuration.bech32ConsensusAddressPrefix,
+            data: data
+        )
     }
 }
 

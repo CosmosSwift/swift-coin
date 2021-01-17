@@ -17,18 +17,18 @@ struct Validator: Codable  {
     // has the validator been jailed from bonded status?
     let jailed: Bool
     // validator status (bonded/unbonding/unbonded)
-    let status: BondStatus
+    var status: BondStatus
     // delegated tokens (incl. self-delegation)
-    let tokens: Int
+    let tokens: UInt
     // total shares issued to a validator's delegators
     let delegatorShares: Decimal
     // description terms for the validator
     // TODO: Implment
 //    let description: Description
     // if unbonding, height at which this validator has begun unbonding
-    let unbondingHeight: Int64
+    var unbondingHeight: Int64
     // if unbonding, min time for the validator to complete unbonding
-    let unbondingCompletionTime: Date
+    var unbondingCompletionTime: Date
     // commission parameters
     // TODO: Implement
 //    let commission: Commission
@@ -38,6 +38,11 @@ struct Validator: Codable  {
 
 
 extension Validator {
+    // return the TM validator address
+    var consensusAddress: ConsensusAddress {
+        ConsensusAddress(data: consensusPublicKey.address.rawValue)
+    }
+
     // IsBonded checks if the validator status equals Bonded
     var isBonded: Bool {
         status == .bonded
@@ -63,6 +68,16 @@ extension Validator {
             power: consensusPower
         )
     }
+    
+    // ABCIValidatorUpdateZero returns an abci.ValidatorUpdate from a staking validator type
+    // with zero power used for validator updates.
+    var abciValidatorUpdateZero: ValidatorUpdate {
+        ValidatorUpdate(
+            publicKey: ABCI.PublicKey(consensusPublicKey),
+            power:  0
+        )
+    }
+
     
     // get the consensus-engine power
     // a reduction of 10^6 from validator tokens is applied

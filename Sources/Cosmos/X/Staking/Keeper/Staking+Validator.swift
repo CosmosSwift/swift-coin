@@ -1,4 +1,5 @@
 import Foundation
+import Database
 
 extension StakingKeeper {
     // get a single validator
@@ -51,7 +52,7 @@ extension StakingKeeper {
     // validator index
     func setValidatorByConsensusAddress(request: Request, validator: Validator) {
         let store = request.keyValueStore(key: storeKey)
-        let consensusAddress = ConsensusAddress(data: validator.consensusPublicKey.address)
+        let consensusAddress = ConsensusAddress(data: validator.consensusPublicKey.address.rawValue)
         
         store.set(
             key: validatorByConsensusAddressKey(consensusAddress: consensusAddress),
@@ -72,6 +73,21 @@ extension StakingKeeper {
             value: validator.operatorAddress.data
         )
     }
+    
+    // validator index
+    func deleteValidatorByPowerIndex(request: Request, validator: Validator) {
+        let store = request.keyValueStore(key: storeKey)
+        store.delete(key: validatorsByPowerIndexKey(validator: validator))
+    }
+
+    // returns an iterator for the current validator power store
+    func validatorsPowerStoreIterator(request: Request) -> Iterator {
+        // TODO: Implement
+        fatalError()
+//        let store = request.keyValueStore(key: storeKey)
+//        return KeyValueStoreReversePrefixIterator(store, validatorsByPowerIndexKey)
+    }
+
 }
 
 //_______________________________________________________________________
@@ -87,6 +103,12 @@ extension StakingKeeper {
             key: lastValidatorPowerKey(operator: `operator`),
             value: data
         )
+    }
+    
+    // Delete the last validator power.
+    func deleteLastValidatorPower(request: Request, operator: ValidatorAddress) {
+        let store = request.keyValueStore(key: storeKey)
+        store.delete(key: lastValidatorPowerKey(operator: `operator`))
     }
 }
 
