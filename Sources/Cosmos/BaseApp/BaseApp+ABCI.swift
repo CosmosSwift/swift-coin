@@ -37,20 +37,21 @@ extension BaseApp: ABCIApplication {
         var response = initChainer(deliverState.request, request)
 
         // sanity check
-        if !request.validators.isEmpty {
-            guard request.validators.count == response.validators.count else {
-                fatalError("len(RequestInitChain.Validators) != len(GenesisValidators) (\(request.validators.count) != \(response.validators.count)")
-            }
-            
-            request.validators.sort()
-            response.validators.sort()
-
-            for (i, validator) in response.validators.enumerated() {
-                guard validator == request.validators[i] else {
-                    fatalError("genesisValidators[\(i)] != req.Validators[\(i)]")
-                }
-            }
-        }
+        // TODO: Implement
+//        if !request.validators.isEmpty {
+//            guard request.validators.count == response.validators.count else {
+//                fatalError("len(RequestInitChain.Validators) != len(GenesisValidators) (\(request.validators.count) != \(response.validators.count)")
+//            }
+//
+//            request.validators.sort()
+//            response.validators.sort()
+//
+//            for (i, validator) in response.validators.enumerated() {
+//                guard validator == request.validators[i] else {
+//                    fatalError("genesisValidators[\(i)] != req.Validators[\(i)]")
+//                }
+//            }
+//        }
 
         // NOTE: We don't commit, but BeginBlock for block 1 starts from this
         // deliverState.

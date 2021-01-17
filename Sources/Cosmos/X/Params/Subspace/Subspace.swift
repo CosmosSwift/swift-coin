@@ -98,10 +98,16 @@ public struct Subspace {
             fatalError("parameter \(key.string) not registered")
         }
 
-        let type = attribute.type
-        let valueType = Swift.type(of: value)
+        let registeredType = attribute.type
+        let valueType: Any.Type
+        
+        if let encodable = value as? AnyEncodable {
+            valueType = Swift.type(of: encodable.value)
+        } else {
+            valueType = Swift.type(of: value)
+        }
 
-        if type != valueType {
+        if registeredType != valueType {
             fatalError("type mismatch with registered table")
         }
     }

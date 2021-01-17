@@ -42,8 +42,7 @@ public struct KeyTable {
             fatalError("duplicate parameter key")
         }
 
-        let type = Swift.type(of: parameterSetPair.value)
-
+        let type = Swift.type(of: parameterSetPair.value.value)
         map[key] = Attribute(type: type, valueValidatorFunction: parameterSetPair.validatorFunction)
     }
 }
