@@ -48,5 +48,14 @@ extension AccountKeeper {
     public func iterateAccounts(request: Request, process: (Account) -> Bool) {
         // TODO: Implement
         fatalError()
+        let store = request.keyValueStore(key: key)
+        var iterator = store.iterator(start: nil, end: nil)
+        while iterator.isValid {
+            var account: BaseAccount = self.decodeAccount(data: iterator.value)
+            if process(account) {
+                break
+            }
+            iterator.next()
+        }
     }
 }
