@@ -1,3 +1,5 @@
+import Foundation
+
 extension AccountKeeper {
     // NewAccountWithAddress implements sdk.AccountKeeper.
     public func makeAccountWithAddress(request: Request, address: AccountAddress) -> Account? {
@@ -46,16 +48,19 @@ extension AccountKeeper {
     
     // IterateAccounts iterates over all the stored accounts and performs a callback function
     public func iterateAccounts(request: Request, process: (Account) -> Bool) {
-        // TODO: Implement
-        fatalError()
         let store = request.keyValueStore(key: key)
-        var iterator = store.iterator(start: nil, end: nil)
+        var iterator = store.iterator(start: Data(), end: Data())
+        
         while iterator.isValid {
-            var account: BaseAccount = self.decodeAccount(data: iterator.value)
+            defer {
+                iterator.next()
+            }
+            
+            let account: BaseAccount = self.decodeAccount(data: iterator.value)
+            
             if process(account) {
                 break
             }
-            iterator.next()
         }
     }
 }

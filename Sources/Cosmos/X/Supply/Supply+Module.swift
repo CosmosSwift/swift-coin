@@ -71,19 +71,20 @@ public final class SupplyAppModule: SupplyAppModuleBasic, AppModule {
    
     // Genesis
     public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
-        fatalError()
         let data = Codec.supplyCodec.mustMarshalJSON(value: json)
         let genesisState: SupplyGenesisState = Codec.supplyCodec.mustUnmarshalJSON(data: data)
+        
         if genesisState.supply.isEmpty {
             var totalSupply = Coins()
-            accountKeeper.iterateAccounts(request: request) { (a) -> Bool in
-                totalSupply = totalSupply + a.coins
+            
+            accountKeeper.iterateAccounts(request: request) { account in
+                totalSupply = totalSupply + account.coins
                 return false
             }
-            
         } else {
             keeper.setSupply(request: request, supply: genesisState.supply)
         }
+        
         return []
     }
     

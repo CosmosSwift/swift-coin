@@ -2,7 +2,7 @@ import Foundation
 
 // MemDB is an in-memory database backend using a B-tree for storage.
 public final class InMemoryDatabase: Database {
-    private var items: [Data: Data] = [:]
+    internal var items: [Data: Data] = [:]
 
     // NewMemDB creates a new in-memory database.
     public init() {}
@@ -68,15 +68,18 @@ public final class InMemoryDatabase: Database {
 
     // Iterator implements DB.
     // Takes out a read-lock on the database until the iterator is closed.
-    public func iterator(start: Data?, end: Data?) throws -> Iterator {
-        // TODO: Implement
-//        return newMemDBIterator(db, start, end, false)
-        fatalError()
+    public func iterator(start: Data, end: Data) throws -> Iterator {
+        InMemoryDatabaseIterator(
+            database: self,
+            start: start,
+            end: end,
+            reverse: false
+        )
     }
 
     // ReverseIterator implements DB.
     // Takes out a read-lock on the database until the iterator is closed.
-    public func reverseIterator(start: Data?, end: Data?) throws -> Iterator {
+    public func reverseIterator(start: Data, end: Data) throws -> Iterator {
         // TODO: Implement
 //        return newMemDBIterator(db, start, end, true);, nil
         fatalError()

@@ -65,7 +65,7 @@ extension PrefixDatabaseIterator {
     }
 
     // Error implements Iterator.
-    var error: Error {
+    var error: Error? {
         source.error
     }
 
@@ -73,7 +73,6 @@ extension PrefixDatabaseIterator {
     func close() {
         source.close()
     }
-
 }
 
 extension Data {

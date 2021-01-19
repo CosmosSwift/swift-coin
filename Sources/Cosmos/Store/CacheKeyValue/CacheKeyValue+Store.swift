@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 import Database
 
 // If value is nil but deleted is false, it means the parent doesn't have the
@@ -14,7 +15,7 @@ final class BaseCacheKeyValueStore: CacheKeyValueStore {
     var cache: [String: CacheValue]
     var unsortedCache: [String: Bool]
     // always ascending sorted
-    var sortedCache: [Any]
+    var sortedCache: [KeyValuePair]
     let parent: KeyValueStore
     
     internal init(parent: KeyValueStore) {
@@ -138,16 +139,16 @@ extension BaseCacheKeyValueStore {
     // Iteration
 
     // Implements types.KVStore.
-    func iterator(start: Data?, end: Data?) -> Iterator {
+    func iterator(start: Data, end: Data) -> Iterator {
         iterator(start: start, end: end, ascending: true)
     }
 
     // Implements types.KVStore.
-    func reverseIterator(start: Data?, end: Data?) -> Iterator {
+    func reverseIterator(start: Data, end: Data) -> Iterator {
         iterator(start: start, end: end, ascending: false)
     }
 
-    func iterator(start: Data?, end: Data?, ascending: Bool) -> Iterator {
+    func iterator(start: Data, end: Data, ascending: Bool) -> Iterator {
         let parent: Iterator
 
         if ascending {
@@ -158,62 +159,41 @@ extension BaseCacheKeyValueStore {
 
         dirtyItems(start: start, end: end)
         
-        // TODO: Implement
-        fatalError()
-//        let cache = InMemoryIterator(
-//            start: start,
-//            end: end,
-//            store.sortedCache,
-//            ascending
-//        )
-//
-//        return CacheMergeIterator(
-//            parent: parent,
-//            cache: cache,
-//            ascending: ascending
-//        )
+        let cache = InMemoryIterator(
+            start: start,
+            end: end,
+            items: sortedCache,
+            ascending: ascending
+        )
+
+        return CacheMergeIterator(
+            parent: parent,
+            cache: cache,
+            ascending: ascending
+        )
     }
 
     // Constructs a slice of dirty items, to use w/ memIterator.
     func dirtyItems(start: Data?, end: Data?) {
-        // TODO: Implement
-        fatalError()
-//        var unsorted: [KeyValuePair] = []
-//
-//        for key in unsortedCache {
-//            cacheValue = cache[key]
-//
-//            if dbm.IsKeyInDomain([]byte(key), start, end) {
-//                unsorted = append(unsorted, &tmkv.Pair{Key: []byte(key), Value: cacheValue.value})
-//                delete(store.unsortedCache, key)
-//            }
-//        }
-//
-//        sort.Slice(unsorted, func(i, j int) bool {
-//            return bytes.Compare(unsorted[i].Key, unsorted[j].Key) < 0
-//        })
-//
-//        for e := store.sortedCache.Front(); e != nil && len(unsorted) != 0; {
-//            uitem := unsorted[0]
-//            sitem := e.Value.(*tmkv.Pair)
-//            comp := bytes.Compare(uitem.Key, sitem.Key)
-//            switch comp {
-//            case -1:
-//                unsorted = unsorted[1:]
-//                store.sortedCache.InsertBefore(uitem, e)
-//            case 1:
-//                e = e.Next()
-//            case 0:
-//                unsorted = unsorted[1:]
-//                e.Value = uitem
-//                e = e.Next()
-//            }
-//        }
-//
-//        for _, kvp := range unsorted {
-//            store.sortedCache.PushBack(kvp)
-//        }
+        var unsorted: [KeyValuePair] = []
 
+        for (key, _) in unsortedCache {
+            let cacheValue = cache[key]
+
+            if isKeyInDomain(key: key.data, start: start, end: end) {
+                let pair = KeyValuePair(
+                    key: key.data,
+                    value: cacheValue?.value
+                )
+                
+                unsorted.append(pair)
+                unsortedCache[key] = nil
+            }
+        }
+
+        sortedCache = Set(sortedCache + unsorted).sorted { lhs, rhs in
+            lhs.key.lexicographicallyPrecedes(rhs.key)
+        }
     }
 
     //----------------------------------------

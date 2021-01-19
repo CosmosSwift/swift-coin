@@ -29,3 +29,22 @@ extension Data {
         return Data()
     }
 }
+
+// See DB interface documentation for more information.
+public func isKeyInDomain(key: Data, start: Data?, end: Data?) -> Bool {
+    if key < start ?? Data() {
+        return false
+    }
+    
+    if let end = end, end <= key {
+        return false
+    }
+    
+    return true
+}
+
+extension Data: Comparable {
+    public static func < (lhs: Data, rhs: Data) -> Bool {
+        lhs.lexicographicallyPrecedes(rhs)
+    }
+}

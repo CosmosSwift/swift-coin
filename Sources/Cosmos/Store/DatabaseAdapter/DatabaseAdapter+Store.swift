@@ -31,12 +31,12 @@ class DatabaseAdapterStore: KeyValueStore {
     }
 
     // Iterator wraps the underlying DB's Iterator method panicing on error.
-    func iterator(start: Data?, end: Data?) -> Iterator {
+    func iterator(start: Data, end: Data) -> Iterator {
         try! database.iterator(start: start, end: end)
     }
 
     // ReverseIterator wraps the underlying DB's ReverseIterator method panicing on error.
-    func reverseIterator(start: Data?, end: Data?) -> Iterator {
+    func reverseIterator(start: Data, end: Data) -> Iterator {
         try! database.reverseIterator(start: start, end: end)
     }
 

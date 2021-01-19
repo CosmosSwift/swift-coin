@@ -1,5 +1,4 @@
-// TODO: Create this in the proper module, if needed.
-public struct KeyValuePair {}
+import Tendermint
 
 // StoreDecoderRegistry defines each of the modules store decoders. Used for ImportExport
 // simulation.

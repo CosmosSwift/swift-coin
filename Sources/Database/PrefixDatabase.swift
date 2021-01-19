@@ -50,11 +50,11 @@ extension PrefixDatabase {
     }
 
     // Iterator implements DB.
-    public func iterator(start: Data?, end: Data?) throws -> Iterator {
-        let prefixedStart = prefix + (start ?? Data())
+    public func iterator(start: Data, end: Data) throws -> Iterator {
+        let prefixedStart = prefix + start
         var prefixedEnd: Data
         
-        if let end = end {
+        if !end.isEmpty {
             prefixedEnd = prefix + end
         } else {
             prefixedEnd = prefix.incremented()
@@ -74,11 +74,11 @@ extension PrefixDatabase {
     }
 
     // ReverseIterator implements DB.
-    public func reverseIterator(start: Data?, end: Data?) throws -> Iterator {
-        let prefixedStart = prefix + (start ?? Data())
+    public func reverseIterator(start: Data, end: Data) throws -> Iterator {
+        let prefixedStart = prefix + start
         var prefixedEnd: Data
         
-        if let end = end {
+        if !end.isEmpty {
             prefixedEnd = prefix + end
         } else {
             prefixedEnd = prefix.incremented()

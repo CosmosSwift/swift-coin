@@ -147,7 +147,7 @@ extension IAVLStore {
 //    }
 
     // Implements types.KVStore.
-    func iterator(start: Data?, end: Data?) -> Iterator {
+    func iterator(start: Data, end: Data) -> Iterator {
         var iTree: ImmutableTree
 
         switch self.tree {
@@ -165,7 +165,7 @@ extension IAVLStore {
     }
 
     // Implements types.KVStore.
-    func reverseIterator(start: Data?, end: Data?) -> Iterator {
+    func reverseIterator(start: Data, end: Data) -> Iterator {
         // TODO: Implement
         fatalError()
 //        var iTree *iavl.ImmutableTree

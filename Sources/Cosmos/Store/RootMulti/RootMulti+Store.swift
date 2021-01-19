@@ -210,7 +210,7 @@ final class RootMultiStore: CommitMultiStore {
     func delete(keyValueStore: KeyValueStore) throws {
         // Note that we cannot write while iterating, so load all keys here, delete below
         var keys: [Data] = []
-        var iterator = keyValueStore.iterator(start: nil, end: nil)
+        var iterator = keyValueStore.iterator(start: Data(), end: Data())
         
         while iterator.isValid {
             defer {
@@ -233,7 +233,7 @@ final class RootMultiStore: CommitMultiStore {
         newStore: KeyValueStore
     ) throws {
         // we read from one and write to another
-        var iterator = oldStore.iterator(start: nil, end: nil)
+        var iterator = oldStore.iterator(start: Data(), end: Data())
         
         while iterator.isValid {
             defer {

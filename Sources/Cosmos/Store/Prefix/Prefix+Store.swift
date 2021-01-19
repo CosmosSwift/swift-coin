@@ -30,11 +30,11 @@ public final class PrefixStore: KeyValueStore {
         parent.delete(key: prefix + key)
     }
     
-    public func iterator(start: Data?, end: Data?) -> Iterator {
+    public func iterator(start: Data, end: Data) -> Iterator {
         iterator(start: start, end: end)
     }
     
-    public func reverseIterator(start: Data?, end: Data?) -> Iterator {
+    public func reverseIterator(start: Data, end: Data) -> Iterator {
         reverseIterator(start: start, end: end)
     }
     

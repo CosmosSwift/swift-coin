@@ -11,9 +11,9 @@ extension KeyValueStore {
 // prefixEndBytes returns the Data that would end a
 // range query for all Data with a certain prefix
 // Deals with last byte of prefix being FF without overflowing
-func prefixEndBytes(prefix: Data) -> Data? {
+func prefixEndBytes(prefix: Data) -> Data {
     if prefix.isEmpty {
-        return nil
+        return Data()
     }
 
     var end = Data(prefix)
@@ -26,7 +26,7 @@ func prefixEndBytes(prefix: Data) -> Data? {
             end = end.dropLast(1)
                 
             if end.isEmpty {
-                return nil
+                return Data()
             }
         }
     }

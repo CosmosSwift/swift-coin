@@ -56,7 +56,7 @@ extension GasKeyValueStore: KeyValueStore {
     // Iterator implements the KVStore interface. It returns an iterator which
     // incurs a flat gas cost for seeking to the first key/value pair and a variable
     // gas cost based on the current value's length if the iterator is valid.
-    func iterator(start: Data?, end: Data?) -> Iterator {
+    func iterator(start: Data, end: Data) -> Iterator {
         iterator(start: start, end: end, ascending: true)
     }
 
@@ -64,7 +64,7 @@ extension GasKeyValueStore: KeyValueStore {
     // iterator which incurs a flat gas cost for seeking to the first key/value pair
     // and a variable gas cost based on the current value's length if the iterator
     // is valid.
-    func reverseIterator(start: Data?, end: Data?) -> Iterator {
+    func reverseIterator(start: Data, end: Data) -> Iterator {
         iterator(start: start, end: end, ascending: false)
     }
 
@@ -78,7 +78,7 @@ extension GasKeyValueStore: KeyValueStore {
         fatalError("cannot CacheWrapWithTrace a GasKVStore")
     }
 
-    func iterator(start: Data?, end: Data?, ascending: Bool) -> Iterator {
+    func iterator(start: Data, end: Data, ascending: Bool) -> Iterator {
         let parentIterator: Iterator
         
         if ascending {
@@ -143,12 +143,12 @@ struct GasIterator: Iterator {
     }
 
     // Implements Iterator.
-    func close() {
+    mutating func close() {
         parent.close()
     }
 
     // Error delegates the Error call to the parent iterator.
-    var error: Swift.Error {
+    var error: Swift.Error? {
         parent.error
     }
 
