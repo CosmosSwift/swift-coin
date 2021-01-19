@@ -100,7 +100,6 @@ func validatorQueueTimeKey(timestamp: Date) -> Data {
 
 ///vgets the key for the historical info
 func historicalInfoKey(height: Int64) -> Data {
-    fatalError()
-    let data =  Data()// []byte(strconv.FormatInt(height, 10))
+    let data =  "\(height)".data // []byte(strconv.FormatInt(height, 10))
     return historicalInfoKey + data
 }

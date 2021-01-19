@@ -112,6 +112,35 @@ extension StakingKeeper {
     }
 }
 
+
+    // get the group of the bonded validators
+    func getLastValidators(request: Request) -> [Validator] {
+            fatalError()
+    //        store := ctx.KVStore(k.storeKey)
+    //
+    //        // add the actual validator power sorted store
+    //        maxValidators := k.MaxValidators(ctx)
+    //        validators = make([]types.Validator, maxValidators)
+    //
+    //        iterator := sdk.KVStorePrefixIterator(store, types.LastValidatorPowerKey)
+    //        defer iterator.Close()
+    //
+    //        i := 0
+    //        for ; iterator.Valid(); iterator.Next() {
+    //
+    //            // sanity check
+    //            if i >= int(maxValidators) {
+    //                panic("more validators than maxValidators found")
+    //            }
+    //            address := types.AddressFromLastValidatorPowerKey(iterator.Key())
+    //            validator := k.mustGetValidator(ctx, address)
+    //
+    //            validators[i] = validator
+    //            i++
+    //        }
+    //        return validators[:i] // trim
+        }
+
 //_______________________________________________________________________
 // Validator Queue
 
