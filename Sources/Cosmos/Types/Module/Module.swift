@@ -227,7 +227,6 @@ public class ModuleManager {
     // child context with an event manager to aggregate events emitted from all
     // modules.
     public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) -> ResponseBeginBlock {
-        var request = request
         request.eventManager = EventManager()
 
         for moduleName in orderBeginBlockers {
@@ -241,7 +240,6 @@ public class ModuleManager {
     // child context with an event manager to aggregate events emitted from all
     // modules.
     public func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> ResponseEndBlock {
-        var request = request
         request.eventManager = EventManager()
         var validatorUpdates: [ValidatorUpdate] = []
 
