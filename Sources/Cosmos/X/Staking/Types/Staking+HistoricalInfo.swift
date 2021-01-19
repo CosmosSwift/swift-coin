@@ -17,34 +17,33 @@ struct HistoricalInfo: Codable {
         //    v1.operatorAddress < v2.operatorAddress
         //})
     }
-}
-
-
-// MustMarshalHistoricalInfo wll marshal historical info and panic on error
-func mustMarshalHistoricalInfo(codec: Codec, historicalInfo: HistoricalInfo) -> Data {
-    codec.mustMarshalBinaryLengthPrefixed(value: historicalInfo)
-}
-
-// MustUnmarshalHistoricalInfo wll unmarshal historical info and panic on error
-func mustUnmarshalHistoricalInfo(codec: Codec, value: Data) -> HistoricalInfo {
-    guard let historicalInfo = try? unmarshalHistoricalInfo(codec: codec, value: value) else {
-        fatalError("Failed to unmarshal Historical Info from data: \(value)")
+    
+    // MustMarshalHistoricalInfo wll marshal historical info and panic on error
+    static func mustMarshalHistoricalInfo(codec: Codec, historicalInfo: HistoricalInfo) -> Data {
+        codec.mustMarshalBinaryLengthPrefixed(value: historicalInfo)
     }
-    return historicalInfo
-}
 
-// UnmarshalHistoricalInfo will unmarshal historical info and return any error
-func unmarshalHistoricalInfo(codec: Codec, value: Data) throws -> HistoricalInfo {
-    try codec.unmarshalBinaryLengthPrefixed(data: value)
-}
+    // MustUnmarshalHistoricalInfo wll unmarshal historical info and panic on error
+    static func mustUnmarshalHistoricalInfo(codec: Codec, value: Data) -> HistoricalInfo {
+        guard let historicalInfo = try? unmarshalHistoricalInfo(codec: codec, value: value) else {
+            fatalError("Failed to unmarshal Historical Info from data: \(value)")
+        }
+        return historicalInfo
+    }
 
-// ValidateBasic will ensure HistoricalInfo is not nil and sorted
-func validateBasic(historicalInfo: HistoricalInfo) throws {
-    fatalError()
-//    if historicalInfo.ValSet.count == 0 {
-//        return sdkerrors.Wrap(ErrInvalidHistoricalInfo, "validator set is empty")
-//    }
-//    if !sort.IsSorted(Validators(hi.ValSet)) {
-//        return sdkerrors.Wrap(ErrInvalidHistoricalInfo, "validator set is not sorted by address")
-//    }
+    // UnmarshalHistoricalInfo will unmarshal historical info and return any error
+    static func unmarshalHistoricalInfo(codec: Codec, value: Data) throws -> HistoricalInfo {
+        try codec.unmarshalBinaryLengthPrefixed(data: value)
+    }
+
+    // ValidateBasic will ensure HistoricalInfo is not nil and sorted
+    static func validateBasic(historicalInfo: HistoricalInfo) throws {
+        fatalError()
+    //    if historicalInfo.ValSet.count == 0 {
+    //        return sdkerrors.Wrap(ErrInvalidHistoricalInfo, "validator set is empty")
+    //    }
+    //    if !sort.IsSorted(Validators(hi.ValSet)) {
+    //        return sdkerrors.Wrap(ErrInvalidHistoricalInfo, "validator set is not sorted by address")
+    //    }
+    }
 }

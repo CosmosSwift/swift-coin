@@ -1,37 +1,28 @@
 extension StakingKeeper {
     /// GetHistoricalInfo gets the historical info at a given height
-    func getHistoricalInfo(request: Request, height: Int64) -> (HistoricalInfo, Bool) {
-        fatalError()
-//        store := ctx.KVStore(k.storeKey)
-//        key := types.GetHistoricalInfoKey(height)
-//
-//        value := store.Get(key)
-//        if value == nil {
-//            return types.HistoricalInfo{}, false
-//        }
-//
-//        hi := types.MustUnmarshalHistoricalInfo(k.cdc, value)
-//        return hi, true
+    func getHistoricalInfo(request: Request, height: Int64) -> HistoricalInfo? {
+        let store = request.keyValueStore(key: storeKey)
+        let key = historicalInfoKey(height: height)
+        guard let data = store.get(key: key) else {
+            return nil
+        }
+        return HistoricalInfo.mustUnmarshalHistoricalInfo(codec: codec, value: data)
     }
 
 
     /// SetHistoricalInfo sets the historical info at a given height
     func setHistoricalInfo(request: Request, height: Int64, historicalInfo: HistoricalInfo) {
-        fatalError()
-//        store := ctx.KVStore(k.storeKey)
-//        key := types.GetHistoricalInfoKey(height)
-//
-//        value := types.MustMarshalHistoricalInfo(k.cdc, hi)
-//        store.Set(key, value)
+        let store = request.keyValueStore(key: storeKey)
+        let key = historicalInfoKey(height: height)
+        let value = HistoricalInfo.mustMarshalHistoricalInfo(codec: codec, historicalInfo: historicalInfo)
+        store.set(key: key, value: value)
     }
 
     /// DeleteHistoricalInfo deletes the historical info at a given height
     func deleteHistoricalInfo(request: Request, height: Int64) {
-        fatalError()
-//        store := ctx.KVStore(k.storeKey)
-//        key := types.GetHistoricalInfoKey(height)
-//
-//        store.Delete(key)
+        let store = request.keyValueStore(key: storeKey)
+        let key = historicalInfoKey(height: height)
+        store.delete(key: key)
     }
 
     /// TrackHistoricalInfo saves the latest historical-info and deletes the oldest
