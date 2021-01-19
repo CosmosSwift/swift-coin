@@ -41,6 +41,8 @@ struct InMemoryIterator: Iterator {
             itemsInDomain.makeIterator() :
             itemsInDomain.reversed().makeIterator()
         )
+        
+        self.next()
     }
 }
 
