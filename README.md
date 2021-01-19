@@ -5,7 +5,7 @@
 
 Build blockchain applications in Swift on top of the Tendermint consensus using [SwiftNIO](https://github.com/apple/swift-nio) as the server core.
 
-This project shows the work in progress for the port of the [Cosmos SDK]() to Swift. It is based on version [0.39.1]() of the SDK.
+This project shows the work in progress for the port of the [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) to Swift. It is based on version [0.39.1](https://github.com/cosmos/cosmos-sdk/tree/v0.39.1) of the SDK.
 
 To make the porting more exciting, we have chosen to use the nameservice to implement the various necessary libraries for the sdk.
 
