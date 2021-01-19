@@ -61,8 +61,7 @@ public final class BankAppModule: BankAppModuleBasic, AppModule {
 
     // MARK: ABCI
     /// BeginBlock performs a no-op.
-    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {
-    }
+    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {}
     
     /// EndBlock returns the end blocker for the bank module. It returns no validator
     /// updates.

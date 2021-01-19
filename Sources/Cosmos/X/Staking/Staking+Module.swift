@@ -66,11 +66,11 @@ public final class StakingAppModule: StakingAppModuleBasic, AppModule {
 
     // ABCI
     public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {
-        fatalError()
+        keeper.trackHistoricalInfo(request: request)
     }
     
     public func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> [ValidatorUpdate] {
-        fatalError()
+        keeper.blockValidatorUpdates(request: request)
     }
    
     // Genesis

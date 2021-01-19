@@ -63,8 +63,7 @@ public class AuthAppModule: AuthAppModuleBasic, AppModule {
 
     // MARK: ABCI
     /// BeginBlock returns the begin blocker for the auth module.
-    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {
-    }
+    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {}
     
     /// EndBlock returns the end blocker for the auth module. It returns no validator
     /// updates.

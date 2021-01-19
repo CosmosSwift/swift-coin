@@ -61,12 +61,10 @@ public final class SupplyAppModule: SupplyAppModuleBasic, AppModule {
     }
 
     // ABCI
-    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {
-        fatalError()
-    }
+    public func beginBlock(request: Request, beginBlockRequest: RequestBeginBlock) {}
     
     public func endBlock(request: Request, endBlockRequest: RequestEndBlock) -> [ValidatorUpdate] {
-        fatalError()
+        []
     }
    
     // Genesis
