@@ -6,7 +6,10 @@ extension KeyValueStore {
     public func prefixIterator(prefix: Data) -> Iterator {
         return iterator(start: prefix, end: prefixEndBytes(prefix: prefix))
     }
-}
+    // Iterator over all the keys with a certain prefix in ascending order
+    public func reversePrefixIterator(prefix: Data) -> Iterator {
+        return reverseIterator(start: prefix, end: prefixEndBytes(prefix: prefix))
+    }}
 
 // prefixEndBytes returns the Data that would end a
 // range query for all Data with a certain prefix

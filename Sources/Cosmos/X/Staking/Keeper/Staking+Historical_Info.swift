@@ -28,7 +28,7 @@ extension StakingKeeper {
     /// heights that are below pruning height
     func trackHistoricalInfo(request: Request) {
 
-        let entryNum = historicalEntries(request: request)
+        let entryNum = historicalEntries(request: request) 
 
         // Prune store to ensure we only have parameter-defined historical entries.
         // In most cases, this will involve removing a single historical entry.

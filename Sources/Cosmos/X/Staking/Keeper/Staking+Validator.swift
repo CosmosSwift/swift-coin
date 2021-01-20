@@ -83,9 +83,9 @@ extension StakingKeeper {
     // returns an iterator for the current validator power store
     func validatorsPowerStoreIterator(request: Request) -> Iterator {
         // TODO: Implement
-        fatalError()
-//        let store = request.keyValueStore(key: storeKey)
-//        return KeyValueStoreReversePrefixIterator(store, validatorsByPowerIndexKey)
+        //fatalError()
+        let store = request.keyValueStore(key: storeKey)
+        return store.reversePrefixIterator(prefix: validatorsByPowerIndexKey) //KeyValueStoreReversePrefixIterator(store, validatorsByPowerIndexKey)
     }
 
 }

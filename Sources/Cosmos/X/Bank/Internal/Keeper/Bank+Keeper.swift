@@ -112,10 +112,13 @@ public final class BaseKeeper: BaseSendKeeper, BankKeeper  {
     
     // GetSendEnabled returns the current SendEnabled
     public func isSendEnabled(request: Request) -> Bool {
-        paramSpace.get(
+        guard let res: Bool = paramSpace.get(
             request: request,
             key: KeyTable.paramStoreKeySendEnabled
-        )
+        ) else {
+            fatalError("send_enabled parameter not set in Bank store")
+        }
+        return res
     }
     
     // SetSendEnabled sets the send enabled

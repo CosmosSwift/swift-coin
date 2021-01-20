@@ -22,7 +22,7 @@ public struct StakingGenesisState: Codable {
         case exported
     }
     
-    // NewGenesisState creates a new GenesisState instanc e
+    // NewGenesisState creates a new GenesisState instance
     init(
         parameters: StakingParameters,
         validators: [Validator] = []

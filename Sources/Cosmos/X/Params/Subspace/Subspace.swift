@@ -84,10 +84,12 @@ public struct Subspace {
 
     // Get queries for a parameter by key from the Subspace's KVStore and sets the
     // value to the provided pointer. If the value does not exist, it will panic.
-    func get<T: Decodable>(request: Request, key: Data) -> T {
+    func get<T: Decodable>(request: Request, key: Data) -> T? {
         let store = keyValueStore(request: request)
         // TODO: Check this force unwrap!
-        let data = store.get(key: key)!
+        guard let data = store.get(key: key) else {
+            return nil
+        }
 
         return try! codec.unmarshalJSON(data: data)
     }

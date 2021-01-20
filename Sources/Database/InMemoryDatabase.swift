@@ -82,6 +82,11 @@ public final class InMemoryDatabase: Database {
     public func reverseIterator(start: Data, end: Data) throws -> Iterator {
         // TODO: Implement
 //        return newMemDBIterator(db, start, end, true);, nil
-        fatalError()
+        InMemoryDatabaseIterator(
+            database: self,
+            start: start,
+            end: end,
+            reverse: true
+        )
     }
 }
