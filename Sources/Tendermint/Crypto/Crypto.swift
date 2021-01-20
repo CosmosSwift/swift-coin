@@ -7,7 +7,7 @@ public typealias Address = HexadecimalData
 
 public enum Crypto {
     public static func addressHash(data: Data) -> Address {
-        Address(TendermintHash.sumTruncated(data: data))
+        Address(Hash.sumTruncated(data: data))
     }
 }
 

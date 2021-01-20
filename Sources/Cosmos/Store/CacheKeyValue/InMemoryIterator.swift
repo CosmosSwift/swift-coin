@@ -78,7 +78,7 @@ extension InMemoryIterator {
 
     var value: Data {
         assertValid()
-        return pair!.value!
+        return pair!.value
     }
 
     mutating func close() {

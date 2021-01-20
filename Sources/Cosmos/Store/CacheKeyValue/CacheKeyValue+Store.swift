@@ -183,7 +183,7 @@ extension BaseCacheKeyValueStore {
             if isKeyInDomain(key: key.data, start: start, end: end) {
                 let pair = KeyValuePair(
                     key: key.data,
-                    value: cacheValue?.value
+                    value: cacheValue?.value ?? Data()
                 )
                 
                 unsorted.append(pair)

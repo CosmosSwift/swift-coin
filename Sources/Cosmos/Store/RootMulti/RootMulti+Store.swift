@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 import Database
 
 // Store is composed of many CommitStores. Name contrasts with
@@ -530,15 +531,13 @@ struct CommitInfo: Codable {
     
     // Hash returns the simple merkle root hash of the stores sorted by name.
     var hash: Data {
-        fatalError()
-//        // TODO: cache to ci.hash []byte
-//        m := make(map[string][]byte, len(ci.StoreInfos))
-//
-//        for _, storeInfo := range ci.StoreInfos {
-//            m[storeInfo.Name] = storeInfo.Hash()
-//        }
-//
-//        return merkle.SimpleHashFromMap(m)
+        var map: [String: Data] = [:]
+
+        for storeInfo in storeInfos {
+            map[storeInfo.name] = storeInfo.hash
+        }
+
+        return Merkle.simpleHash(map: map)
     }
 
     var commitID: CommitID {
@@ -561,6 +560,19 @@ struct StoreCore: Codable {
     // StoreType StoreType
     let commitID: CommitID
     // ... maybe add more state
+}
+
+extension StoreInfo {
+    // Implements merkle.Hasher.
+    var hash: Data {
+        // Doesn't write Name, since merkle.SimpleHashFromMap() will
+        // include them via the keys.
+        let data = core.commitID.hash
+        var hasher = Hash()
+        hasher.write(data: data)
+        return hasher.sum()
+    }
+
 }
 
 //----------------------------------------

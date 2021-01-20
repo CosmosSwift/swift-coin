@@ -2,7 +2,7 @@ import Foundation
 
 // memDBIterator is a memDB iterator.
 struct InMemoryDatabaseIterator: Iterator  {
-    var iterator: Dictionary<Data, Data>.Iterator?
+    var iterator: AnyIterator<(key: Data, value: Data)>?
     var item: (key: Data, value: Data)?
     let start: Data
     let end: Data
@@ -14,17 +14,30 @@ struct InMemoryDatabaseIterator: Iterator  {
         end: Data,
         reverse: Bool
     ) {
-        if !start.isEmpty || !end.isEmpty {
-            // TODO: Add support for non empty start and end
-            fatalError()
-        }
-        
         self.start = start
         self.end = end
+        
         // TODO: We ignore reverse here because
         // Swift dictionaries don't guarantee any ordering
-        self.iterator = database.items.makeIterator()
+        let iterator = database.items
+            .filter {
+                if !start.isEmpty {
+                    return $0.key.starts(with: start)
+                }
+                
+                return true
+            }
+            .sorted { lhs, rhs in
+                lhs.key.lexicographicallyPrecedes(rhs.key)
+            }
+            .makeIterator()
         
+        if reverse {
+            self.iterator = AnyIterator(iterator.reversed().makeIterator())
+        } else {
+            self.iterator = AnyIterator(iterator)
+        }
+
         // prime the iterator with the first value, if any
         self.next()
     }
