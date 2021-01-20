@@ -156,7 +156,7 @@ public final class NameServiceApp: BaseApp, App {
         )
 
         self.moduleManager.setOrderInitGenesis(
-//            StakingKeys.moduleName,
+            StakingKeys.moduleName,
             AuthKeys.moduleName,
             BankKeys.moduleName,
             NameServiceKeys.moduleName,
