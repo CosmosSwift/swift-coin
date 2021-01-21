@@ -5,17 +5,16 @@ import ABCI
 /// HistoricalInfo contains the historical information that gets stored at each height
 struct HistoricalInfo: Codable {
     let header: Header
-    let valSet: [Validator]
+    let validatorSet: [Validator]
 
     /// NewHistoricalInfo will create a historical information struct from header and valset
     /// it will first sort valset before inclusion into historical info
-    init(header: Header, valSet: [Validator]) {
+    init(header: Header, validatorSet: [Validator]) {
         self.header = header
-        // TODO: the validators should be sorted by address
-        // sort.Sort(Validators(valSet))
-        self.valSet = valSet //.sorted(by: { (v1, v2) -> Bool in
-        //    v1.operatorAddress < v2.operatorAddress
-        //})
+        
+        self.validatorSet = validatorSet.sorted { lhs, rhs in
+            lhs.operatorAddress.data.lexicographicallyPrecedes(rhs.operatorAddress.data)
+        }
     }
     
     // MustMarshalHistoricalInfo wll marshal historical info and panic on error
@@ -28,6 +27,7 @@ struct HistoricalInfo: Codable {
         guard let historicalInfo = try? unmarshalHistoricalInfo(codec: codec, value: value) else {
             fatalError("Failed to unmarshal Historical Info from data: \(value)")
         }
+        
         return historicalInfo
     }
 

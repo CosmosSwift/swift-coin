@@ -3,9 +3,11 @@ extension StakingKeeper {
     func getHistoricalInfo(request: Request, height: Int64) -> HistoricalInfo? {
         let store = request.keyValueStore(key: storeKey)
         let key = historicalInfoKey(height: height)
+        
         guard let data = store.get(key: key) else {
             return nil
         }
+        
         return HistoricalInfo.mustUnmarshalHistoricalInfo(codec: codec, value: data)
     }
 
@@ -27,8 +29,7 @@ extension StakingKeeper {
     /// TrackHistoricalInfo saves the latest historical-info and deletes the oldest
     /// heights that are below pruning height
     func trackHistoricalInfo(request: Request) {
-
-        let entryNum = historicalEntries(request: request) 
+        let historicalEntries = self.historicalEntries(request: request)
 
         // Prune store to ensure we only have parameter-defined historical entries.
         // In most cases, this will involve removing a single historical entry.
@@ -37,25 +38,32 @@ extension StakingKeeper {
         // Since the entries to be deleted are always in a continuous range, we can iterate
         // over the historical entries starting from the most recent version to be pruned
         // and then return at the first empty entry.
-        for i in (0..<request.header.height - Int64(entryNum)).reversed() {
-            if let _ = getHistoricalInfo(request: request, height: i) {
-                deleteHistoricalInfo(request: request, height: i)
-            } else {
-                break
+        for height in (0 ..< request.header.height - Int64(historicalEntries)).reversed() {
+            guard getHistoricalInfo(request: request, height: height) != nil else {
+               break
             }
+            
+            deleteHistoricalInfo(request: request, height: height)
         }
 
         // if there is no need to persist historicalInfo, return
-        if entryNum == 0 {
+        guard historicalEntries != 0 else {
             return
         }
 
         // Create HistoricalInfo struct
-        let lastVals = getLastValidators(request: request)
+        let lastValidators = self.lastValidators(request: request)
         
-        let historicalEntry = HistoricalInfo(header: request.header, valSet: lastVals)
+        let historicalEntry = HistoricalInfo(
+            header: request.header,
+            validatorSet: lastValidators
+        )
 
         // Set latest HistoricalInfo at current height
-        setHistoricalInfo(request: request, height: request.header.height, historicalInfo: historicalEntry)
+        setHistoricalInfo(
+            request: request,
+            height: request.header.height,
+            historicalInfo: historicalEntry
+        )
     }
 }

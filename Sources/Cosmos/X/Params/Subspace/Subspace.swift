@@ -86,7 +86,7 @@ public struct Subspace {
     // value to the provided pointer. If the value does not exist, it will panic.
     func get<T: Decodable>(request: Request, key: Data) -> T? {
         let store = keyValueStore(request: request)
-        // TODO: Check this force unwrap!
+        
         guard let data = store.get(key: key) else {
             return nil
         }

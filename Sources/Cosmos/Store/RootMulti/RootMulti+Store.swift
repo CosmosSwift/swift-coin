@@ -591,7 +591,7 @@ extension RootMultiStore {
     
     //// Commits each store and returns a new commitInfo.
     func commitStores(version: Int64) -> CommitInfo {
-    var storeInfos: [StoreInfo] = []
+        var storeInfos: [StoreInfo] = []
     
         for (key, store) in stores {
             let commitID = store.commit()
@@ -605,7 +605,8 @@ extension RootMultiStore {
     
         return CommitInfo(
             version:    version,
-            storeInfos: storeInfos)
+            storeInfos: storeInfos
+        )
     
     }
 

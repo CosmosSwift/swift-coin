@@ -112,9 +112,9 @@ extension StakingKeeper {
     }
 }
 
-
+extension StakingKeeper {
     // get the group of the bonded validators
-    func getLastValidators(request: Request) -> [Validator] {
+    func lastValidators(request: Request) -> [Validator] {
             fatalError()
     //        store := ctx.KVStore(k.storeKey)
     //
@@ -139,7 +139,8 @@ extension StakingKeeper {
     //            i++
     //        }
     //        return validators[:i] // trim
-        }
+    }
+}
 
 //_______________________________________________________________________
 // Validator Queue

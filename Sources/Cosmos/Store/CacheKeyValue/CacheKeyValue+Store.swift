@@ -12,8 +12,18 @@ struct CacheValue {
 
 // Store wraps an in-memory cache around an underlying types.KVStore.
 final class BaseCacheKeyValueStore: CacheKeyValueStore {
-    var cache: [String: CacheValue]
-    var unsortedCache: [String: Bool]
+    var cache: [Data: CacheValue] {
+        didSet {
+            var description = "Cache \(ObjectIdentifier(self).debugDescription) Did Change:\n"
+            
+            for (key, value) in cache {
+                description += "\(value.dirty ? "*" : " ")\(value.deleted ? "-" : " ")\(String(data: key, encoding: .utf8) ?? key.hexEncodedString()): \(String(data: (value.value ?? Data()), encoding: .utf8) ?? (value.value ?? Data()).hexEncodedString())\n"
+            }
+            
+           print(description)
+        }
+    }
+    var unsortedCache: [Data: Bool]
     // always ascending sorted
     var sortedCache: [KeyValuePair]
     let parent: KeyValueStore
@@ -36,7 +46,7 @@ extension BaseCacheKeyValueStore {
     func get(key: Data) -> Data? {
         let value: Data?
         
-        if let cacheValue = cache[key.hexEncodedString()] {
+        if let cacheValue = cache[key] {
             value = cacheValue.value
         } else {
             value = parent.get(key: key)
@@ -81,15 +91,14 @@ extension BaseCacheKeyValueStore {
     func write() {
         // We need a copy of all of the keys.
         // Not the best, but probably not a bottleneck depending.
-        var keys: [String] = []
-        
-        for (key, databaseValue) in cache {
-            if databaseValue.dirty {
-                keys.append(key)
+        let keys = cache
+            .filter { pair in
+                pair.value.dirty
             }
-        }
-
-        keys.sort()
+            .map { pair in
+                pair.key
+            }
+            .sorted()
 
         // TODO: Consider allowing usage of Batch, which would allow the write to
         // at least happen atomically.
@@ -99,9 +108,9 @@ extension BaseCacheKeyValueStore {
             }
             
             if cacheValue.deleted {
-                parent.delete(key: key.data)
+                parent.delete(key: key)
             } else if let value = cacheValue.value {
-                parent.set(key: key.data, value: value)
+                parent.set(key: key, value: value)
             } else {
                 // Skip, it already doesn't exist in parent.
                 continue
@@ -180,9 +189,9 @@ extension BaseCacheKeyValueStore {
         for (key, _) in unsortedCache {
             let cacheValue = cache[key]
 
-            if isKeyInDomain(key: key.data, start: start, end: end) {
+            if isKeyInDomain(key: key, start: start, end: end) {
                 let pair = KeyValuePair(
-                    key: key.data,
+                    key: key,
                     value: cacheValue?.value ?? Data()
                 )
                 
@@ -206,14 +215,14 @@ extension BaseCacheKeyValueStore {
         deleted: Bool,
         dirty: Bool
     ) {
-        cache[key.hexEncodedString()] = CacheValue(
+        cache[key] = CacheValue(
             value: value,
             deleted: deleted,
             dirty: dirty
         )
         
         if dirty {
-            unsortedCache[key.hexEncodedString()] = true
+            unsortedCache[key] = true
         }
     }
 }

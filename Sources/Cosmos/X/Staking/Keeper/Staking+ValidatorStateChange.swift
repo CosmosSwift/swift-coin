@@ -83,7 +83,7 @@ extension StakingKeeper {
     // are returned to Tendermint.
     func applyAndReturnValidatorSetUpdates(request: Request) -> [ValidatorUpdate] {
         var validatorUpdates: [ValidatorUpdate] = []
-        let maxValidators = self.parameters(request: request).maxValidators
+        let maxValidators = self.maxValidators(request: request)
         var totalPower = 0
         var amountFromBondedToNotBonded: UInt = 0
         var amountFromNotBondedToBonded: UInt = 0
