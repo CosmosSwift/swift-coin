@@ -479,7 +479,7 @@ final class RootMultiStore: CommitMultiStore {
         case .multi:
             fatalError("recursive MultiStores not yet supported")
         case .iavlTree:
-            let store = TransientStore()
+            let store = PersistentInMemStore()
             // TODO: Implement actual iAVL store
 //            var store: CommitKeyValueStore = try IAVLStore(
 //                database: database,
@@ -596,7 +596,7 @@ extension RootMultiStore {
         for (key, store) in stores {
             let commitID = store.commit()
     
-            if store is TransientStore {
+            if store.storeType == .transient {
                 continue
             }
 
