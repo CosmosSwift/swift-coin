@@ -390,30 +390,60 @@ final class RootMultiStore: CommitMultiStore {
     // iterating at past heights.
     func cacheMultiStore(withVersion version: Int64) throws -> CacheMultiStore {
         // TODO: Implement
-        fatalError()
-//        cachedStores := make(map[types.StoreKey]types.CacheWrapper)
-//        for key, store := range rs.stores {
-//            switch store.GetStoreType() {
-//            case types.StoreTypeIAVL:
-//                // If the store is wrapped with an inter-block cache, we must first unwrap
-//                // it to get the underlying IAVL store.
-//                store = rs.GetCommitKVStore(key)
-//
-//                // Attempt to lazy-load an already saved IAVL store version. If the
-//                // version does not exist or is pruned, an error should be returned.
-//                iavlStore, err := store.(*iavl.Store).GetImmutable(version)
-//                if err != nil {
-//                    return nil, err
-//                }
-//
-//                cachedStores[key] = iavlStore
-//
-//            default:
-//                cachedStores[key] = store
+        
+        var stores: [StoreKey: CacheWrapper] = [:]
+        
+        for (key, value) in self.stores {
+            switch value.storeType {
+            case .iavlTree:
+            // If the store is wrapped with an inter-block cache, we must first unwrap
+            // it to get the underlying IAVL store.
+            let store = commitKeyValueStore(key: key)//rs.GetCommitKVStore(key)
+            
+            // Attempt to lazy-load an already saved IAVL store version. If the
+            // version does not exist or is pruned, an error should be returned.
+            // TODO: implement
+//            guard let value =  store.(*iavl.Store).GetImmutable(version) else {
+//                throw
 //            }
-//        }
-//
-//        return cachemulti.NewStore(rs.db, cachedStores, rs.keysByName, rs.traceWriter, rs.traceContext), nil
+
+            stores[key] = store
+            
+            default:
+                
+                stores[key] = value
+            }
+        }
+        
+        //                cachedStores := make(map[types.StoreKey]types.CacheWrapper)
+        //        for key, store := range rs.stores {
+        //            switch store.GetStoreType() {
+        //            case types.StoreTypeIAVL:
+        //                // If the store is wrapped with an inter-block cache, we must first unwrap
+        //                // it to get the underlying IAVL store.
+        //                store = rs.GetCommitKVStore(key)
+        //
+        //                // Attempt to lazy-load an already saved IAVL store version. If the
+        //                // version does not exist or is pruned, an error should be returned.
+        //                iavlStore, err := store.(*iavl.Store).GetImmutable(version)
+        //                if err != nil {
+        //                    return nil, err
+        //                }
+        //
+        //                cachedStores[key] = iavlStore
+        //
+        //            default:
+        //                cachedStores[key] = store
+        //            }
+        //        }
+        
+        return BaseCacheMultiStore(
+            database: database,
+            stores: stores,
+            keys: keysByName,
+            traceWriter: traceWriter,
+            traceContext: traceContext
+        )
     }
 
     // GetStore returns a mounted Store for a given StoreKey. If the StoreKey does
