@@ -12,7 +12,7 @@ struct PrintInfo: Codable {
     let chainID: String
     let nodeID: String
     let genesisTransactionsDirectory: String
-    let appState: JSON
+    let appState: MetaSet<AppStateMetatype>
     
     private enum CodingKeys: String, CodingKey {
         case moniker
@@ -78,13 +78,15 @@ public struct InitCommand: ParsableCommand {
             throw InitCommandError(description: "genesis.json file already exists: \(genesisFilePath)")
         }
         
-        let appState = Self.moduleBasicManager.defaultGenesis()
+        let array = AppStateMetatype.typeMap.values.map({ $0.init(default: Void()) })
 
+        let appState = MetaSet<AppStateMetatype>(array: array)
+                                                    
         guard FileManager.default.fileExists(atPath: genesisFilePath) else {
             throw InitCommandError(description: "genesisFile does not exist")
         }
         
-        var genesisDocument: GenesisDocument
+        var genesisDocument: GenesisDocument<MetaSet<AppStateMetatype>>
         
         do {
             genesisDocument = try GenesisDocument(fileAtPath: genesisFilePath)

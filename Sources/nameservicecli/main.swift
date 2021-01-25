@@ -1,184 +1,89 @@
-import Foundation
+import JSON
+import ArgumentParser
+import Logging
+import Tendermint
 import ABCI
-import ABCINIO
+import Database
+import Cosmos
+import App
 
-public final class Store {
-    public final class Transaction {
-        var storage: [String: String] = [:]
-        
-        init() {}
-         
-        public func put(key: String, value: String) {
-            self.storage[key] = value
-        }
-    }
-    
-    private var storage: [String: String] = [:]
-    
-    public init() {}
-    
-    public func makeTransaction() -> Transaction {
-        Transaction()
-    }
-    
-    public func get(key: String) -> String? {
-        self.storage[key]
-    }
-     
-    public func commit(transaction: Transaction) {
-        self.storage.merge(transaction.storage, uniquingKeysWith: { _, new in new })
-    }
+struct Nameservicecli: ParsableCommand {
+    static var configuration = CommandConfiguration(
+        abstract: "app Daemon (server)",
+        subcommands: [
+            InitCommand.self,
+            CollectGenesisTransactionsCommand.self,
+            MigrateGenesisCommand.self,
+            GenerateGenesisTransactionCommand.self,
+            ValidateGenesisCommand.self,
+            AddGenesisAccountCommand.self,
+            DebugCommand.self,
+        ] + ServerContext.commands,
+        defaultSubcommand: StartCommand.self
+    )
 }
 
-enum Endpoint {
-    case root
-    case balance
-    case store
+func makeApp(
+    logger: Logger,
+    database: Database,
+    traceStore:  Writer?,
+    globalOptions: GlobalOptions
+) throws -> ABCIApplication {
+    try NameServiceApp(
+        logger: logger,
+        database: database,
+        commitMultiStoreTracer: traceStore,
+        loadLatest: true,
+        invariantCheckPeriod: globalOptions.invariantCheckPeriod
+//        BaseApp.setPruning(pruningOpts),
+//        BaseApp.setMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
+//        BaseApp.setHaltHeight(viper.GetUint64(server.FlagHaltHeight)),
+//        BaseApp.setHaltTime(viper.GetUint64(server.FlagHaltTime)),
+//        BaseApp.setInterBlockCache(cache)
+    )
 }
 
-public final class KeyValueStoreApp {
-    private let store = Store()
-    private var transaction: Store.Transaction? = nil
-
-    public init() {
-        
+func exportApp(
+    logger: Logger,
+    database: Database,
+    traceStore: Writer?,
+    height: Int64,
+    forZeroHeight: Bool,
+    jailWhiteList: [String]
+) throws -> (JSON, [GenesisValidator]) {
+    let app = try NameServiceApp(
+        logger: logger,
+        database: database,
+        commitMultiStoreTracer: traceStore,
+        loadLatest: true,
+        invariantCheckPeriod: 1
+    )
+    
+    if height != -1 {
+        try app.load(height: height)
     }
+    
+    return try app.exportAppStateAndValidators(
+        forZeroHeight: forZeroHeight,
+        jailWhiteList: jailWhiteList
+    )
 }
 
-extension KeyValueStoreApp: ABCIApplication {
-    public func echo(request: RequestEcho) -> ResponseEcho {
-        .init(message: request.message)
-    }
+let codec = NameServiceApp.makeCodec()
 
-    public func info(request: RequestInfo) -> ResponseInfo {
-        .init()
-    }
+NameServiceApp.configure()
+ServerContext.defaultHome = NameServiceApp.defaultNodeHome
 
-    public func initChain(request: RequestInitChain) -> ResponseInitChain {
-        .init()
-    }
+InitCommand.codec = codec
+InitCommand.moduleBasicManager = NameServiceApp.moduleBasics
+InitCommand.defaultHome = NameServiceApp.defaultNodeHome
 
-    public func query(request: RequestQuery) -> ResponseQuery {
-        guard let key = String(data: request.data, encoding: .utf8) else {
-            return ResponseQuery(code: 1)
-        }
-        
-        guard let value = self.persistedValue(key: key) else {
-            return ResponseQuery(log: "does not exist")
-        }
-        
-        return .init(
-            log: "exists",
-            key: key.data(using: .utf8)!,
-            value: value.data(using: .utf8)!
-        )
-    }
 
-    public func beginBlock(request: RequestBeginBlock) -> ResponseBeginBlock {
-        self.transaction = self.store.makeTransaction()
-        return .init()
-    }
+ServerContext.makeApp = makeApp
+ServerContext.exportApp = exportApp
 
-    public func checkTx(request: RequestCheckTx) -> ResponseCheckTx {
-        let result = self.validate(tx: request.tx)
-        return .init(code: result.code, gasWanted: 1)
-    }
-
-    public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
-        let result = self.validate(tx: request.tx)
-        
-        if case .valid(let key, let value) = result {
-            self.persist(key: key, value: value)
-        }
-        
-        return .init(code: result.code)
-    }
-    
-    public func endBlock(request: RequestEndBlock) -> ResponseEndBlock {
-        .init()
-    }
-
-    public func commit() -> ResponseCommit {
-        guard let transaction = self.transaction else {
-            fatalError("Unexpected state. Transaction should exist during commit.")
-        }
-        
-        self.store.commit(transaction: transaction)
-        return .init(data: Data(count: 8))
-    }
-    
-    public func listSnapshots() -> ResponseListSnapshots {
-        .init()
-    }
-    
-    public func offerSnapshot(request: RequestOfferSnapshot) -> ResponseOfferSnapshot {
-        .init()
-    }
-    
-    public func loadSnapshotChunk(request: RequestLoadSnapshotChunk) -> ResponseLoadSnapshotChunk {
-        .init()
-    }
-    
-    public func applySnapshotChunk(request: RequestApplySnapshotChunk) -> ResponseApplySnapshotChunk {
-        .init()
-    }
-}
-
-enum ValidationResult {
-    case invalidStringEncoding
-    case invalidFormat
-    case valueAlreadyExists
-    case valid(key: String, value: String)
-    
-    var code: UInt32 {
-        switch self {
-        case .invalidStringEncoding:
-            return 1
-        case .invalidFormat:
-            return 2
-        case .valueAlreadyExists:
-            return 3
-        case .valid:
-            return 0
-        }
-    }
-}
-
-extension KeyValueStoreApp {
-    private func validate(tx: Data) -> ValidationResult {
-        guard let string = String(data: tx, encoding: .utf8) else {
-            return .invalidStringEncoding
-        }
-        
-        let parts = string.split(separator: "=")
-        
-        guard parts.count == 2 else {
-            return .invalidFormat
-        }
-        
-        let key = String(parts[0])
-        let value = String(parts[1])
-
-        if let stored = self.persistedValue(key: key), stored == value {
-            return .valueAlreadyExists
-        }
-        
-        return .valid(key: key, value: value)
-    }
-
-    func persistedValue(key: String) -> String? {
-        self.store.get(key: key)
-    }
-    
-    func persist(key: String, value: String) {
-        self.transaction?.put(key: key, value: value)
-    }
-}
-
-let app = KeyValueStoreApp()
-let server = NIOABCIServer(application: app)
-try server.start()
-
+let executor = Executor(command: Nameservicecli.self)
+executor.execute()
 
 
 //

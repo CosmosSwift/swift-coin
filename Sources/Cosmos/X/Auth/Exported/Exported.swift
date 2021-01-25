@@ -31,7 +31,7 @@ public protocol Account: Codable, CustomStringConvertible {
 }
 
 // GenesisAccounts defines a slice of GenesisAccount objects
-typealias GenesisAccounts = [GenesisAccount]
+public typealias GenesisAccounts = [GenesisAccount]
 
 extension GenesisAccounts {
     // Contains returns true if the given address exists in a slice of GenesisAccount
@@ -48,7 +48,7 @@ extension GenesisAccounts {
 }
 
 // GenesisAccount defines a genesis account that embeds an Account with validation capabilities.
-protocol GenesisAccount: Account {
+public protocol GenesisAccount: Account {
     func validate() throws
 }
 

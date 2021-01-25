@@ -1,9 +1,13 @@
+import Tendermint
+
 // GenesisState is the supply state that must be provided at genesis.
-struct SupplyGenesisState: Codable {
-    let supply: Coins
+public struct SupplyGenesisState: Codable, AppState {
+    static public  var metatype: String { "supply" }
+
+    public var supply: Coins
     
     // NewGenesisState creates a new genesis state.
-    init(supply: Coins) {
+    public init(supply: Coins) {
         self.supply = supply
     }
 }
@@ -12,5 +16,9 @@ extension SupplyGenesisState {
     // DefaultGenesisState returns a default genesis state
     static var `default`: SupplyGenesisState {
         SupplyGenesisState(supply: Supply.default.total)
+    }
+    
+    public init(default:Void) {
+        self.init(supply: Supply.default.total)
     }
 }

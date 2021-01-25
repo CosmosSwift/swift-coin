@@ -25,12 +25,12 @@ extension CosmosError {
 
 }
 
-struct CosmosError: Swift.Error, Equatable {
+public struct CosmosError: Swift.Error, Equatable {
     let codespace: String
     let code: UInt32
     let description: String
 
-    init(codespace: String, code: UInt32, description: String) {
+    public init(codespace: String, code: UInt32, description: String) {
         self.codespace = codespace
         self.code = code
         self.description = description
@@ -77,7 +77,7 @@ struct CosmosError: Swift.Error, Equatable {
     //
     // If err is nil, this returns nil, avoiding the need for an if statement when
     // wrapping a error returned at the end of a function
-    static func wrap(error: Swift.Error, description: String) -> Swift.Error {
+    static public func wrap(error: Swift.Error, description: String) -> Swift.Error {
 //        if err == nil {
 //            return nil
 //        }

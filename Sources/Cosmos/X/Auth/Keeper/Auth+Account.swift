@@ -2,9 +2,12 @@ import Foundation
 
 extension AccountKeeper {
     // NewAccountWithAddress implements sdk.AccountKeeper.
-    public func makeAccountWithAddress(request: Request, address: AccountAddress) -> Account? {
+    public func makeAccountWithAddress(request: Request, address: AccountAddress) -> BaseAccount {
         // TODO: Implement
-        fatalError()
+        let account = BaseAccount(address: address)
+        setAccount(request: request, account: account)
+        return account
+        //fatalError()
 //        let account = proto()
 //
 //        try! account.set(address: address)
@@ -23,6 +26,17 @@ extension AccountKeeper {
 
         guard let data = store.get(key: addressStoreKey(address: address)) else {
             return nil
+        }
+
+        return decodeAccount(data: data)
+    }
+    
+    // GetAccount implements sdk.AccountKeeper.
+    public func baseAccount(request: Request, address: AccountAddress) -> BaseAccount? {
+        let store = request.keyValueStore(key: key)
+
+        guard let data = store.get(key: addressStoreKey(address: address)) else {
+            return makeAccountWithAddress(request: request, address: address) 
         }
 
         return decodeAccount(data: data)

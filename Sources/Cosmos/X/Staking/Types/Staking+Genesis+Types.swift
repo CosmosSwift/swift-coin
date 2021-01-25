@@ -1,7 +1,10 @@
 import ABCI
+import Tendermint
 
 // GenesisState - all staking state that must be provided at genesis
-public struct StakingGenesisState: Codable {
+public struct StakingGenesisState: Codable, AppState {
+    static public var metatype: String { "staking" }
+
     let parameters: StakingParameters
     let lastTotalPower: Int = 0
     let lastValidatorPowers: [LastValidatorPower] = []
@@ -44,5 +47,9 @@ extension StakingGenesisState {
     // DefaultGenesisState gets the raw genesis raw message for testing
     static var `default`: StakingGenesisState {
         StakingGenesisState(parameters: .default)
+    }
+    
+    public init(default:Void) {
+        self.init(parameters: .default)
     }
 }

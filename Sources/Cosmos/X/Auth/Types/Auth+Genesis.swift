@@ -1,7 +1,11 @@
+import Tendermint
+
 // GenesisState - all auth state that must be provided at genesis
-struct AuthGenesisState: Codable {
-    let parameters: AuthParameters
-    let accounts: GenesisAccounts
+public struct AuthGenesisState: Codable, AppState {
+    static public var metatype: String { "auth" }
+
+    public var parameters: AuthParameters
+    public var accounts: [BaseAccount]
     
     private enum CodingKeys: String, CodingKey {
         case parameters = "params"
@@ -9,22 +13,22 @@ struct AuthGenesisState: Codable {
     }
     
     // NewGenesisState - Create a new genesis state
-    internal init(parameters: AuthParameters, accounts: GenesisAccounts) {
+    internal init(parameters: AuthParameters, accounts: [BaseAccount]) {
         self.parameters = parameters
         self.accounts = accounts
     }
     
-    init(from decoder: Decoder) throws {
-        // TODO: Implement
-        fatalError()
-    }
+//    public init(from decoder: Decoder) throws {
+//        // TODO: Implement
+//        fatalError()
+//    }
     
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(parameters, forKey: .parameters)
-        // TODO: Implement
-//        try container.encode(accounts, forKey: .accounts)
-    }
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(parameters, forKey: .parameters)
+//        // TODO: Implement
+////        try container.encode(accounts, forKey: .accounts)
+//    }
 }
 
 extension AuthGenesisState {
@@ -32,7 +36,14 @@ extension AuthGenesisState {
     static var `default`: AuthGenesisState {
         AuthGenesisState(
             parameters: .default,
-            accounts: GenesisAccounts()
+            accounts: []
+        )
+    }
+    
+    public init(default:Void) {
+        self.init(
+            parameters: .default,
+            accounts: []
         )
     }
 }

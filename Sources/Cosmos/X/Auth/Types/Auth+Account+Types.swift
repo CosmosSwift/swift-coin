@@ -13,7 +13,7 @@ public class BaseAccount: Account, GenesisAccount {
     public var sequence: UInt64
     
     // NewBaseAccount creates a new BaseAccount object
-    init(
+    public init(
         address: AccountAddress,
         coins: Coins = Coins(),
         publicKey: PublicKey? = nil,
@@ -52,7 +52,7 @@ public class BaseAccount: Account, GenesisAccount {
     }
     
     // Validate checks for errors on the account fields
-    func validate() throws {
+    public func validate() throws {
         struct ValidationError: Swift.Error, CustomStringConvertible {
             let description: String
         }

@@ -52,8 +52,24 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "start"
+            argument = "start --host 0.0.0.0"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "collect-gentxs"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "gentx --name user1 --keyring-backend test"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "add-genesis-account cosmos1a5t7ufe0fuyrkgxstnrt9xzjc2m92jjslevxy9 1000nametoken,100000000stake"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "validate-genesis"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "init newnode -o"

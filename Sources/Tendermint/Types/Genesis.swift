@@ -57,17 +57,29 @@ public struct GenesisValidator: Codable {
     }
 }
 
+struct ReadError: Error, CustomStringConvertible {
+    var description: String
+}
+
+struct DecodeError: Error, CustomStringConvertible {
+    var description: String
+}
+
+struct ValidationError: Error, CustomStringConvertible {
+    let description: String
+}
+
 // GenesisDoc defines the initial conditions for a tendermint blockchain, in particular its validator set.
-public struct GenesisDocument: Codable {
+public struct GenesisDocument<AppState: Codable>: Codable {
     // MaxChainIDLen is a maximum length of the chain ID.
-    static let maximumChainIDLength = 50
+    static var maximumChainIDLength: Int { 50 }
     
     let genesisTime: Date
     public var chainID: String
     var consensusParameters: ConsensusParameters?
     public var validators: [GenesisValidator]?
     let appHash: Data
-    public var appState: JSON?
+    public var appState: AppState?
     
     private enum CodingKeys: String, CodingKey {
         case genesisTime = "genesis_time"
@@ -100,22 +112,14 @@ public struct GenesisDocument: Codable {
             let url = URL(fileURLWithPath: path)
             jsonData = try Data(contentsOf: url)
         } catch {
-            struct ReadError: Error, CustomStringConvertible {
-                var description: String
-            }
-            
             throw ReadError(description: "Couldn't read GenesisDoc file: \(error)")
         }
         
-        let genesisDocument: GenesisDocument
+        let genesisDocument: GenesisDocument<AppState>
         
         do {
-            genesisDocument = try GenesisDocument(jsonData: jsonData)
+            genesisDocument = try GenesisDocument<AppState>(jsonData: jsonData)
         } catch {
-            struct DecodeError: Error, CustomStringConvertible {
-                var description: String
-            }
-            
             throw DecodeError(description: "Error reading GenesisDoc at \(path): \(error)")
         }
         
@@ -164,10 +168,6 @@ extension GenesisDocument {
     // ValidateAndComplete checks that all necessary fields are present
     // and fills in defaults for optional fields left empty
     public mutating func validateAndComplete() throws {
-        struct ValidationError: Error, CustomStringConvertible {
-            let description: String
-        }
-        
         if chainID == "" {
             throw ValidationError(description: "genesis doc must include non-empty chain_id")
         }

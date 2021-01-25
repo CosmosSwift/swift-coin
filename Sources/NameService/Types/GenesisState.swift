@@ -1,7 +1,11 @@
 import Cosmos
+import Tendermint
 
 // GenesisState - all nameservice state that must be provided at genesis
-struct GenesisState: Codable {
+public struct GenesisState: Codable, AppState {
+    
+    static public var metatype: String { "nameservice" }
+
     let whoisRecords: [Whois]
 }
 
@@ -9,6 +13,10 @@ extension GenesisState {
     // DefaultGenesisState - default GenesisState used by Cosmos Hub
     static var `default`: GenesisState {
         GenesisState(whoisRecords: [])
+    }
+    
+    public init(default: Void) {
+        self.init(whoisRecords: [])
     }
 }
 

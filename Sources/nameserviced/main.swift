@@ -6,8 +6,9 @@ import ABCI
 import Database
 import Cosmos
 import App
+import NameService
 
-struct RootCommand: ParsableCommand {
+struct Nameserviced: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "app Daemon (server)",
         subcommands: [
@@ -71,6 +72,13 @@ func exportApp(
 
 let codec = NameServiceApp.makeCodec()
 
+AppStateMetatype.register(NameService.GenesisState.self) // Nameservice
+AppStateMetatype.register(Cosmos.AuthGenesisState.self) // Auth
+AppStateMetatype.register(Cosmos.StakingGenesisState.self) // Staking
+AppStateMetatype.register(Cosmos.SupplyGenesisState.self) // Supply
+AppStateMetatype.register(Cosmos.GenUtilGenesisState.self) // GenUtil
+AppStateMetatype.register(Cosmos.BankGenesisState.self) // Bank
+
 NameServiceApp.configure()
 ServerContext.defaultHome = NameServiceApp.defaultNodeHome
 
@@ -78,10 +86,13 @@ InitCommand.codec = codec
 InitCommand.moduleBasicManager = NameServiceApp.moduleBasics
 InitCommand.defaultHome = NameServiceApp.defaultNodeHome
 
+AddGenesisAccountCommand.defaultHome = NameServiceApp.defaultNodeHome
+AddGenesisAccountCommand.codec = codec
+AddGenesisAccountCommand.defaultClientHome = NameServiceApp.defaultCLIHome
 
 ServerContext.makeApp = makeApp
 ServerContext.exportApp = exportApp
 
-let executor = Executor(command: RootCommand.self)
+let executor = Executor(command: Nameserviced.self)
 executor.execute()
 

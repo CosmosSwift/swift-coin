@@ -6,14 +6,14 @@ public protocol Meta: Codable {
 }
 
 public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
+    // TODO: this should implement all the normal Set stuff
+    public var set: [M.Element]
 
-    let set: [M.Element]
-
-    init(array: [M.Element]) {
+    public init(array: [M.Element]) {
         self.set = array
     }
 
-    init(arrayLiteral elements: M.Element...) {
+    public init(arrayLiteral elements: M.Element...) {
         self.set = elements
     }
 
@@ -27,7 +27,7 @@ public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
         init?(intValue: Int) { return nil }
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: ElementKey.self)
 
         var elements: [M.Element] = []
@@ -48,7 +48,7 @@ public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
         set = elements
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: ElementKey.self)
         try set.forEach { object in
             let metatype = M.metatype(for: object)
@@ -63,12 +63,15 @@ public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
 
 public protocol AppState: Codable {
     static var metatype: String { get }
+    
+    //static var `default`: Self { get }
+    init(default: Void)
 }
 
 public struct AppStateMetatype: Meta, Hashable {
     public typealias Element = AppState
 
-    public static var typeMap: [String: Decodable.Type] = [:]
+    public static var typeMap: [String: Element.Type] = [:]
 
     public static func metatype(for element: AppState) -> String {
         return type(of:element).metatype
@@ -78,3 +81,5 @@ public struct AppStateMetatype: Meta, Hashable {
         typeMap[type.metatype] = type
     }
 }
+
+
