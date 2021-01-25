@@ -451,7 +451,7 @@ public struct ConsensusAddress: Address {
 extension Data {
     // GetFromBech32 decodes a bytestring from a Bech32 encoded string.
     init(bech32Encoded: String, prefix: String) throws {
-        guard bech32Encoded.isEmpty else {
+        guard !bech32Encoded.isEmpty else {
             throw Cosmos.Error.generic(reason: "decoding Bech32 address failed: must provide an address")
         }
 
