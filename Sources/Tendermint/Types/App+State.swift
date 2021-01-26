@@ -8,6 +8,17 @@ public protocol Meta: Codable {
 }
 
 public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
+    //        {
+    //          "author" : {
+    //            "value" : "Author Tag Value"
+    //          }
+    //        ,
+    //
+    //          "genre" : {
+    //            "value" : "Genre Tag Value"
+    //          }
+    //        }
+    
     // TODO: this should implement all the normal Set stuff
     public var set: [M.Element]
 
