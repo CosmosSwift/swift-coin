@@ -94,6 +94,16 @@ public struct AccountAddress: Equatable, Address {
         self.data = data
     }
 
+    enum CodingKeys: String, CodingKey {
+        case data
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(self.description, forKey: .data)
+        
+    }
     // TODO: Simplify all of this codebase based only on the prefix,
     // which seems to be the only thing that differs between all the addresses.
     // AccAddressFromHex creates an AccAddress from a hex string.

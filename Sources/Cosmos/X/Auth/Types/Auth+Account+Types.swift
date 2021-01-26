@@ -6,6 +6,7 @@ import Tendermint
 // However one doesn't have to use BaseAccount as long as your struct
 // implements Account.
 public class BaseAccount: Account, GenesisAccount {
+    var type = "cosmos-sdk/Account"
     public var address: AccountAddress
     public var coins: Coins
     public var publicKey: PublicKey?

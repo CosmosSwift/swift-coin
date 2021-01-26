@@ -1,3 +1,5 @@
+// Inspired by https://stackoverflow.com/a/44473156
+
 import Foundation
 
 public protocol Meta: Codable {

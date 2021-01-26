@@ -71,6 +71,11 @@ extension BaseApp: ABCIApplication {
         )
     }
     
+    // Legacy prior to tendermint 0.34.0
+    public func echo(request: RequestEcho) -> ResponseEcho {
+        .init(message: request.message)
+    }
+    
     // FilterPeerByAddrPort filters peers by address/port.
     private func filterPeer(byAddressPort info: String) -> ResponseQuery {
         if let filter = addressPeerFilter {
@@ -607,7 +612,6 @@ extension BaseApp: ABCIApplication {
 
         return path
     }
-
 
     public func listSnapshots() -> ResponseListSnapshots {
         // TODO: Implement
