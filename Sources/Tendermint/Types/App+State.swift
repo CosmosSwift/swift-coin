@@ -9,13 +9,14 @@ public protocol Meta: Codable {
 
 public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
     //        {
-    //          "author" : {
-    //            "value" : "Author Tag Value"
+    //          "type1" : {
+    //            "value1" : "bla bla bla"
     //          }
     //        ,
     //
-    //          "genre" : {
-    //            "value" : "Genre Tag Value"
+    //          "type2" : {
+    //            "value2" : "bla bla bla"
+    //            "value3" : "bla bla bla"
     //          }
     //        }
     
@@ -77,7 +78,6 @@ public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
 public protocol AppState: Codable {
     static var metatype: String { get }
     
-    //static var `default`: Self { get }
     init(default: Void)
 }
 
