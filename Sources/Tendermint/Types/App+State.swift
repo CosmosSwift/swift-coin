@@ -13,7 +13,6 @@ public struct MetaSet<M: Meta>: Codable, ExpressibleByArrayLiteral {
     //            "value1" : "bla bla bla"
     //          }
     //        ,
-    //
     //          "type2" : {
     //            "value2" : "bla bla bla"
     //            "value3" : "bla bla bla"
@@ -86,11 +85,11 @@ public struct AppStateMetatype: Meta, Hashable {
 
     public static var typeMap: [String: Element.Type] = [:]
 
-    public static func metatype(for element: AppState) -> String {
+    public static func metatype(for element: Element) -> String {
         return type(of:element).metatype
     }
     
-    public static func register(_ type: AppState.Type) {
+    public static func register(_ type: Element.Type) {
         typeMap[type.metatype] = type
     }
 }

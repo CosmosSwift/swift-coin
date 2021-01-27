@@ -13,13 +13,15 @@ To make the porting more exciting, we have chosen to use the [nameservice](https
 
 
 ## Work in progress
-This is work in progress. In order to 
+This is work in progress. We 
 
 
 
+
+## Requirements
 - Swift version: 5.3.x
 - SwiftNIO version: 2.0.x
-- ABCI version: 0.34 (tendermint 0.34)
+- ABCI version: 0.33.9 (tendermint 0.33.9)
 
 
 ## Installation
