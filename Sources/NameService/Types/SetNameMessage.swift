@@ -1,8 +1,13 @@
 import Foundation
+import Tendermint
 import Cosmos
 
 // MsgSetName defines a SetName message
 struct SetNameMessage: Codable, Message {
+    static let metaType: MetaType = Self.metaType(
+        key: "nameservice/SetName"
+    )
+    
     let name: String
     let value: String
     let owner: AccountAddress

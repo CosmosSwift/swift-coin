@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 
 extension BankKeys {
     // RouterKey is they name of the bank module
@@ -6,7 +7,11 @@ extension BankKeys {
 }
 
 // MsgSend - high level transaction of the coin module
-struct SendMessage: Codable, Message {
+struct SendMessage: Message {
+    static let metaType: MetaType = Self.metaType(
+        key: "cosmos-sdk/MsgSend"
+    )
+    
     let senderAddress: AccountAddress
     let destinationAddress: AccountAddress
     let amount: Coins
@@ -66,6 +71,10 @@ extension SendMessage {
 
 // MsgMultiSend - high level transaction of the coin module
 struct MultiSendMessage: Message {
+    static let metaType: MetaType = Self.metaType(
+        key: "cosmos-sdk/MsgMultiSend"
+    )
+    
     let inputs:  [Input]
     let outputs: [Output]
     

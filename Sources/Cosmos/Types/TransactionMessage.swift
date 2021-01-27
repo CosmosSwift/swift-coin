@@ -1,7 +1,8 @@
 import Foundation
+import Tendermint
 
 // Transactions messages must fulfill the `Message`
-public protocol Message: Codable {
+public protocol Message: ProtocolCodable {
     // Return the message type.
     // Must be alphanumeric or empty.
     var route: String { get }
@@ -26,7 +27,7 @@ public protocol Message: Codable {
 //__________________________________________________________
 
 // Transactions objects must fulfill the Tx
-public protocol Transaction: Codable {
+public protocol Transaction: ProtocolCodable {
     // Gets the all the transaction's messages.
     var messages: [Message] { get }
 

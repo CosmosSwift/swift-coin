@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 import Cosmos
 
 // MsgBuyName defines the BuyName message
@@ -15,6 +16,10 @@ struct BuyNameMessage: Codable {
 }
 
 extension BuyNameMessage: Message {
+    static let metaType: MetaType = Self.metaType(
+        key: "nameservice/BuyName"
+    )
+    
     // Route should return the name of the module
     var route: String {
         NameServiceKeys.routerKey

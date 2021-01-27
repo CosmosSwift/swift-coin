@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 import Cosmos
 
 struct DeleteNameMessage: Codable {
@@ -12,6 +13,10 @@ struct DeleteNameMessage: Codable {
 }
 
 extension DeleteNameMessage: Message {
+    static let metaType: MetaType = Self.metaType(
+        key: "nameservice/DeleteName"
+    )
+    
     var route: String {
         NameServiceKeys.routerKey
     }

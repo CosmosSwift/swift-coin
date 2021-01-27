@@ -93,17 +93,18 @@ public struct AccountAddress: Equatable, Address {
     public init(data: Data = Data()) {
         self.data = data
     }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let bech32Encoded = try container.decode(String.self)
+        try self.init(bech32Encoded: bech32Encoded)
+    }
 
-    enum CodingKeys: String, CodingKey {
-        case data
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(bech32Encoded)
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        
-        try container.encode(self.description, forKey: .data)
-        
-    }
     // TODO: Simplify all of this codebase based only on the prefix,
     // which seems to be the only thing that differs between all the addresses.
     // AccAddressFromHex creates an AccAddress from a hex string.
@@ -118,7 +119,6 @@ public struct AccountAddress: Equatable, Address {
 
         self.data = data
     }
-
 
     // AccAddressFromBech32 creates an AccAddress from a Bech32 string.
     public init(bech32Encoded: String) throws {
@@ -135,7 +135,17 @@ public struct AccountAddress: Equatable, Address {
         try Self.verifyAddressFormat(data: data)
         self.data = data
     }
+    
+    var bech32Encoded: String {
+        guard !data.isEmpty else {
+            return ""
+        }
 
+        return try! Bech32.convertAndEncode(
+            humanReadablePart: Configuration.bech32AccountAddressPrefix,
+            data: data
+        )
+    }
 
     // Returns boolean for whether two ValAddresses are Equal
     public func equals(_ other: Address) -> Bool {
@@ -205,14 +215,7 @@ public struct AccountAddress: Equatable, Address {
 
     // String implements the Stringer interface.
     public var description: String {
-        guard !data.isEmpty else {
-            return ""
-        }
-
-        return try! Bech32.convertAndEncode(
-            humanReadablePart: Configuration.bech32AccountAddressPrefix,
-            data: data
-        )
+        bech32Encoded
     }
 }
 
@@ -229,6 +232,17 @@ public struct ValidatorAddress: Address {
         self.data = data
     }
     
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let bech32Encoded = try container.decode(String.self)
+        try self.init(bech32Encoded: bech32Encoded)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(bech32Encoded)
+    }
+
     // ValAddressFromHex creates a ValAddress from a hex string.
     public init(hexEncoded: String) throws {
         guard !hexEncoded.isEmpty else {
@@ -257,6 +271,17 @@ public struct ValidatorAddress: Address {
         try Self.verifyAddressFormat(data: data)
         self.data = data
     }
+    
+    var bech32Encoded: String {
+        guard !data.isEmpty else {
+            return ""
+        }
+
+        return try! Bech32.convertAndEncode(
+            humanReadablePart: Configuration.bech32ValidatorAddressPrefix,
+            data: data
+        )
+    }
 
     // Returns boolean for whether two ValAddresses are Equal
     public func equals(_ other: Address) -> Bool {
@@ -326,14 +351,7 @@ public struct ValidatorAddress: Address {
 
     // String implements the Stringer interface.
     public var description: String {
-        guard !data.isEmpty else {
-            return ""
-        }
-
-        return try! Bech32.convertAndEncode(
-            humanReadablePart: Configuration.bech32ValidatorAddressPrefix,
-            data: data
-        )
+        bech32Encoded
     }
 }
 
@@ -350,6 +368,17 @@ public struct ConsensusAddress: Address {
         self.data = data
     }
     
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let bech32Encoded = try container.decode(String.self)
+        try self.init(bech32Encoded: bech32Encoded)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(bech32Encoded)
+    }
+
     // ValAddressFromHex creates a ValAddress from a hex string.
     public init(hexEncoded: String) throws {
         guard !hexEncoded.isEmpty else {
@@ -378,6 +407,17 @@ public struct ConsensusAddress: Address {
         try Self.verifyAddressFormat(data: data)
         self.data = data
     }
+    
+    var bech32Encoded: String {
+        guard !data.isEmpty else {
+            return ""
+        }
+
+        return try! Bech32.convertAndEncode(
+            humanReadablePart: Configuration.bech32ConsensusAddressPrefix,
+            data: data
+        )
+    }
 
     // Returns boolean for whether two ValAddresses are Equal
     public func equals(_ other: Address) -> Bool {
@@ -447,14 +487,7 @@ public struct ConsensusAddress: Address {
 
     // String implements the Stringer interface.
     public var description: String {
-        guard !data.isEmpty else {
-            return ""
-        }
-
-        return try! Bech32.convertAndEncode(
-            humanReadablePart: Configuration.bech32ConsensusAddressPrefix,
-            data: data
-        )
+        bech32Encoded
     }
 }
 
@@ -465,10 +498,10 @@ extension Data {
             throw Cosmos.Error.generic(reason: "decoding Bech32 address failed: must provide an address")
         }
 
-        let (hrp, data) = try Bech32.decodeAndConvert(bech32Encoded)
+        let (humanReadablePart, data) = try Bech32.decodeAndConvert(bech32Encoded)
 
-        guard hrp == prefix else {
-            throw Cosmos.Error.generic(reason: "invalid Bech32 prefix; expected \(prefix), got \(hrp)")
+        guard humanReadablePart == prefix else {
+            throw Cosmos.Error.generic(reason: "invalid Bech32 prefix; expected \(prefix), got \(humanReadablePart)")
         }
 
         self = data

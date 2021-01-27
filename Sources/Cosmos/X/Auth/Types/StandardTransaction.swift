@@ -4,6 +4,8 @@ import Tendermint
 // StdTx is a standard way to wrap a Msg with Fee and Signatures.
 // NOTE: the first signature is the fee payer (Signatures must not be nil).
 struct StandardTransaction: Transaction {
+    static let metaType: MetaType = Self.metaType(key: "cosmos-sdk/StdTx")
+    
     static let maxGasWanted = UInt64((1 << 63) - 1)
 
     let messages: [Message]
