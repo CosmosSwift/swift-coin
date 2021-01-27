@@ -14,7 +14,9 @@ To make the porting more exciting, we have chosen to use the [nameservice](https
 
 ## Work in progress
 This is work in progress. What we currrently have is the following:
+
 | Module  |  milestone  |  completion  |  notes
+|-----------| -------|---------|-------
 | Framework  |  2   | 100% |   Framework mimics the CosmosSDK framework, including the directory structure.
 | Store  |  2   | 80%  |  Store is there, currently in memory. Needs to be properly connected to the iAVLP.
 | Bech32  |  2   | 100%    |
