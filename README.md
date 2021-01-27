@@ -13,13 +13,29 @@ To make the porting more exciting, we have chosen to use the [nameservice](https
 
 
 ## Work in progress
-This is work in progress. In order to 
+This is work in progress. What we currrently have is the following:
+
+| Module  |  milestone  |  completion  |  notes
+|-----------| -------|---------|-------
+| Framework  |  2   | 100% |   Framework mimics the CosmosSDK framework, including the directory structure.
+| Store  |  2   | 80%  |  Store is there, currently in memory. Needs to be properly connected to the iAVLP.
+| Bech32  |  2   | 100%    |
+| Auth  |  2   | 80%    |
+| Params  |  2 |   80%|    
+| Supply  |  3  |  50%  |  
+| Governance  |  3  |  50% |   
+| Staking  |  3   | 50%    |
+| Simulation  |   3  |  50%|    
+| Bank  |  3 |   50% |   
+            
 
 
 
+
+## Requirements
 - Swift version: 5.3.x
 - SwiftNIO version: 2.0.x
-- ABCI version: 0.34 (tendermint 0.34)
+- ABCI version: 0.33.9 (tendermint 0.33.9)
 
 
 ## Installation
@@ -83,7 +99,11 @@ swift run nameserviced start
 
 Compile:
 
-1. run `swift build`
+1. run `swift build` or spawn XCode `xed .` from the root of the cloned directory.
+
+2. Initialize a Tendermint chain node and the nameserviced as explained above
+
+3. Run the [Go nameservicecli](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice/nameservice) to drive the Swift `nameserviced`
 
 ## Documentation
 
