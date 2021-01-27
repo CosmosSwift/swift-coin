@@ -2,10 +2,6 @@ import Foundation
 import Tendermint
 import ABCI
 
-struct LocalQueryAccountParameters: Codable {
-    let Address: String
-}
-
 extension AccountKeeper {
     // NewQuerier creates a querier for auth REST endpoints
     public func makeQuerier() -> Querier {
@@ -20,9 +16,7 @@ extension AccountKeeper {
     }
 
     private func queryAccount(request: Request, queryRequest: RequestQuery) throws -> Data {
-
-        
-        let parameters: LocalQueryAccountParameters
+        let parameters: QueryAccountParameters
         
         do {
             parameters = try codec.unmarshalJSON(data: queryRequest.data)
@@ -30,12 +24,10 @@ extension AccountKeeper {
             throw Cosmos.Error.jsonUnmarshal(error: error)
         }
         
-        let address = try AccountAddress(bech32Encoded: parameters.Address)
-
         // TODO: this creates the address if it's missing.
         // TODO: this might not be the behaviour expected
-        guard let account = self.account(request: request, address: address) else {
-            throw Cosmos.Error.unknownAddress(reason: "account \(address) does not exist")
+        guard let account = self.account(request: request, address: parameters.address) else {
+            throw Cosmos.Error.unknownAddress(reason: "account \(parameters.address) does not exist")
         }
         
         do {
