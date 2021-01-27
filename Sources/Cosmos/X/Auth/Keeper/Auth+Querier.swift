@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 import ABCI
 
 struct LocalQueryAccountParameters: Codable {
@@ -11,15 +12,14 @@ extension AccountKeeper {
         return { request, path, queryRequest in
             switch path[0] {
             case AuthKeys.queryAccount:
-                // TODO: Deal with the generics
-                return try queryAccount(of: BaseAccount.self, request: request, queryRequest: queryRequest)
+                return try queryAccount(request: request, queryRequest: queryRequest)
             default:
                 throw Cosmos.Error.unknownRequest(reason: "unknown query path: \(path[0])")
             }
         }
     }
 
-    private func queryAccount<A: Account>(of type: A.Type, request: Request, queryRequest: RequestQuery) throws -> Data {
+    private func queryAccount(request: Request, queryRequest: RequestQuery) throws -> Data {
 
         
         let parameters: LocalQueryAccountParameters
@@ -34,12 +34,13 @@ extension AccountKeeper {
 
         // TODO: this creates the address if it's missing.
         // TODO: this might not be the behaviour expected
-        guard let account: BaseAccount = self.baseAccount(request: request, address: address) else {
+        guard let account = self.account(request: request, address: address) else {
             throw Cosmos.Error.unknownAddress(reason: "account \(address) does not exist")
         }
         
         do {
-            return try codec.marshalJSONIndent(value: account)
+            let value = AnyProtocolCodable(account)
+            return try codec.marshalJSONIndent(value: value)
         } catch {
             throw Cosmos.Error.jsonMarshal(error: error)
         }

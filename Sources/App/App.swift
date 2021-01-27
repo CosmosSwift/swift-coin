@@ -238,12 +238,11 @@ extension NameServiceApp {
     public static func makeCodec() -> Codec {
         let codec = Codec()
 
-        // TODO: Decide what to do about codecs
-    //    ModuleBasics.registerCodec(codec)
-    //    registerCodec(codec)
-    //    codec.registerCrypto(codec)
-
-    //    return codec.seal()
+        moduleBasics.register(codec: codec)
+//        registerCodec(codec)
+//        codec.registerCrypto(codec)
+//
+//        return codec.seal()
         return codec
     }
 }

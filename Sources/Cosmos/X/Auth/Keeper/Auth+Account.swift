@@ -16,12 +16,13 @@ extension AccountKeeper {
     
     // NewAccount sets the next account number to a given account interface
     public func makeAccount(request: Request, account: Account) -> Account {
+        var account = account
         try! account.set(accountNumber: nextAccountNumber(request: request))
         return account
     }
 
     // GetAccount implements sdk.AccountKeeper.
-    public func account<A: Account>(request: Request, address: AccountAddress) -> A? {
+    public func account(request: Request, address: AccountAddress) -> Account? {
         let store = request.keyValueStore(key: key)
 
         guard let data = store.get(key: addressStoreKey(address: address)) else {
@@ -30,18 +31,7 @@ extension AccountKeeper {
 
         return decodeAccount(data: data)
     }
-    
-    // GetAccount implements sdk.AccountKeeper.
-    public func baseAccount(request: Request, address: AccountAddress) -> BaseAccount? {
-        let store = request.keyValueStore(key: key)
 
-        guard let data = store.get(key: addressStoreKey(address: address)) else {
-            return makeAccountWithAddress(request: request, address: address) 
-        }
-
-        return decodeAccount(data: data)
-    }
-    
     // GetAllAccounts returns all accounts in the accountKeeper.
     public func allAccounts(request: Request) -> [Account] {
         // TODO: Implement
@@ -70,7 +60,7 @@ extension AccountKeeper {
                 iterator.next()
             }
             
-            let account: BaseAccount = self.decodeAccount(data: iterator.value)
+            let account  = self.decodeAccount(data: iterator.value)
             
             if process(account) {
                 break

@@ -8,8 +8,7 @@ public class BankAppModuleBasic: AppModuleBasic {
     public let name: String = BankKeys.moduleName
     
     public func register(codec: Codec) {
-         // TODO: Implement
-        fatalError()
+        Self.register(codec: codec)
     }
     
     public func defaultGenesis() -> JSON? {

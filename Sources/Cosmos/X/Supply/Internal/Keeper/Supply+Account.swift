@@ -17,7 +17,7 @@ extension SupplyKeeper {
             return (nil, [])
         }
 
-        if let moduleAccount: ModuleAccount = accountKeeper.account(request: request, address: address) {
+        if let moduleAccount = accountKeeper.account(request: request, address: address) as? ModuleAccount {
             return (moduleAccount, permissions)
         }
 

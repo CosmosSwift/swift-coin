@@ -104,7 +104,7 @@ extension StakingKeeper {
         let notBondedCoins = Coins(coins: [Coin(denomination: data.parameters.bondDenomination, amount: UInt(notBondedTokens))])
 
         // check if the unbonded and bonded pools accounts exists
-        guard let bondedPool = self.bondedPool(request: request) else {
+        guard var bondedPool = self.bondedPool(request: request) else {
             fatalError("\(StakingKeys.bondedPoolName) module account has not been set")
         }
 
@@ -115,7 +115,7 @@ extension StakingKeeper {
             supplyKeeper.setModuleAccount(request: request, moduleAccount: bondedPool)
         }
 
-        guard let notBondedPool = self.notBondedPool(request: request) else {
+        guard var notBondedPool = self.notBondedPool(request: request) else {
             fatalError("\(StakingKeys.notBondedPoolName) module account has not been set")
         }
 

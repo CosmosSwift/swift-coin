@@ -1,6 +1,11 @@
 import Cosmos
 
 extension Codec {
+    // ModuleCdc defines the module codec
+    static let moduleCodec = Codec()
+}
+
+extension NameServiceAppModuleBasic {
     // RegisterCodec registers concrete types on codec
     static func register(codec: Codec) {
         // this line is used by starport scaffolding # 1
@@ -9,10 +14,7 @@ extension Codec {
     //    codec.registerConcrete(DeleteNameMessage.self, "nameservice/DeleteName", nil)
     }
 
-    // ModuleCdc defines the module codec
-    static let moduleCodec = Codec()
-
-    func initialize() {
+    static func initiCodec() {
     //    register(codec: moduleCodec)
     //    codec.registerCrypto(moduleCodec)
     //    moduleCodec.seal()

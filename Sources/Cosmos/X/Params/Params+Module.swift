@@ -7,8 +7,7 @@ public struct ParamsAppModuleBasic: AppModuleBasic {
     public var name: String = ParamsKeys.moduleName
     
     public func register(codec: Codec) {
-        // TODO: Implement
-        fatalError()
+        Self.register(codec: codec)
     }
     
     /// DefaultGenesis returns default genesis state as raw bytes for the params

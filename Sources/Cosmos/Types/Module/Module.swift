@@ -33,7 +33,7 @@ extension BasicManager {
     }
     
     // RegisterCodec registers all module codecs
-    func registerCodec(codec: Codec) {
+    public func register(codec: Codec) {
         for basic in values {
             basic.register(codec: codec)
         }

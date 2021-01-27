@@ -5,13 +5,16 @@ import Tendermint
 // This can be extended by embedding within in your AppAccount.
 // However one doesn't have to use BaseAccount as long as your struct
 // implements Account.
-public class BaseAccount: Account, GenesisAccount {
-    var type = "cosmos-sdk/Account"
-    public var address: AccountAddress
-    public var coins: Coins
-    public var publicKey: PublicKey?
-    public var accountNumber: UInt64
-    public var sequence: UInt64
+public struct BaseAccount: Account, GenesisAccount {
+    public static let metaType: MetaType = Self.metaType(
+        key: "cosmos-sdk/Account"
+    )
+    
+    public private(set) var address: AccountAddress
+    public private(set) var coins: Coins
+    public private(set) var publicKey: PublicKey?
+    public private(set) var accountNumber: UInt64
+    public private(set) var sequence: UInt64
     
     // NewBaseAccount creates a new BaseAccount object
     public init(
@@ -28,7 +31,7 @@ public class BaseAccount: Account, GenesisAccount {
         self.sequence = sequence
     }
     
-    public func set(address: AccountAddress) throws {
+    public mutating func set(address: AccountAddress) throws {
         guard address.isEmpty else {
             throw Cosmos.Error.generic(reason: "cannot override BaseAccount address")
         }
@@ -36,19 +39,19 @@ public class BaseAccount: Account, GenesisAccount {
         self.address = address
     }
 
-    public func set(publicKey: PublicKey) throws {
+    public mutating func set(publicKey: PublicKey) throws {
         self.publicKey = publicKey
     }
     
-    public func set(accountNumber: UInt64) throws {
+    public mutating func set(accountNumber: UInt64) throws {
         self.accountNumber = accountNumber
     }
     
-    public func set(sequence: UInt64) throws {
+    public mutating func set(sequence: UInt64) throws {
         self.sequence = sequence
     }
     
-    public func set(coins: Coins) throws {
+    public mutating func set(coins: Coins) throws {
         self.coins = coins
     }
     
@@ -89,6 +92,8 @@ public class BaseAccount: Account, GenesisAccount {
         }
     }
 
+    // TODO: Check if this just used as description or
+    // if it's used to output to files or something
     public var description: String {
         // TODO: Deal with force try and force unwrap.
         let data = try! encodeYAML()
@@ -98,7 +103,7 @@ public class BaseAccount: Account, GenesisAccount {
     // MarshalYAML returns the YAML representation of an account.
     func encodeYAML() throws -> Data {
         // TODO: Implement
-        Data()
+        fatalError()
 //        alias := baseAccountPretty{
 //            Address:       acc.Address,
 //            Coins:         acc.Coins,

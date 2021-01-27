@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 
 // AccountKeeper encodes/decodes accounts using the go-amino (binary)
 // encoding/decoding library.
@@ -54,7 +55,8 @@ extension AccountKeeper {
 // Misc.
 
 extension AccountKeeper {
-    func decodeAccount<A: Account>(data: Data) -> A {
-        try! codec.unmarshalBinaryBare(data: data)
+    func decodeAccount(data: Data) -> Account {
+        let account: AnyProtocolCodable = try! codec.unmarshalBinaryBare(data: data)
+        return account as! Account
     }
 }

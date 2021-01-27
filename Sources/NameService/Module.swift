@@ -3,18 +3,15 @@ import ABCI
 import Cosmos
 
 // AppModuleBasic defines the basic application module used by the nameservice module.
-public struct NameServiceAppModuleBasic: AppModuleBasic {
+public class NameServiceAppModuleBasic: AppModuleBasic {
     // TODO: Probably all of AppModuleBasic requirements should be static
     public init() {}
 
     // Name returns the nameservice module's name.
-    public var name: String {
-        NameServiceKeys.moduleName
-    }
-    
+    public let name: String = NameServiceKeys.moduleName
+
     public func register(codec: Codec) {
-        // TODO: Maybe store codec here
-        Codec.register(codec: codec)
+        Self.register(codec: codec)
     }
 
     // DefaultGenesis returns default genesis state as raw bytes for the nameservice
@@ -50,7 +47,7 @@ public struct NameServiceAppModuleBasic: AppModuleBasic {
 //____________________________________________________________________________
 
 // AppModule implements an application module for the nameservice module.
-public struct NameServiceAppModule: AppModule {
+public final class NameServiceAppModule: NameServiceAppModuleBasic, AppModule {
     let keeper: NameServiceKeeper
     let coinKeeper: BankKeeper
     
@@ -59,30 +56,7 @@ public struct NameServiceAppModule: AppModule {
         self.keeper = keeper
         self.coinKeeper = coinKeeper
     }
-    
-    // Name returns the nameservice module's name.
-    public var name: String {
-        NameServiceKeys.moduleName
-    }
-    
-    public func register(codec: Codec) {
-        Codec.register(codec: codec)
-    }
 
-    // DefaultGenesis returns default genesis state as raw bytes for the nameservice
-    // module.
-    public func defaultGenesis() -> JSON? {
-        let data = Codec.moduleCodec.mustMarshalJSON(value: GenesisState.default)
-        return Codec.moduleCodec.mustUnmarshalJSON(data: data)
-    }
-
-    // ValidateGenesis performs genesis state validation for the nameservice module.
-    public func validateGenesis(json: JSON) throws {
-        let data = Codec.moduleCodec.mustMarshalJSON(value: json)
-        let genesisState: GenesisState = try Codec.moduleCodec.unmarshalJSON(data: data)
-        try genesisState.validate()
-    }
-    
     // RegisterInvariants registers the nameservice module invariants.
     public func registerInvariants(in invariantRegistry: InvariantRegistry) {}
 

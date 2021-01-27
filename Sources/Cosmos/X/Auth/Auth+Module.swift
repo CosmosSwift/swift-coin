@@ -8,8 +8,7 @@ public class AuthAppModuleBasic: AppModuleBasic {
     public let name: String = AuthKeys.moduleName
     
     public func register(codec: Codec) {
-        // TODO: Implement
-        fatalError()
+        Self.register(codec: codec)
     }
     
     /// DefaultGenesis returns default genesis state as raw bytes for the auth

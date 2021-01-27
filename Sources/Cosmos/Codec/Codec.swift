@@ -1,12 +1,87 @@
 import Foundation
 
 public class Codec {
-    let encoder = JSONEncoder()
-    let decoder = JSONDecoder()
+    private var sealed = false
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
     
     public init() {}
     
     public static let codec = Codec()
+    
+    struct InterfaceOptions {}
+    
+    // This function should be used to register all interfaces that will be
+    // encoded/decoded by go-amino.
+    // Usage:
+    // `amino.RegisterInterface((*MyInterface1)(nil), nil)`
+    func registerInterface<T: Decodable>(type: T.Type, options: InterfaceOptions? = nil) {
+        assertNotSealed()
+
+//        // Get reflect.Type from ptr.
+//        rt := getTypeFromPointer(ptr)
+//        if rt.Kind() != reflect.Interface {
+//            panic(fmt.Sprintf("RegisterInterface expects an interface, got %v", rt))
+//        }
+//
+//        // Construct InterfaceInfo
+//        var info = cdc.newTypeInfoFromInterfaceType(rt, iopts)
+//
+//        // Finally, check conflicts and register.
+//        cdc.collectImplementers_nolock(info)
+//        err := cdc.checkConflictsInPrio_nolock(info)
+//
+//        if err != nil {
+//            panic(err)
+//        }
+//
+//        cdc.setTypeInfo_nolock(info)
+    }
+    
+    struct ConcreteOptions {}
+
+    func registerConcrete<T: Decodable>(type: T.Type, name: String, options: ConcreteOptions? = nil) {
+        assertNotSealed()
+
+//        var pointerPreferred: bool
+//
+//        // Get reflect.Type.
+//        rt := reflect.TypeOf(o)
+//
+//        if rt.Kind() == reflect.Interface {
+//            panic(fmt.Sprintf("expected a non-interface: %v", rt))
+//        }
+//
+//        if rt.Kind() == reflect.Ptr {
+//            rt = rt.Elem()
+//
+//            if rt.Kind() == reflect.Ptr {
+//                // We can encode/decode pointer-pointers, but not register them.
+//                panic(fmt.Sprintf("registering pointer-pointers not yet supported: *%v", rt))
+//            }
+//
+//            if rt.Kind() == reflect.Interface {
+//                // MARKER: No interface-pointers
+//                panic(fmt.Sprintf("registering interface-pointers not yet supported: *%v", rt))
+//            }
+//
+//            pointerPreferred = true
+//        }
+//
+//        // Construct ConcreteInfo.
+//        var info = cdc.newTypeInfoFromRegisteredConcreteType(rt, pointerPreferred, name, copts)
+//
+//        // Finally, check conflicts and register.
+//        cdc.addCheckConflictsWithConcrete_nolock(info)
+//        cdc.setTypeInfo_nolock(info)
+    }
+    
+    func assertNotSealed() {
+        guard !sealed else {
+            fatalError("codec sealed")
+        }
+    }
+
     
     func marshalJSON<T: Encodable>(value: T) throws -> Data {
         try encoder.encode(value)

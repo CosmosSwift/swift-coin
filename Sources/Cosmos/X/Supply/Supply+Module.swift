@@ -8,8 +8,7 @@ public class SupplyAppModuleBasic: AppModuleBasic {
     public let name: String = SupplyKeys.moduleName
     
     public func register(codec: Codec) {
-        // TODO: Implement
-        fatalError()
+        Self.register(codec: codec)
     }
     
     public func defaultGenesis() -> JSON? {

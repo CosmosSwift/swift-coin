@@ -7,23 +7,23 @@ import Tendermint
 // and a pubkey for authentication purposes.
 //
 // Many complex conditions can be used in the concrete struct which implements Account.
-public protocol Account: Codable, CustomStringConvertible {
+public protocol Account: ProtocolCodable, CustomStringConvertible {
     var address: AccountAddress { get }
     // errors if already set.
-    func set(address: AccountAddress) throws
+    mutating func set(address: AccountAddress) throws
 
     // can return nil.
     var publicKey: PublicKey? { get }
-    func set(publicKey: PublicKey) throws
+    mutating func set(publicKey: PublicKey) throws
 
     var accountNumber: UInt64 { get }
-    func set(accountNumber: UInt64) throws
+    mutating func set(accountNumber: UInt64) throws
 
     var sequence: UInt64 { get }
-    func set(sequence: UInt64) throws
+    mutating func set(sequence: UInt64) throws
 
     var coins: Coins { get }
-    func set(coins: Coins) throws
+    mutating func set(coins: Coins) throws
 
     // Calculates the amount of coins that can be sent to other accounts given
     // the current time.
