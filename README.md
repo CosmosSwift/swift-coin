@@ -1,4 +1,4 @@
-# swift-coin
+# swift-coin / nameservice [ALPHA]
 
 ![Swift5.3+](https://img.shields.io/badge/Swift-5.3+-blue.svg)
 ![platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20linux-orange.svg)
@@ -31,9 +31,6 @@ This is work in progress. What we currrently have is the following:
 | Bank  |  3 |   70% |   
 | IBC| 3 | 0% |
 
-            
-
-
 
 
 ## Requirements
@@ -41,12 +38,11 @@ This is work in progress. What we currrently have is the following:
 - SwiftNIO version: 2.0.x
 - ABCI version: 0.33.9 (tendermint 0.33.9)
 
-
 ## Installation
 
 Requires macOS or a variant of Linux with the Swift 5.3.x toolchain installed.
 
-When running on an Apple M1 from XCode, you need to set the minimum macOS version to 11 in `Pachage.swift` as such:
+When running on an Apple M1 from XCode, you need to set the minimum macOS version to 11 in `Package.swift` as such:
 ```
 // swift-tools-version:5.3
 import PackageDescription
@@ -75,10 +71,7 @@ swift build
 swift run nameserviced ${COMMAND} ${OPTIONS}
 ```
 
-3. Run Tendermint and the nameservice.
-
-Initialise and run Tendermint (for instance in Docker):
-
+3. Run Tendermint and the nameservice:
 ```bash
 # initialise tendermint
 docker run -it --rm -v "/tmp:/tendermint" tendermint/tendermint:v0.34 init
@@ -108,6 +101,74 @@ Compile:
 2. Initialize a Tendermint chain node and the nameserviced as explained above
 
 3. Run the [Go nameservicecli](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice/nameservice) to drive the Swift `nameserviced`
+```bash
+#!/usr/bin/env bash
+
+rm -rf ~/.nameserviced
+rm -rf ~/.nameservicecli
+
+# Swift nameserviced
+nameserviced init test --chain-id=namechain
+
+# Go nameservicecli
+nameservicecli config output json
+nameservicecli config indent true
+nameservicecli config trust-node true
+nameservicecli config chain-id namechain
+nameservicecli config keyring-backend test
+
+nameservicecli keys add user1
+nameservicecli keys add user2
+
+# Swift nameserviced
+nameserviced add-genesis-account $(nameservicecli keys show user1 -a) 1000nametoken,100000000stake
+nameserviced add-genesis-account $(nameservicecli keys show user2 -a) 1000nametoken,100000000stake
+
+# Not implemented
+# nameserviced gentx --name user1 --keyring-backend test
+
+echo "Collecting genesis txs..."
+# Not implemented
+# nameserviced collect-gentxs
+
+echo "Validating genesis file..."
+# Not implemented
+# nameserviced validate-genesis
+```
+Then:
+```bash
+nameservicecli query account $(nameservicecli keys show jack -a) | jq ".value.coins[0]"
+nameservicecli query account $(nameservicecli keys show alice -a) | jq ".value.coins[0]"
+
+# Below messages are not fully working at this stage
+
+# Buy your first name using your coins from the genesis file
+nameservicecli tx nameservice buy-name jack.id 5nametoken --from jack -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Set the value for the name you just bought
+nameservicecli tx nameservice set-name jack.id 8.8.8.8 --from jack -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Try out a resolve query against the name you registered
+nameservicecli query nameservice resolve jack.id | jq ".value"
+# > 8.8.8.8
+
+# Try out a whois query against the name you just registered
+nameservicecli query nameservice get-whois jack.id
+# > {"value":"8.8.8.8","owner":"cosmos1l7k5tdt2qam0zecxrx78yuw447ga54dsmtpk2s","price":[{"denom":"nametoken","amount":"5"}]}
+
+# Alice buys name from jack
+nameservicecli tx nameservice buy-name jack.id 10nametoken --from alice -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Alice decides to delete the name she just bought from jack
+nameservicecli tx nameservice delete-name jack.id --from alice -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Try out a whois query against the name you just deleted
+nameservicecli query nameservice get-whois jack.id
+# > {"value":"","owner":"","price":[{"denom":"nametoken","amount":"1"}]}
+
+Initialise and run Tendermint (for instance in Docker):
+```
+
 
 ## Documentation
 
