@@ -26,7 +26,7 @@ extension FilePrivateValidatorKey {
 
 public struct FilePrivateValidatorState: Codable {
     public let height: String // Required!!! otherwise tendermint throws: Error reading PrivValidator state from /tendermint/config/priv_validator_state.json: invalid 64-bit integer encoding "0", expected string
-    public let round: Int
+    public let round: String // Required!!! otherwise tendermint throws: Error reading PrivValidator state from /tendermint/config/priv_validator_state.json: invalid 64-bit integer encoding "0", expected string
     public let step: Int
 }
 
@@ -104,7 +104,7 @@ public enum FilePrivateValidator {
     }
     
     private static func generateFilePrivateValidatorState(atPath path: String) throws -> FilePrivateValidatorState {
-        let filePrivateValidatorState = FilePrivateValidatorState(height: "0", round: 0, step: 0)
+        let filePrivateValidatorState = FilePrivateValidatorState(height: "0", round: "0", step: 0)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [
             .prettyPrinted,

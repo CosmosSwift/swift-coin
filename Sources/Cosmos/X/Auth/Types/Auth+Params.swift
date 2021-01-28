@@ -58,7 +58,9 @@ extension AuthParameters {
     // ParamSetPairs implements the ParamSet interface and returns all the key/value pairs
     // pairs of auth module's parameters.
     // nolint
-    var parameterSetPairs: ParameterSetPairs {
+    
+    // TODO: remove Validate. we already have the correct type as part of the decoding.
+   var parameterSetPairs: ParameterSetPairs {
         [
             ParameterSetPair(key: AuthKeys.maximumMemoCharacters, value: maximumMemoCharacters, validatorFunction: validateMaximumMemoCharacters),
             ParameterSetPair(key: AuthKeys.transactionSignatureLimit, value: transactionSignatureLimit, validatorFunction: validateTransactionSignatureLimit),
@@ -82,9 +84,15 @@ extension AuthParameters {
     }
 }
 
-func validateTransactionSignatureLimit(i: Any) throws {
-    // TODO: Implement
-    fatalError()
+func validateTransactionSignatureLimit(i: AnyEncodable) throws {
+    
+    guard let uint64 = i.value as? UInt64 else {
+        fatalError("Invalid parameter type: \(i)")
+    }
+    
+    if uint64 == 0 {
+        fatalError("Invalid tx signature limit: \(uint64)")
+    }
 //    v, ok := i.(uint64)
 //    if !ok {
 //        return fmt.Errorf("invalid parameter type: %T", i)
@@ -97,10 +105,15 @@ func validateTransactionSignatureLimit(i: Any) throws {
 //    return nil
 }
 
-func validateSignatureVerifyCostED25519(i: Any) throws {
-    // TODO: Implement
-    fatalError()
-//    v, ok := i.(uint64)
+func validateSignatureVerifyCostED25519(i: AnyEncodable) throws {
+    guard let uint64 = i.value as? UInt64 else {
+        fatalError("Invalid parameter type: \(i)")
+    }
+    
+    if uint64 == 0 {
+        fatalError("Invalid ED25519 signature verification cost: \(uint64)")
+    }
+    //    v, ok := i.(uint64)
 //    if !ok {
 //        return fmt.Errorf("invalid parameter type: %T", i)
 //    }
@@ -112,9 +125,14 @@ func validateSignatureVerifyCostED25519(i: Any) throws {
 //    return nil
 }
 
-func validateSignatureVerifyCostSecp256k1(i: Any) throws {
-    // TODO: Implement
-    fatalError()
+func validateSignatureVerifyCostSecp256k1(i: AnyEncodable) throws {
+    guard let uint64 = i.value as? UInt64 else {
+        fatalError("Invalid parameter type: \(i)")
+    }
+    
+    if uint64 == 0 {
+        fatalError("Invalid SECK256k1 signature verification cost: \(uint64)")
+    }
 //    v, ok := i.(uint64)
 //    if !ok {
 //        return fmt.Errorf("invalid parameter type: %T", i)
@@ -127,9 +145,14 @@ func validateSignatureVerifyCostSecp256k1(i: Any) throws {
 //    return nil
 }
 
-func validateMaximumMemoCharacters(i: Any) throws {
-    // TODO: Implement
-    fatalError()
+func validateMaximumMemoCharacters(i: AnyEncodable) throws {
+    guard let uint64 = i.value as? UInt64 else {
+        fatalError("Invalid parameter type: \(i)")
+    }
+    
+    if uint64 == 0 {
+        fatalError("Invalid max memo characters: \(uint64)")
+    }
 //    v, ok := i.(uint64)
 //    if !ok {
 //        return fmt.Errorf("invalid parameter type: %T", i)
@@ -142,9 +165,14 @@ func validateMaximumMemoCharacters(i: Any) throws {
 //    return nil
 }
 
-func validateTransactionSizeCostPerByte(i: Any) throws {
-    // TODO: Implement
-    fatalError()
+func validateTransactionSizeCostPerByte(i: AnyEncodable) throws {
+    guard let uint64 = i.value as? UInt64 else {
+        fatalError("Invalid parameter type: \(i)")
+    }
+    
+    if uint64 == 0 {
+        fatalError("Invalid tx size cost per byte: \(uint64)")
+    }
 //    v, ok := i.(uint64)
 //    if !ok {
 //        return fmt.Errorf("invalid parameter type: %T", i)

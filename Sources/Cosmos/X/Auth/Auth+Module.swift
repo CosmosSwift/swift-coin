@@ -74,7 +74,21 @@ public class AuthAppModule: AuthAppModuleBasic, AppModule {
     /// InitGenesis performs genesis initialization for the auth module. It returns
     /// no validator updates.
     public func initGenesis(request: Request, json: JSON) -> [ValidatorUpdate] {
-        []
+        let data = Codec.authCodec.mustMarshalJSON(value: json)
+        let genesisState: AuthGenesisState = Codec.authCodec.mustUnmarshalJSON(data: data)
+
+        self.accountKeeper.setParams(request: request, parameters: genesisState.parameters)
+        for account in genesisState.accounts {
+            self.accountKeeper.setAccount(request: request, account: account)
+        }
+//        ak.SetParams(ctx, data.Params)
+//        data.Accounts = SanitizeGenesisAccounts(data.Accounts)
+//
+//        for _, a := range data.Accounts {
+//            acc := ak.NewAccount(ctx, a)
+//            ak.SetAccount(ctx, acc)
+//        }
+        return []
     }
     
     /// ExportGenesis returns the exported genesis state as raw bytes for the auth

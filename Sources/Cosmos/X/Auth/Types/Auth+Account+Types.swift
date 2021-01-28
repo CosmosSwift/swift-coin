@@ -31,6 +31,39 @@ public struct BaseAccount: Account, GenesisAccount {
         self.sequence = sequence
     }
     
+    enum CodingKeys: String, CodingKey {
+        case address, coins, publicKey, accountNumber, sequence
+    }
+    
+    // This si required because Tendermint 0.33.9 ser/deser UInt64 as strings
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.address = try container.decode(AccountAddress.self, forKey: .address)
+        self.coins = try container.decode(Coins.self, forKey: .coins)
+        self.publicKey = try container.decodeIfPresent(PublicKey.self, forKey: .publicKey)
+        let accountNumberStr = try container.decode(String.self, forKey: .accountNumber)
+        guard let accountNumber = UInt64(accountNumberStr) else {
+            throw Cosmos.Error.generic(reason: "Decoding: Invalid accountNumber: \(accountNumberStr)")
+        }
+        self.accountNumber = accountNumber
+        
+        let sequenceStr = try container.decode(String.self, forKey: .sequence)
+        guard let sequence = UInt64(sequenceStr) else {
+            throw Cosmos.Error.generic(reason: "Decoding: Invalid sequence: \(sequenceStr)")
+        }
+        self.sequence = sequence
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
+        try container.encode(coins, forKey: .coins)
+        try container.encode(publicKey, forKey: .publicKey)
+        try container.encode("\(accountNumber)", forKey: .accountNumber)
+        try container.encode("\(sequence)", forKey: .sequence)
+
+    }
+    
     public mutating func set(address: AccountAddress) throws {
         guard address.isEmpty else {
             throw Cosmos.Error.generic(reason: "cannot override BaseAccount address")

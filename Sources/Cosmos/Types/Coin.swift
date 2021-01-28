@@ -12,6 +12,28 @@ public struct Coin: Codable {
         self.amount = amount
     }
     
+    enum CodingKeys: String, CodingKey {
+        case denomination = "denom"
+        case amount
+    }
+    
+    // This si required because Tendermint 0.33.9 ser/deser UInt64 as strings
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.denomination = try container.decode(String.self, forKey: .denomination)
+        let amountStr = try container.decode(String.self, forKey: .amount)
+        guard let amount = UInt(amountStr) else {
+            throw Cosmos.Error.generic(reason: "Decoding: Invalid amount: \(amountStr)")
+        }
+        self.amount = amount
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(denomination, forKey: .denomination)
+        try container.encode("\(amount)", forKey: .amount)
+    }
+    
     var isZero: Bool {
         amount == 0
     }

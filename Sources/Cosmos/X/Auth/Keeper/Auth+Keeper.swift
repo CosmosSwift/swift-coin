@@ -27,7 +27,7 @@ public struct AccountKeeper {
         self.key = key
         self.proto = proto
         self.codec = codec
-        self.paramSubspace = paramstore.with(keyTable: .paramKeyTable)
+        self.paramSubspace = paramstore.with(keyTable: KeyTable(pairs: AuthParameters.default.parameterSetPairs))
     }
 }
 
@@ -49,6 +49,10 @@ extension AccountKeeper {
         store.set(key: globalAccountNumberKey, value: data)
         return accountNumber
     }
+    
+    func setParams(request: Request, parameters: AuthParameters) {
+        self.paramSubspace.setParameterSet(request: request, parameterSet: parameters)
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -57,6 +61,6 @@ extension AccountKeeper {
 extension AccountKeeper {
     func decodeAccount(data: Data) -> Account {
         let account: AnyProtocolCodable = try! codec.unmarshalBinaryBare(data: data)
-        return account as! Account
+        return account.value as! Account
     }
 }

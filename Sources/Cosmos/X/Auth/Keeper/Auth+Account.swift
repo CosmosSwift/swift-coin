@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 
 extension AccountKeeper {
     // NewAccountWithAddress implements sdk.AccountKeeper.
@@ -42,7 +43,7 @@ extension AccountKeeper {
     public func setAccount<A: Account>(request: Request, account: A) {
         let address = account.address
         let store = request.keyValueStore(key: key)
-        let data = try! codec.marshalBinaryBare(value: account)
+        let data = try! codec.marshalBinaryBare(value: AnyProtocolCodable(account))
         
         store.set(
             key: addressStoreKey(address: address),
