@@ -15,14 +15,14 @@ To make the porting more exciting, we have chosen to use the [nameservice](https
 ## Work in progress
 This is work in progress. What we currrently have is the following:
 
-| Module  |  milestone  |  completion  |  notes
-|-----------| -------|---------|-------
+| Module/App  |  milestone  |  completion  |  notes
+|:-----------| :-------:|:---------:|:-------
 | Framework  |  2   | ✔️ |   Framework mimics the CosmosSDK framework, including the directory structure.
-| Store  (ex integration with stand alone iAVLP) |  2   | ✔️ |  Store is there, currently in memory.
+| Store  (ex integration with stand alone iAVLP) |  2   | ✔️ |  Currently in memory.
 | Bech32  |  2   | ✔️    |
-| Auth ( ex Staking, Governance, Bank) |  2   | ✔️    |
+| Auth |  2   | ✔️    | Staking, Governance, Bank requirements in progress (see respective Modules)
 | Params  |  2 |   ✔️|    
-| Nameservice example| not planned | 70%|
+| Nameservice | unplanned | 70%| Allows us to test modules.
 | GenUtils | |  80%|
 | Supply  |  3  |  50%  |  
 | Governance  |  3  |  0% |   
