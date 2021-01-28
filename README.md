@@ -9,34 +9,33 @@ This project shows the work in progress for the port of the [Cosmos SDK](https:/
 
 To make the porting more exciting, we have chosen to use the [nameservice](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice) to implement the various necessary libraries for the sdk.
 
-
-
+The primary focus is to get to parity with the Cosmos-SDK version 0.40. We are currently tracking version 0.33.9 because the Go nameservice still requires it.
 
 ## Work in progress
 This is work in progress. What we currrently have is the following:
 
-| Module/App  |  milestone  |  completion  |  notes
-|:-----------| :-------:|:---------:|:-------
-| Framework  |  2   | ✔️ |   Framework mimics the CosmosSDK framework, including the directory structure.
-| Store  (ex integration with stand alone iAVLP) |  2   | ✔️ |  Currently in memory.
-| Bech32  |  2   | ✔️    |
-| Auth |  2   | ✔️    | Staking, Governance, Bank requirements in progress (see respective Modules)
-| Params  |  2 |   ✔️|    
-| Nameservice | unplanned | 70%| Allows us to test modules.
-| GenUtils | |  80%|
-| Supply  |  3  |  50%  |  
-| Governance  |  3  |  0% |   
-| Staking  |  3   | 50%    |
-| Simulation  |   3  |  50%|    
-| Bank  |  3 |   70% |   
-| IBC| 3 | 0% |
+| Module/App  |  completion  |  notes
+|:-----------|:---------:|:-------
+| Framework  | ✔️ |   Framework mimics the CosmosSDK framework, including the directory structure.
+| Store  (ex integration with stand alone iAVLP)  | ✔️ |  Currently in memory.
+| Bech32 | ✔️    |
+| Auth   | ✔️    | Staking, Governance, Bank requirements in progress (see respective Modules)
+| Params |   ✔️|    
+| Nameservice  | 70%| Allows us to test modules.
+| GenUtils | 80%|
+| Supply  |  50%  |  
+| Governance  |  0% |   
+| Staking | 50%    |
+| Simulation  |  50%|    
+| Bank |   70% |   
+| IBC | 0% |
 
-
+We currently bundle the nameservice, all modules and the framework as one repository, however, we will redistribute this into decoupled libraries when we get closer to parity with the Cosmos-sdk.
 
 ## Requirements
 - Swift version: 5.3.x
 - SwiftNIO version: 2.0.x
-- ABCI version: 0.33.9 (tendermint 0.33.9)
+- Tendermint/ABCI version: 0.33.9 (tendermint 0.33.9)
 
 ## Installation
 
@@ -185,7 +184,9 @@ For all other support requests, please email [opensource@katalysis.io](mailto:op
 
 ## Contributing
 
-Check out [CONTRIBUTING.md](https://github.com/cosmosswift/swift-coin/blob/master/CONTRIBUTING.md) for more information on how to help with **swift-coin**.
+Since the software is still under heavy development, our current focus is first and foremost to reach parity with version 0.39.1 of the Cosmos SDK. In the meantime, we still welcome any contribution, however, we apologize in advance if we are slow to respond.
+
+Should you want contribute, check out [CONTRIBUTING.md](https://github.com/cosmosswift/swift-coin/blob/master/CONTRIBUTING.md) for more information on how to help with **swift-coin**.
 
 ## Contributors
 
