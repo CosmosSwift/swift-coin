@@ -17,16 +17,20 @@ This is work in progress. What we currrently have is the following:
 
 | Module  |  milestone  |  completion  |  notes
 |-----------| -------|---------|-------
-| Framework  |  2   | 100% |   Framework mimics the CosmosSDK framework, including the directory structure.
-| Store  |  2   | 80%  |  Store is there, currently in memory. Needs to be properly connected to the iAVLP.
-| Bech32  |  2   | 100%    |
-| Auth  |  2   | 80%    |
-| Params  |  2 |   80%|    
+| Framework  |  2   | ✔️ |   Framework mimics the CosmosSDK framework, including the directory structure.
+| Store  (ex integration with stand alone iAVLP) |  2   | ✔️ |  Store is there, currently in memory.
+| Bech32  |  2   | ✔️    |
+| Auth ( ex Staking, Governance, Bank) |  2   | ✔️    |
+| Params  |  2 |   ✔️|    
+| Nameservice example| not planned | 70%|
+| GenUtils | |  80%|
 | Supply  |  3  |  50%  |  
-| Governance  |  3  |  50% |   
+| Governance  |  3  |  0% |   
 | Staking  |  3   | 50%    |
 | Simulation  |   3  |  50%|    
-| Bank  |  3 |   50% |   
+| Bank  |  3 |   70% |   
+| IBC| 3 | 0% |
+
             
 
 
