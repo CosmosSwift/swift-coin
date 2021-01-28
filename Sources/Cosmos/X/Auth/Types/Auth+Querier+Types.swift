@@ -7,6 +7,10 @@ extension AuthKeys {
 struct QueryAccountParameters: Codable {
     let address: AccountAddress
     
+    enum CodingKeys: String, CodingKey {
+        case address = "Address"
+    }
+    
     // NewQueryAccountParams creates a new instance of QueryAccountParams.
     internal init(address: AccountAddress) {
         self.address = address
