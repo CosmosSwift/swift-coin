@@ -11,7 +11,6 @@ struct NameserviceCLI: ParsableCommand {
         ]
     )
 }
-
 let codec = NameServiceApp.makeCodec()
 
 NameServiceApp.configure()
