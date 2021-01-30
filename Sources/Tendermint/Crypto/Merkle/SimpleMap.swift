@@ -89,7 +89,7 @@ extension KeyValuePair {
 extension Data {
     // PutUvarint encodes a uint64 into buf and returns the number of bytes written.
     // If the buffer is too small, PutUvarint will panic.
-    init(uvarint value: UInt64) {
+    public init(uvarint value: UInt64) {
         var data = Data()
         var value = value
 

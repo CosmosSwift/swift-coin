@@ -28,9 +28,7 @@ let package = Package(
         .target(
             name: "nameservicecli",
             dependencies: [
-                .product(name: "ABCI", package: "ABCI"),
-                .product(name: "ABCINIO", package: "ABCI"),
-                .target(name: "Cosmos"),
+                .target(name: "App"),
             ]
         ),
         .target(

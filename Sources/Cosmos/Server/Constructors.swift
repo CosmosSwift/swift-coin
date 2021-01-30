@@ -11,7 +11,7 @@ public typealias MakeApp = (
     _ logger: Logger,
     _ database: Database,
     _ writer: Writer?,
-    _ globalOptions: GlobalOptions
+    _ globalOptions: ServerOptions
 ) throws -> ABCIApplication
 
 public typealias ExportApp = (

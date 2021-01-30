@@ -8,7 +8,7 @@ import Cosmos
 import App
 import NameService
 
-struct Nameserviced: ParsableCommand {
+struct NameserviceDaemon: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "app Daemon (server)",
         subcommands: [
@@ -28,7 +28,7 @@ func makeApp(
     logger: Logger,
     database: Database,
     traceStore:  Writer?,
-    globalOptions: GlobalOptions
+    globalOptions: ServerOptions
 ) throws -> ABCIApplication {
     try NameServiceApp(
         logger: logger,
@@ -93,6 +93,6 @@ AddGenesisAccountCommand.defaultClientHome = NameServiceApp.defaultCLIHome
 ServerContext.makeApp = makeApp
 ServerContext.exportApp = exportApp
 
-let executor = Executor(command: Nameserviced.self)
+let executor = Executor(command: NameserviceDaemon.self)
 executor.execute()
 

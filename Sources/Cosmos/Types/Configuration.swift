@@ -11,7 +11,7 @@ public class Configuration: Sealable {
 //    txEncoder           TxEncoder
     public var addressVerifier: ((Data) throws -> Void)?
 //    mtx                 sync.RWMutex
-//    coinType            uint32
+    var coinType: UInt32 = Configuration.coinType
     var sealed: Bool = false
 //    sealedch            chan struct{}
     
@@ -101,6 +101,5 @@ public class Configuration: Sealable {
     public static var bech32ConsensusPublicKeyPrefix: String {
         configuration.bech32AddressPrefix[Bech32AddressPrefixKeys.consensusNodePublicKey]!
     }
-
 }
 

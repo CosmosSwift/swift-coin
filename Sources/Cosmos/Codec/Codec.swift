@@ -1,4 +1,5 @@
 import Foundation
+import Tendermint
 
 public class Codec {
     private var sealed = false
@@ -91,9 +92,21 @@ public class Codec {
     public func mustMarshalJSON<T: Encodable>(value: T) -> Data {
         try! marshalJSON(value: value)
     }
+    
+    // MarshalBinaryLengthPrefixed encodes the object o according to the Amino spec,
+    // but prefixed by a uvarint encoding of the object to encode.
+    // Use MarshalBinaryBare if you don't want byte-length prefixing.
+    //
+    // For consistency, MarshalBinaryLengthPrefixed will first dereference pointers
+    // before encoding.  MarshalBinaryLengthPrefixed will panic if o is a nil-pointer,
+    // or if o is invalid.
+    public func marshalBinaryLengthPrefixed<T: Encodable>(value: T) throws -> Data {
+        let data = try marshalBinaryBare(value: value)
+        return Data(uvarint: UInt64(data.count)) + data
+    }
 
     public func mustMarshalBinaryLengthPrefixed<T: Encodable>(value: T) -> Data {
-        try! encoder.encode(value)
+        try! marshalBinaryLengthPrefixed(value: value)
     }
     
     // MarshalBinaryBare encodes the object o according to the Amino spec.
@@ -141,28 +154,27 @@ public class Codec {
     // UnmarshalBinaryLengthPrefixed will panic if ptr is a nil-pointer.
     // Returns an error if not all of bz is consumed.
     public func unmarshalBinaryLengthPrefixed<T: Decodable>(data: Data) throws -> T {
-        try decoder.decode(T.self, from: data)
-//        if data.isEmpty {
-//            throw Cosmos.Error.decodingError(reason: "UnmarshalBinaryLengthPrefixed cannot decode empty bytes")
-//        }
-//
-//        // Read byte-length prefix.
-//        let (u64, n) = data.uvarint()
-//
-//        if n < 0 {
-//            throw Cosmos.Error.decodingError(reason: "Error reading msg byte-length prefix: got code \(n)")
-//        }
-//
-//        if u64 > UInt64(data.count - n) {
-//            throw Cosmos.Error.decodingError(reason: "Not enough bytes to read in UnmarshalBinaryLengthPrefixed, want \(u64) more bytes but only have \(data.count - n)")
-//        } else if u64 < UInt64(data.count - n) {
-//            throw Cosmos.Error.decodingError(reason: "Bytes left over in UnmarshalBinaryLengthPrefixed, should read \(u64) more bytes but have \(data.count - n)")
-//        }
-//
-//        let data = data.prefix(n)
-//
-//        // Decode.
-//        return try unmarshalBinaryBare(data: data)
+        if data.isEmpty {
+            throw Cosmos.Error.decodingError(reason: "UnmarshalBinaryLengthPrefixed cannot decode empty bytes")
+        }
+
+        // Read byte-length prefix.
+        let (u64, n) = data.uvarint()
+
+        if n < 0 {
+            throw Cosmos.Error.decodingError(reason: "Error reading msg byte-length prefix: got code \(n)")
+        }
+
+        if u64 > UInt64(data.count - n) {
+            throw Cosmos.Error.decodingError(reason: "Not enough bytes to read in UnmarshalBinaryLengthPrefixed, want \(u64) more bytes but only have \(data.count - n)")
+        } else if u64 < UInt64(data.count - n) {
+            throw Cosmos.Error.decodingError(reason: "Bytes left over in UnmarshalBinaryLengthPrefixed, should read \(u64) more bytes but have \(data.count - n)")
+        }
+
+        let data = data.suffix(from: n)
+
+        // Decode.
+        return try unmarshalBinaryBare(data: data)
     }
     
     public func unmarshalJSON<T: Decodable>(data: Data) throws -> T {

@@ -8,6 +8,11 @@ public class Ed25519PrivateKey: PrivateKey {
         key.rawRepresentation
     }
     
+    public init(data: Data) throws {
+        self.key = try Curve25519.Signing.PrivateKey(rawRepresentation: data)
+        super.init()
+    }
+    
     init(key: Curve25519.Signing.PrivateKey) {
         self.key = key
         super.init()

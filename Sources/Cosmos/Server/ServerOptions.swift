@@ -1,6 +1,6 @@
 import ArgumentParser
 
-public struct GlobalOptions: ParsableArguments {
+public struct ServerOptions: ParsableArguments {
     @Option(name: .customLong("inv-check-period"), help: "Assert registered invariants every N blocks")
     public var invariantCheckPeriod: UInt = 0
 

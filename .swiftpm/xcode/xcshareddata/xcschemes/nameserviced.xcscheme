@@ -56,6 +56,18 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "add-genesis-account cosmos12dfry9k8v99zpjsszdwpf6fc0cgfu7afz7mpmj 1000nametoken,100000000stake"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "add-genesis-account cosmos1l9qcvyzcrpu0glm8e4vgr2uhensre9nvych6hu 1000nametoken,100000000stake"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "add-genesis-account cosmos1h9ls954e3rmtpg84k5xv5ck5nygfs63jt83kjl 1000nametoken,100000000stake"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "collect-gentxs"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -68,15 +80,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "add-genesis-account cosmos1x8k6s0qv89wppaeem28ej2przy2v5l64cf595q 1000nametoken,100000000stake"
+            argument = "init newnode -o"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "validate-genesis"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "init newnode -o"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

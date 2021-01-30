@@ -17,8 +17,10 @@ import Bech32
 // AddrLen defines a valid address length
 let addressLength = 20
 
-// Atom in https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-let coinType = 118
+extension Configuration {
+    // Atom in https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+    static let coinType: UInt32 = 118
+}
 
 // BIP44Prefix is the parts of the BIP44 HD path that are fixed by
 // what we used during the fundraiser.

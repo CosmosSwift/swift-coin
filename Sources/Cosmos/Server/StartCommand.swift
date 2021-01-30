@@ -27,7 +27,7 @@ public struct StartCommand: ParsableCommand {
     private var storeTraceFilePath: String?
     
     @OptionGroup
-    private var globalOptions: GlobalOptions
+    private var globalOptions: ServerOptions
 
     public init() {}
     

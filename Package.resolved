@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "HexString",
+        "repositoryURL": "https://gitlab.com/katalysis/open-source/HexString.git",
+        "state": {
+          "branch": null,
+          "revision": "61718ed9c1902a76744ffc84b432e8e8e0788ab2",
+          "version": "0.4.0"
+        }
+      },
+      {
         "package": "ABCI",
         "repositoryURL": "https://github.com/CosmosSwift/swift-abci",
         "state": {
@@ -38,15 +47,6 @@
         }
       },
       {
-        "package": "HexString",
-        "repositoryURL": "https://github.com/katalysis-io/swift-hex-string.git",
-        "state": {
-          "branch": null,
-          "revision": "61718ed9c1902a76744ffc84b432e8e8e0788ab2",
-          "version": "0.4.0"
-        }
-      },
-      {
         "package": "iAVLPlus",
         "repositoryURL": "https://github.com/CosmosSwift/swift-iavlplus",
         "state": {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/cosmosswift/swift-mint.git",
         "state": {
           "branch": null,
-          "revision": "c9884e56de1d7ad2c0ee657638eec2e3ccf1843b",
-          "version": "0.3.1"
+          "revision": "4f72ba177f0c545e4b2e2e3b75bce18601bb46b9",
+          "version": "0.3.0"
         }
       },
       {
