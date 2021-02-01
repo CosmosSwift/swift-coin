@@ -23,6 +23,7 @@ let package = Package(
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
+        .package(name: "BigInt", url: "https://github.com/attaswift/BigInt", .upToNextMajor(from: "5.2.1")),
     ],
     targets: [
         .target(
@@ -56,6 +57,7 @@ let package = Package(
                 .target(name: "IAVL"),
                 .target(name: "Database"),
                 .target(name: "Tendermint"),
+                .target(name: "BIP39"),
                 .product(name: "iAVLPlus", package: "iAVLPlus"),
                 .product(name: "InMemoryNodeDB", package: "iAVLPlus"),
                 .product(name: "SQLiteNodeDB", package: "iAVLPlus"),
@@ -83,7 +85,13 @@ let package = Package(
             ]
         ),
         .target(name: "Bech32"),
+        .target(
+            name: "BIP39",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "BigInt", package: "BigInt"),
+            ]
+        ),
         .target(name: "JSON"),
     ]
 )
-

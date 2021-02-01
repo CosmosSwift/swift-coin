@@ -1,4 +1,5 @@
 import Foundation
+import BIP39
 import Tendermint
 
 struct KeybaseOptions {
@@ -85,20 +86,22 @@ struct BaseKeybase {
         bip39Passphrase: String,
         hdPath: String
     ) throws -> Data {
-        fatalError()
-        
-//        let seed = try bip39.NewSeedWithErrorChecking(
-//            mnemonic: mnemonic,
-//            bip39Passphrase: bip39Passphrase
-//        )
-//
-//        let (masterPriv, ch) = hd.computeMasters(from: seed)
-//
-//        guard !hdPath.isEmpty else {
-//            return masterPriv
-//        }
-//
-//        return try hd.derivePrivateKey(for: hdPath, masterPriv, ch)
+        let seed = try BIP39.makeSeed(
+            mnemonic: mnemonic,
+            password: bip39Passphrase
+        )
+
+        let (masterPrivateKey, chainCode) = HD.computeMasters(fromSeed: seed)
+
+        guard !hdPath.isEmpty else {
+            return masterPrivateKey
+        }
+
+        return try HD.derivePrivateKey(
+            forPath: hdPath,
+            privateKey: masterPrivateKey,
+            chainCode: chainCode
+        )
     }
     
     // CreateAccount creates an account Info object.
