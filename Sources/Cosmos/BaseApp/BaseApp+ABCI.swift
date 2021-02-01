@@ -266,7 +266,9 @@ extension BaseApp: ABCIApplication {
         // The write to the DeliverTx state writes all state transitions to the root
         // MultiStore (app.cms) so when Commit() is called is persists those values.
         deliverState.multiStore.write()
-        let commitID = commitMultiStore.commit()
+        guard let commitID = try? commitMultiStore.commit() else {
+            fatalError("Enable to commit multistore")
+        }
         logger.debug("Commit synced.\ncommit: \(commitID)")
 
         // Reset the Check state to the latest committed.

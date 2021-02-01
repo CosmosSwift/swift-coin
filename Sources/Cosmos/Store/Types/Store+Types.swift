@@ -70,7 +70,7 @@ public protocol Store: CacheWrapper {
 
 // something that can persist to disk
 public protocol Commiter {
-    func commit() -> CommitID
+    func commit() throws -> CommitID
     var lastCommitID: CommitID? { get }
 }
 

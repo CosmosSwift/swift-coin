@@ -1,0 +1,28 @@
+digraph {
+    rankdir="LR"
+    BaseCacheMultiStore[shape=box]
+    RootMultiStore[shape=box]
+    BaseApp[shape=box]
+    Request[shape=box]
+
+    CacheWrapper -> BaseCacheMultiStore[label=""]
+    StoreKey -> BaseCacheMultiStore[color="red"]
+    KeyValueStore -> BaseCacheMultiStore[label=""]
+    CacheWrap -> BaseCacheMultiStore[color="red"]
+    CacheKeyValueStore -> BaseCacheMultiStore[color="red"]
+    CacheMultiStore -> RootMultiStore
+    Database -> RootMultiStore[color="red"]
+    StoreKey -> RootMultiStore[color="red"]
+    CommitKeyValueStore -> RootMultiStore[color="red"]
+    StoreParameters -> RootMultiStore[color="red"]
+    MultiStorePersistentCache -> RootMultiStore[color="red"]
+
+    CacheWrapper -> RootMultiStore[color="red"]
+
+
+    MultiStore -> BaseApp[color="red"]
+    Request -> BaseApp[color="red"]
+    
+
+
+}

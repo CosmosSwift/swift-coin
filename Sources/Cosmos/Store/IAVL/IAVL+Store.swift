@@ -1,27 +1,30 @@
 import Foundation
 import ABCI
 import Database
-import IAVL
+import iAVLPlusCore
+
 
 // Store Implements types.KVStore and CommitKVStore.
-final class IAVLStore: KeyValueStore, CommitStore, CommitKeyValueStore, Queryable {
-    static let defaultIAVLCacheSize = 10000
+final class IAVLStore<Storage: NodeStorageProtocol>: KeyValueStore, CommitStore, CommitKeyValueStore, Queryable where Storage.Key == Data, Storage.Value == Data {
+    static var defaultIAVLCacheSize : Int { 10000 }
 
-    let tree: Tree
+//    typealias Node = NodeProtocol
+    typealias Key = Storage.Key
+    typealias Value = Storage.Value
+    typealias Hasher = Storage.Hasher
+    
+    let tree: Storage
 
     // LoadStore returns an IAVL Store as a CommitKVStore. Internally, it will load the
     // store's version (id) from the provided DB. An error is returned if the version
     // fails to load.
     init(
-        database: Database,
+        database: Storage,
         commitId: CommitID,
         isLazyLoadingEnabled: Bool
     ) throws {
-        let tree = MutableTree(
-            database: database,
-            cacheSize: Self.defaultIAVLCacheSize
-        )
-
+        
+        let tree = database
         // TODO: Implement
 //        if lazyLoading {
 //            try tree.lazyLoadVersion(id.version)
@@ -38,7 +41,7 @@ final class IAVLStore: KeyValueStore, CommitStore, CommitKeyValueStore, Queryabl
     // CONTRACT: The IAVL tree should be fully loaded.
     // CONTRACT: PruningOptions passed in as argument must be the same as pruning options
     // passed into iavl.MutableTree
-    init(tree: MutableTree) {
+    init(tree: Storage) {
         self.tree = tree
     }
 }
@@ -66,12 +69,13 @@ extension IAVLStore {
 
     // Commit commits the current store state and returns a CommitID with the new
     // version and hash.
-    func commit() -> CommitID {
-        let (hash, version) = try! tree.saveVersion()
+    func commit() throws -> CommitID {
+        let versionToCommit = tree.version
+        try tree.commit()
         
         return CommitID(
-            version: version,
-            hash: hash
+            version: versionToCommit,
+            hash: Data(tree.root.hash)
         )
     }
 
@@ -80,7 +84,7 @@ extension IAVLStore {
         CommitID(
             version: tree.version,
             // TODO: Check this optionality
-            hash: tree.hash!
+            hash: Data(tree.root.hash)
         )
     }
 
@@ -119,23 +123,30 @@ extension IAVLStore {
     }
 
     // Implements types.KVStore.
-    func set(key: Data, value: Data) {
-        tree.set(key: key, value: value)
+    func set(key: Key, value: Value) {
+        guard let _ = try? tree.set(key: key, value: value) else {
+            fatalError("Failed setting {\(key):\(value)}")
+        }
     }
 
     // Implements types.KVStore.
-    func get(key: Data) -> Data? {
-        let (_, value) = tree.get(key: key)
-        return value
+    func get(key: Key) -> Value? {
+        if let (_, value) = try? tree.get(key: key) {
+            return value
+        }
+        return nil
     }
 
     // Implements types.KVStore.
-    func has(key: Data) -> Bool {
-        tree.has(key: key)
+    func has(key: Key) -> Bool {
+        if let _ = try? tree.has(key: key) {
+            return true
+        }
+        return false
     }
 
     // Implements types.KVStore.
-    func delete(key: Data) {
+    func delete(key: Key) {
         tree.remove(key: key)
     }
 
@@ -146,28 +157,32 @@ extension IAVLStore {
 //        return st.tree.DeleteVersions(versions...)
 //    }
 
-    // Implements types.KVStore.
-    func iterator(start: Data, end: Data) -> Iterator {
-        var iTree: ImmutableTree
 
-        switch self.tree {
-        case let immutableTree as ImmutableTree:
-            iTree = immutableTree
-        case let mutableTree as MutableTree:
-            iTree = mutableTree
-        default:
-            break
-        }
+    // Implements types.KVStore.
+    func iterator(start: Key, end: Key) -> Iterator {
+        return IAVLIterator(tree, start, end, true)
+        
+        //var iTree: ImmutableTree
+
+//        switch self.tree {
+//        case let immutableTree as ImmutableTree:
+//            iTree = immutableTree
+//        case let mutableTree as MutableTree:
+//            iTree = mutableTree
+//        default:
+//            break
+//        }
 
         // TODO: Implement
-        fatalError()
+        //fatalError()
 //        return IAVLIterator(iTree, start, end, true)
     }
 
     // Implements types.KVStore.
-    func reverseIterator(start: Data, end: Data) -> Iterator {
+    func reverseIterator(start: Key, end: Key) -> Iterator {
+        return IAVLIterator(tree, start, end, false)
         // TODO: Implement
-        fatalError()
+        //fatalError()
 //        var iTree *iavl.ImmutableTree
 //
 //        switch tree := st.tree.(type) {

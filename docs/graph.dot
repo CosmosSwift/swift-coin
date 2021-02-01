@@ -1,0 +1,128 @@
+digraph StorageProtocols {
+    //rankdir="LR"
+    BaseCacheKeyValueStore [shape=box,style=filled,color="grey"]
+    BaseCacheMultiStore [shape=box,peripheries=3,style=filled,color=".7 .3 1.0"] // Database.write()
+    RootMultiStore [shape=box,peripheries=3,style=filled,color=".7 .3 1.0"] // Database.get()
+    CommitDatabaseAdapterStore [shape=box,style=filled,color="pink"]
+    PersistentInMemStore [shape=box,style=filled,color="orange"]
+    IAVLStore [shape=box,style=filled,color="yellow"]
+    TransientStore [shape=box,style=filled,color="orange"]
+    DatabaseAdapterStore [shape=box,peripheries=3,style=filled,color="pink"]
+    PrefixStore [shape=box,style=filled,color="grey"]
+    GasKeyValueStore [shape=box,style=filled,color="grey"]
+
+
+    BaseCacheKeyValueStore -> CacheKeyValueStore
+    IAVLStore -> CommitKeyValueStore
+    IAVLStore -> CommitStore
+    IAVLStore -> KeyValueStore
+    IAVLStore -> Queryable
+ 
+    TransientStore -> CommitKeyValueStore
+    TransientStore -> DatabaseAdapterStore
+
+    PrefixStore -> KeyValueStore
+    GasKeyValueStore -> KeyValueStore
+    KeyValueStore -> GasKeyValueStore[color="red"]
+    KeyValueStore -> PrefixStore[color="red"]
+
+    CommitDatabaseAdapterStore -> DatabaseAdapterStore
+    CommitDatabaseAdapterStore -> CommitKeyValueStore
+
+    PersistentInMemStore -> CommitKeyValueStore
+    PersistentInMemStore -> DatabaseAdapterStore
+
+    DatabaseAdapterStore -> KeyValueStore
+
+    CacheWrap -> CacheWrapper
+    CacheKeyValueStore -> KeyValueStore
+    CacheKeyValueStore -> CacheWrap
+    CommitKeyValueStore -> CommitStore 
+    CommitKeyValueStore -> KeyValueStore
+
+    Store -> CacheWrapper
+
+
+    CommitStore -> Commiter
+    CommitStore -> Store
+
+    BaseCacheMultiStore -> CacheMultiStore
+
+    CacheMultiStore -> MultiStore
+    CacheMultiStore -> CacheWrap
+    CommitMultiStore -> Commiter
+
+    CommitMultiStore -> MultiStore
+
+    KeyValueStore -> Store
+
+    RootMultiStore -> CommitMultiStore
+
+    MultiStore -> Store
+
+     MultiStorePersistentCache
+
+
+    StoreKey [shape=box]
+    KeyValueStoreKey [shape=box]
+    TransientStoreKey [shape=box]
+    
+    KeyValueStoreKey -> StoreKey
+
+    TransientStoreKey -> StoreKey
+
+    StoreParameters[shape=box]
+    BaseApp[shape=box]
+    StartCommand[shape=box]
+    StoreParameters[shape=box]
+
+    InMemoryDatabase[shape=box,peripheries=2,color="purple"]
+    PrefixDatabase[shape=box,peripheries=2,color="purple"]
+
+    InMemoryDatabase -> Database
+
+    PrefixDatabase -> Database
+
+    Database -> RootMultiStore[color="green"]
+    InMemoryDatabase -> TransientStore[color="blue"]
+    InMemoryDatabase -> PersistentInMemStore[color="blue"]
+    PrefixDatabase -> RootMultiStore[color="blue"]
+
+    ImmutableTree [shape=box]
+    MutableTree [shape=box]
+    NodeDatabase [shape=box]
+    NameServiceD [shape=circle]
+
+
+    Database -> PrefixDatabase [color="green"]
+    Database -> StartCommand [color="green"]
+    Database -> BaseApp [color="green"]
+    Database -> StoreParameters [color="green"]
+    Database -> PersistentInMemStore [color="green"]
+    Database -> CommitDatabaseAdapterStore [color="green"]
+    Database -> DatabaseAdapterStore [color="green"]
+    CacheKeyValueStore -> BaseCacheMultiStore [color="red"]
+    Database -> ImmutableTree [color="green"]
+    Database -> MutableTree [color="green"]
+    Database -> NodeDatabase [color="green"]
+    Database -> NameServiceD [color="green"]
+
+    Tree -> IAVLStore
+    ImmutableTree -> Tree
+    MutableTree -> Tree
+
+
+    CommitKeyValueStore -> RootMultiStore [style=bold,color="red"]
+    MultiStorePersistentCache -> RootMultiStore  [color="red"]
+    StoreParameters -> RootMultiStore [style=bold,color="red"]
+
+    KeyValueStore -> BaseCacheKeyValueStore [color="red"]
+    StoreKey -> BaseCacheKeyValueStore [style=bold,color="red"]
+    CacheWrap -> BaseCacheMultiStore [style=bold,color="red"]
+
+    StoreKey -> RootMultiStore [style=bold,color="red"]
+    StoreKey -> BaseCacheMultiStore [style=bold,color="red"]
+
+    StoreKey -> StoreParameters[color="red"]
+
+}

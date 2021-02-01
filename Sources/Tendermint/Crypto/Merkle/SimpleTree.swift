@@ -33,18 +33,18 @@ public enum Merkle {
     
     // getSplitPoint returns the largest power of 2 less than length
     static func getSplitPoint(count: Int) -> Int {
-        if count < 1 {
-            fatalError("Trying to split a tree with size < 1")
+        guard count > 0 else { fatalError("Trying to split a tree with size < 1") }
+        if count == 1 { return 0 }
+        var i = 0
+        var j = MemoryLayout<Int>.size * 8 / 2
+        while i < j - 1 {
+            let mid = (j + i) >> 1
+            if count > (1 << mid) {
+                i = mid
+            } else if count <= (1 << mid) {
+                j = mid
+            }
         }
-        
-        // TODO: Check if this is correct
-        let unsignedBitWidth = UInt(count).bitWidth
-        var splitPoint = 1 << UInt(unsignedBitWidth - 1)
-        
-        if splitPoint == count {
-            splitPoint >>= 1
-        }
-        
-        return splitPoint
+        return 1 << i
     }
 }

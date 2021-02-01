@@ -1,6 +1,8 @@
 import Foundation
 import Tendermint
 import Database
+import InMemoryNodeDB
+import Merkle
 
 // Store is composed of many CommitStores. Name contrasts with
 // cacheMultiStore which is for cache-wrapping other MultiStores. It implements
@@ -509,13 +511,13 @@ final class RootMultiStore: CommitMultiStore {
         case .multi:
             fatalError("recursive MultiStores not yet supported")
         case .iavlTree:
-            let store = PersistentInMemStore()
-            // TODO: Implement actual iAVL store
-//            var store: CommitKeyValueStore = try IAVLStore(
-//                database: database,
-//                commitId: id,
-//                isLazyLoadingEnabled: isLazyLoadingEnabled
-//            )
+
+            var store: CommitKeyValueStore = try IAVLStore(
+                database: InMemoryNodeStorage<Data, Data, TestHasher>(),
+                commitId: id,
+                isLazyLoadingEnabled: isLazyLoadingEnabled
+            )
+            // TODO: implement below
 //
 //            if let cache = interBlockCache {
 //                // Wrap and get a CommitKVStore with inter-block caching. Note, this should
@@ -624,7 +626,9 @@ extension RootMultiStore {
         var storeInfos: [StoreInfo] = []
     
         for (key, store) in stores {
-            let commitID = store.commit()
+            guard let commitID = try? store.commit() else {
+                fatalError("Enalble to commit store \(key).")
+            }
     
             if store.storeType == .transient {
                 continue

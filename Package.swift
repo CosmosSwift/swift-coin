@@ -57,6 +57,8 @@ let package = Package(
                 .target(name: "Database"),
                 .target(name: "Tendermint"),
                 .product(name: "iAVLPlus", package: "iAVLPlus"),
+                .product(name: "InMemoryNodeDB", package: "iAVLPlus"),
+                .product(name: "SQLiteNodeDB", package: "iAVLPlus"),
                 .product(name: "ABCI", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
                 .product(name: "Logging", package: "swift-log"),
