@@ -1,10 +1,12 @@
-import ArgumentParser
 import Foundation
+import ArgumentParser
+import BIP39
 
 // AddKeyCommand defines a keys command to add a generated or recovered private key to keybase.
 public struct AddKeyCommand: ParsableCommand {
     // DefaultKeyPass contains the default key password for genesis transactions
     private static let defaultKeyPassword = "12345678"
+    private static let mnemonicEntropySize = 256
 
     @OptionGroup
     private var clientOptions: ClientOptions
@@ -280,20 +282,11 @@ public struct AddKeyCommand: ParsableCommand {
         }
 
         // TODO: Implement
-//        if mnemonic.isEmpty {
-//            // read entropy seed straight from crypto.Rand and convert to mnemonic
-//            entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
-//
-//            if err != nil {
-//                return err
-//            }
-//
-//            mnemonic, err = bip39.NewMnemonic(entropySeed)
-//
-//            if err != nil {
-//                return err
-//            }
-//        }
+        if mnemonic.isEmpty {
+            // read entropy seed straight from crypto.Rand and convert to mnemonic
+            let entropySeed = try BIP39.makeEntropy(bitSize: Self.mnemonicEntropySize)
+            mnemonic = try BIP39.makeMnemonic(entropy: entropySeed)
+        }
 
         // override bip39 passphrase
         if isInteractiveEnabled {
