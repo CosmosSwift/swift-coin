@@ -22,6 +22,7 @@ let package = Package(
         .package(name: "iAVLPlus", url: "https://github.com/CosmosSwift/swift-iavlplus", .branch("master")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.3.8")),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
         .package(name: "BigInt", url: "https://github.com/attaswift/BigInt", .upToNextMajor(from: "5.2.1")),
     ],
@@ -88,6 +89,7 @@ let package = Package(
         .target(
             name: "BIP39",
             dependencies: [
+                .product(name: "CryptoSwift", package: "CryptoSwift"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "BigInt", package: "BigInt"),
             ]

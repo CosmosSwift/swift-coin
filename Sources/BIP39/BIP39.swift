@@ -1,6 +1,7 @@
 import Foundation
 import Crypto
-import CommonCrypto
+import CryptoSwift
+//import CommonCrypto
 import BigInt
 
 public enum BIP39 {
@@ -168,13 +169,13 @@ public enum BIP39 {
     // NewSeed creates a hashed seed output given a provided string and password.
     // No checking is performed to validate that the string provided is a valid mnemonic.
     static func seed(mnemonic: String, password: String) -> Data {
-        PBKDF2.key(
-            password: mnemonic,
-            salt: ("mnemonic" + password).data(using: .utf8)!,
-            rounds: 2048,
-            keyByteCount: 64,
-            algorithm: UInt32(kCCPRFHmacAlgSHA512)
-        )!
+        
+        let p: Array<UInt8> = Array(mnemonic.utf8)
+        let s: Array<UInt8> = Array(("mnemonic" + password).utf8)
+
+        // TODO: handle the ! properly
+        let key = try! PKCS5.PBKDF2(password: p, salt: s, iterations: 2048, keyLength: 64, variant: .sha512).calculate()
+        return Data(key)
     }
     
     // Appends to data the first (len(data) / 32)bits of the result of sha256(data)
@@ -308,43 +309,5 @@ extension UInt32 {
 extension UInt16 {
     init(bigEndian data: Data) {
         self = UInt16(data[1]) | UInt16(data[0]) << 8
-    }
-}
-
-enum PBKDF2 {
-    static func key(
-        password: String,
-        salt: Data,
-        rounds: Int,
-        keyByteCount: Int,
-        algorithm: CCPBKDFAlgorithm
-    ) -> Data? {
-        guard let passwordData = password.data(using: .utf8) else {
-            return nil
-        }
-        
-        var derivedKeyData = Data(repeating: 0, count: keyByteCount)
-        let derivedCount = derivedKeyData.count
-        
-        let derivationStatus: Int32 = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
-            let keyBuffer = derivedKeyBytes.baseAddress!.assumingMemoryBound(to: UInt8.self)
-            
-            return salt.withUnsafeBytes { saltBytes in
-                let saltBuffer = saltBytes.baseAddress!.assumingMemoryBound(to: UInt8.self)
-                
-                return CCKeyDerivationPBKDF(
-                    CCPBKDFAlgorithm(kCCPBKDF2),
-                    password,
-                    passwordData.count,
-                    saltBuffer,
-                    salt.count,
-                    algorithm,
-                    UInt32(rounds),
-                    keyBuffer,
-                    derivedCount)
-            }
-        }
-        
-        return derivationStatus == kCCSuccess ? derivedKeyData : nil
     }
 }
