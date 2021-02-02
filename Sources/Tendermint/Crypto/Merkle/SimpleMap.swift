@@ -94,7 +94,7 @@ extension Data {
         var value = value
 
         while value >= 0x80 {
-            data.append(UInt8(value) | 0x80)
+            data.append(UInt8(value | 0x80))
             value >>= 7
         }
         

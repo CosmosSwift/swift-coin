@@ -102,7 +102,7 @@ public class Codec {
     // or if o is invalid.
     public func marshalBinaryLengthPrefixed<T: Encodable>(value: T) throws -> Data {
         let data = try marshalBinaryBare(value: value)
-        return Data(uvarint: UInt64(data.count)) + data
+        return Data(data.count.words.map(UInt8.init)) + data
     }
 
     public func mustMarshalBinaryLengthPrefixed<T: Encodable>(value: T) -> Data {

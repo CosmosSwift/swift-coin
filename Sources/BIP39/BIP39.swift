@@ -5,8 +5,8 @@ import CryptoSwift
 import BigInt
 
 public enum BIP39 {
-    static let last11BitsMask = 2047
-    static let rightShift11BitsDivider = 2048
+    static let last11BitsMask: BigUInt = 2047
+    static let rightShift11BitsDivider: BigUInt = 2048
 
     // NewEntropy will create random entropy bytes
     // so long as the requested size bitSize is an appropriate size.
@@ -35,24 +35,24 @@ public enum BIP39 {
         // Add to the last empty slot so we can work with LSBs instead of MSB
 
         // Entropy as an int so we can bitmask without worrying about bytes slices
-        var entropyInt = Int(bigEndian: entropy)
+        var entropyInt = BigUInt(entropy)
 
         // Slice to hold words in
         var words: [Substring] = Array(repeating: "", count: sentenceLength)
 
         // Throw away big int for AND masking
-        var word = 0
+        var word: BigUInt = 0
 
         for i in (0 ..< sentenceLength).reversed() {
             // Get 11 right most bits and bitshift 11 to the right for next time
             word = entropyInt & last11BitsMask
-            entropyInt = entropyInt / rightShift11BitsDivider
+            entropyInt /= rightShift11BitsDivider
 
             // Get the bytes representing the 11 bits as a 2 byte slice
-//            let wordData = pad(data: Data(bigEndian: word), length: 2)
+            let wordData = pad(data: word.serialize(), length: 2)
 
             // Convert bytes to an index and add that word to the list
-            words[i] = wordList[word] // Int(UInt16(bigEndian: wordData))]
+            words[i] = wordList[Int(BigUInt(wordData))]
         }
 
         return words.joined(separator: " ")
@@ -76,8 +76,8 @@ public enum BIP39 {
         try validateEntropy(withChecksumBitSize: bitSize)
         let checksumSize = bitSize % 32
 
-        var b = 0
-        var modulo = 2048
+        var b: BigUInt = 0
+        let modulo: BigUInt = 2048
         
         for mnemonic in mnemonics {
             guard let index = reverseWordMap[mnemonic] else {
@@ -89,15 +89,15 @@ public enum BIP39 {
             }
             
             b *= modulo
-            b += index
+            b += BigUInt(index)
         }
         
-        let hex = Data(bigEndian: b.bigEndian)
+        let hex = b.serialize()
         
-        let checksumModulo = (pow(2, checksumSize) as NSDecimalNumber).intValue
+        let checksumModulo = BigUInt(2).power(checksumSize)
         let (entropy, _) = b.quotientAndRemainder(dividingBy: checksumModulo)
 
-        let entropyHex = Data(bigEndian: entropy.bigEndian)
+        let entropyHex = entropy.serialize()
 
         // Add padding (an extra byte is for checksum)
         let byteSize = (bitSize - checksumSize) / 8 + 1
@@ -143,12 +143,10 @@ public enum BIP39 {
         }
 
         if hex.count != validationHex.count {
-            fatalError("[]byte len mismatch - it shouldn't happen")
+            fatalError("Data.count mismatch - it shouldn't happen")
         }
         
-        for i in validationHex {
-            let index = Int(i)
-            
+        for index in validationHex.indices {
             if hex[index] != validationHex[index] {
                 // TODO: Implement
                 fatalError()
@@ -193,7 +191,7 @@ public enum BIP39 {
         // For each bit of check sum we want we shift the data one the left
         // and then set the (new) right most bit equal to checksum bit at that index
         // staring from the left
-        var dataBigInt = UInt32(bigEndian: data)
+        var dataBigInt = BigUInt(data)
         
         for i in 0 ..< checksumBitLength {
             // Bitshift 1 left
@@ -205,7 +203,7 @@ public enum BIP39 {
             }
         }
 
-        return Data(bigEndian: dataBigInt)
+        return dataBigInt.serialize()
     }
     
     static func pad(data: Data, length: Int) -> Data {

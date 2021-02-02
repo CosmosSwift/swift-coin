@@ -126,11 +126,25 @@ extension Keybase {
 }
 
 // KeyType reflects a human-readable type for key listing.
-enum KeyType: UInt {
+enum KeyType: UInt, CustomStringConvertible {
     case local = 0
     case ledger = 1
     case offline = 2
     case multi = 3
+    
+    var description: String {
+        switch self {
+        case .local:
+            return "local"
+        case .ledger:
+            return "ledger"
+        case .offline:
+            return "offline"
+        case .multi:
+            return "multi"
+        }
+    }
+    
 }
 
 // Info is the publicly exposed information about a keypair

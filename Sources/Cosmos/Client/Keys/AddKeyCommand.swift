@@ -328,27 +328,30 @@ public struct AddKeyCommand: ParsableCommand {
 //            mnemonic = ""
         }
 
-        try print(
+        try printOutput(
             info: info,
             showMnemonic: showMnemonic,
             mnemonic: mnemonic
         )
     }
     
-    func print(info: Info, showMnemonic: Bool, mnemonic: String) throws {
+    func printOutput(info: Info, showMnemonic: Bool, mnemonic: String) throws {
         switch clientOptions.output {
         case .text:
-            // TODO: Implement
-            fatalError()
-//            print("", to: &OutputStream.standardError)
-//            printKeyInfo(info, keys.Bech32KeyOutput)
-//
-//            // print mnemonic unless requested not to.
-//            if showMnemonic {
-//                print("\n**Important** write this mnemonic phrase in a safe place.", to: &OutputStream.standardError)
-//                print("It is the only way to recover your account if you ever forget your password.", to: &OutputStream.standardError)
-//                print(mnemonic, to: &OutputStream.standardError)
-//            }
+            print("", to: &OutputStream.standardError)
+            
+            printKeyInfo(
+                keyInfo: info,
+                bechKeyOutput: bech32KeyOutput,
+                output: clientOptions.output
+            )
+
+            // print mnemonic unless requested not to.
+            if showMnemonic {
+                print("\n**Important** write this mnemonic phrase in a safe place.", to: &OutputStream.standardError)
+                print("It is the only way to recover your account if you ever forget your password.", to: &OutputStream.standardError)
+                print(mnemonic, to: &OutputStream.standardError)
+            }
         case .json:
             // TODO: Implement
             fatalError()

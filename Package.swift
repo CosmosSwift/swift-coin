@@ -59,6 +59,7 @@ let package = Package(
                 .target(name: "Database"),
                 .target(name: "Tendermint"),
                 .target(name: "BIP39"),
+                .target(name: "Bcrypt"),
                 .product(name: "iAVLPlus", package: "iAVLPlus"),
                 .product(name: "InMemoryNodeDB", package: "iAVLPlus"),
 //                .product(name: "SQLiteNodeDB", package: "iAVLPlus"),
@@ -92,6 +93,13 @@ let package = Package(
                 .product(name: "CryptoSwift", package: "CryptoSwift"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "BigInt", package: "BigInt"),
+            ]
+        ),
+        .target(name: "CBcrypt"),
+        .target(
+            name: "Bcrypt",
+            dependencies: [
+                .target(name: "CBcrypt"),
             ]
         ),
         .target(name: "JSON"),

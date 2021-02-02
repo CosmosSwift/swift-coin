@@ -11,21 +11,21 @@
         }
       },
       {
-        "package": "CryptoSwift",
-        "repositoryURL": "https://github.com/krzyzanowskim/CryptoSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "5669f222e46c8134fb1f399c745fa6882b43532e",
-          "version": "1.3.8"
-        }
-      },
-      {
         "package": "GRDB",
         "repositoryURL": "https://github.com/groue/GRDB.swift.git",
         "state": {
           "branch": null,
           "revision": "5ee47c3c2765bdfde0f44c2ea9a263f6aa252d63",
           "version": "4.14.0"
+        }
+      },
+      {
+        "package": "HexString",
+        "repositoryURL": "https://gitlab.com/katalysis/open-source/HexString.git",
+        "state": {
+          "branch": null,
+          "revision": "61718ed9c1902a76744ffc84b432e8e8e0788ab2",
+          "version": "0.4.0"
         }
       },
       {
@@ -56,15 +56,6 @@
         }
       },
       {
-        "package": "HexString",
-        "repositoryURL": "https://github.com/katalysis-io/swift-hex-string.git",
-        "state": {
-          "branch": null,
-          "revision": "61718ed9c1902a76744ffc84b432e8e8e0788ab2",
-          "version": "0.4.0"
-        }
-      },
-      {
         "package": "iAVLPlus",
         "repositoryURL": "https://github.com/CosmosSwift/swift-iavlplus",
         "state": {
@@ -87,8 +78,8 @@
         "repositoryURL": "https://github.com/cosmosswift/swift-mint.git",
         "state": {
           "branch": null,
-          "revision": "08a94c2145797636af24e5bf7e05f485dabb790f",
-          "version": "0.3.2"
+          "revision": "4f72ba177f0c545e4b2e2e3b75bce18601bb46b9",
+          "version": "0.3.0"
         }
       },
       {
