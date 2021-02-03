@@ -1,11 +1,11 @@
 import Foundation
 
-// DefaultKeyringServiceName defines a default service name for the keyring.
-let defaultKeyringServiceName = "cosmos"
-
 // Config is the structure that holds the SDK configuration parameters.
 // This could be used to initialize certain configuration parameters for the SDK.
 public class Configuration: Sealable {
+    // DefaultKeyringServiceName defines a default service name for the keyring.
+    static let defaultKeyringServiceName = "cosmos"
+    
 //    fullFundraiserPath  string
     var bech32AddressPrefix: [String: String]
 //    txEncoder           TxEncoder
@@ -101,5 +101,15 @@ public class Configuration: Sealable {
     public static var bech32ConsensusPublicKeyPrefix: String {
         configuration.bech32AddressPrefix[Bech32AddressPrefixKeys.consensusNodePublicKey]!
     }
+    
+    static var keyringServiceName: String {
+        // TODO: Check this
+//        if len(version.Name) == 0 {
+            return defaultKeyringServiceName
+//        }
+//
+//        return version.Name
+    }
+
 }
 

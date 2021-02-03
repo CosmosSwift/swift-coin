@@ -1,4 +1,5 @@
 import Foundation
+import ArgumentParser
 import Tendermint
 import Bech32
 
@@ -26,20 +27,20 @@ extension Configuration {
 // what we used during the fundraiser.
 let fullFundraiserPath = "44'/118'/0'/0/0"
 
-public enum Prefix {
+public enum Prefix: String, ExpressibleByArgument {
     // PrefixAccount is the prefix for account keys
-    static let account = "acc"
+    case account = "acc"
     // PrefixValidator is the prefix for validator keys
-    static let validator = "val"
+    case validator = "val"
     // PrefixConsensus is the prefix for consensus keys
-    static let consensus = "cons"
+    case consensus = "cons"
     // PrefixPublic is the prefix for public keys
-    static let publicKey = "pub"
+    case publicKey = "pub"
     // PrefixOperator is the prefix for operator keys
-    static let `operator` = "oper"
+    case `operator` = "oper"
 
     // PrefixAddress is the prefix for addresses
-    static let address = "addr"
+    case address = "addr"
 }
 
 public enum Bech32Prefix {
@@ -48,15 +49,15 @@ public enum Bech32Prefix {
     // Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
     static let accountAddress = main
     // Bech32PrefixAccPub defines the Bech32 prefix of an account's public key
-    static let accountPublicKey = main + Prefix.publicKey
+    static let accountPublicKey = main + Prefix.publicKey.rawValue
     // Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address
-    static let validatorOperatorAddress = main + Prefix.validator + Prefix.operator
+    static let validatorOperatorAddress = main + Prefix.validator.rawValue + Prefix.operator.rawValue
     // Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key
-    static let validatorOperatorPublicKey = main + Prefix.validator + Prefix.operator + Prefix.publicKey
+    static let validatorOperatorPublicKey = main + Prefix.validator.rawValue + Prefix.operator.rawValue + Prefix.publicKey.rawValue
     // Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address
-    static let consensusNodeAddress = main + Prefix.validator + Prefix.consensus
+    static let consensusNodeAddress = main + Prefix.validator.rawValue + Prefix.consensus.rawValue
     // Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key
-    static let consensNodePublicKey = main + Prefix.validator + Prefix.consensus + Prefix.publicKey
+    static let consensNodePublicKey = main + Prefix.validator.rawValue + Prefix.consensus.rawValue + Prefix.publicKey.rawValue
 }
 
 // Address is a common interface for different types of addresses used by the SDK

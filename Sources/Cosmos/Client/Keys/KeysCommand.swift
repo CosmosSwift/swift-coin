@@ -12,8 +12,7 @@ public struct KeysOptions: ParsableArguments {
 public struct KeysCommand: ParsableCommand {
     public static var defaultHome: String!
     public static var codec: Codec!
-    public static var moduleBasicManager: BasicManager!
-    
+
     public static var configuration = CommandConfiguration(
         commandName: "keys",
         abstract: "Add or view local private keys",
@@ -31,7 +30,7 @@ public struct KeysCommand: ParsableCommand {
 //            ExportKeyCommand.self,
 //            ImportKeyCommand.self,
 //            ListKeysCommand.self,
-//            ShowKeysCommand.self,
+            ShowKeysCommand.self,
 //            DeleteKeyCommand.self,
 //            UpdateKeyCommand.self,
 //            ParseKeyStringCommand.self,
