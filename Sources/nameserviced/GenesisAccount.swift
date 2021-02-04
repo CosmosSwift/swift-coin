@@ -133,6 +133,7 @@ struct AddGenesisAccountCommand: ParsableCommand {
         // TODO: this should be implemented better...
         var authState = (genesisDocument.appState?.set.first(where: {type(of:$0).metatype == "auth"}) as! Cosmos.AuthGenesisState)
         genesisDocument.appState?.set.removeAll(where: {type(of:$0).metatype == "auth"})
+        // TODO: do not append an account which has already been added.
         authState.accounts.append(account)
         
         genesisDocument.appState?.set.append(authState)

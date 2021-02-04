@@ -1,3 +1,36 @@
+import Foundation
+import ArgumentParser
+
+
+extension AccountAddress: ExpressibleByArgument {
+    public init?(argument: String) {
+        try? self.init(bech32Encoded: argument)
+    }
+}
+
+// GetAccountCmd returns a query account that will display the state of the
+// account at a given address.
+public struct GetAccountCommand: ParsableCommand {
+
+    @OptionGroup
+    private var clientOptions: AuthClientOptions
+    
+    public static var configuration = CommandConfiguration(
+        commandName: "account",
+        abstract: "Query for account by address"
+    )
+
+    @Argument
+    var address: AccountAddress
+    
+    public init() {}
+    
+    public func run() throws {
+        // TODO: call the tendermint node using the following route: /cosmos.auth.v1beta1.Query/Account
+        // returns an Account in a res
+        // TODO: print the Account
+    }
+}
 /*
  
  package cli
