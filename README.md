@@ -17,7 +17,7 @@ This is work in progress. What we currrently have is the following:
 | Module/App  |  completion  |  notes
 |:-----------|:---------:|:-------
 | Framework  | ✔️ |   Framework mimics the CosmosSDK framework, including the directory structure.
-| Store  (ex integration with stand alone iAVLP)  | ✔️ |  Currently in memory.
+| Store  | ✔️ |  Currently using in memory version of iAVLPlus.
 | Bech32 | ✔️    |
 | Auth   | ✔️    | Staking, Governance, Bank requirements in progress (see respective Modules)
 | Params |   ✔️|    
