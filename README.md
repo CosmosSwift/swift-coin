@@ -75,7 +75,7 @@ swift run nameserviced ${COMMAND} ${OPTIONS}
 Initialise and run Tendermint (for instance in Docker):
 ```bash
 # initialise tendermint
-docker run -it --rm -v "/tmp:/tendermint" tendermint/tendermint:v0.34 init
+docker run -it --rm -v "/tmp:/tendermint" tendermint/tendermint:v0.34.0 init
 
 # initialise the namservice daemon
 # note that this will update the config.toml file to use 0.0.0.0:26657 instead of 127.0.0.1:26657
