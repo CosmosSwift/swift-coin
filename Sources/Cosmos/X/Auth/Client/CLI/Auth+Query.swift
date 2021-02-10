@@ -1,6 +1,8 @@
 import Foundation
 import ArgumentParser
 import CosmosProto
+import NIO
+import GRPC
 
 extension AccountAddress: ExpressibleByArgument {
     public init?(argument: String) {
@@ -26,10 +28,34 @@ public struct GetAccountCommand: ParsableCommand {
     public init() {}
     
     public func run() throws {
+        // Setup an `EventLoopGroup` for the connection to run on.
+        //
+        // See: https://github.com/apple/swift-nio#eventloops-and-eventloopgroups
+        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+
+        // Make sure the group is shutdown when we're done with it.
+        defer {
+          try! group.syncShutdownGracefully()
+        }
+
+        // Configure the channel, we're not using TLS so the connection is `insecure`.
+        let channel = ClientConnection.insecure(group: group)
+            .connect(host: clientOptions.node.host, port: clientOptions.node.port)
+
+        // Close the connection when we're done with it.
+        defer {
+          try! channel.close().wait()
+        }
+
+        let client = Cosmos_Auth_V1beta1_QueryClient(channel: channel)
         
-        // TODO: call the tendermint node using the following route: /cosmos.auth.v1beta1.Query/Account
-        // returns an Account in a res
-        // TODO: print the Account
+        var request = Cosmos_Auth_V1beta1_QueryAccountRequest()
+        request.address = address.data.hexEncodedString()
+        
+        // TODO: implement
+        let response = client.account(request).response
+        
+        print(response)
     }
 }
 /*

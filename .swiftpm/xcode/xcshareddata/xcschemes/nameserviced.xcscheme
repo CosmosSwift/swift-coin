@@ -53,11 +53,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "start --host 0.0.0.0"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "add-genesis-account cosmos1tftr55rs0w9a5yew57v09dt5gxak6al53samzq 123nametoken,10000000stake"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "collect-gentxs"
