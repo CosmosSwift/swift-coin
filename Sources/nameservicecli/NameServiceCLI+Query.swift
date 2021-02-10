@@ -1,4 +1,5 @@
 import ArgumentParser
+import Cosmos
 
 public struct KeysOptions: ParsableArguments {
     @Option(name: .customLong("keyring-backend"), help: "Select keyring's backend (os|file|test)")
@@ -22,7 +23,7 @@ public struct QueryCommand: ParsableCommand {
         Query allows to query the blockchain node
         """,
         subcommands: [
-            //            Auth.GetAccountCommand.self,
+                        GetAccountCommand.self,
             //            Auth.QueryTxByEventCommand.self,
             //            Auth.QueryTxCommand.self,
             //            RPC.ValidatorCommand.self,

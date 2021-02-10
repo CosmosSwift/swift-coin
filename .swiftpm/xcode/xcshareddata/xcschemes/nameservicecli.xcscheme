@@ -56,7 +56,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "keys show jack -a"
+            argument = "query account --chain-id toto cosmos1phqfg26hx5wkm5c9d7969kwk0th857u7a3s2h6 --node &quot;tcp://127.0.0.1:26657&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
