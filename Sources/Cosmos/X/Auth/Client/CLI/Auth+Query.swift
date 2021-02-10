@@ -1,6 +1,6 @@
 import Foundation
 import ArgumentParser
-
+import CosmosProto
 
 extension AccountAddress: ExpressibleByArgument {
     public init?(argument: String) {
@@ -26,6 +26,7 @@ public struct GetAccountCommand: ParsableCommand {
     public init() {}
     
     public func run() throws {
+        
         // TODO: call the tendermint node using the following route: /cosmos.auth.v1beta1.Query/Account
         // returns an Account in a res
         // TODO: print the Account

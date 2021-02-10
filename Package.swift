@@ -25,12 +25,16 @@ let package = Package(
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.3.8")),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
         .package(name: "BigInt", url: "https://github.com/attaswift/BigInt", .upToNextMajor(from: "5.2.1")),
+        .package(name: "swift-cosmos-proto", url: "https://github.com/cosmosswift/swift-cosmos-proto.git", .branch( "main")),
+        .package(name: "swift-nio", url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
+
     ],
     targets: [
         .target(
             name: "nameservicecli",
             dependencies: [
                 .target(name: "App"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(
@@ -66,6 +70,7 @@ let package = Package(
                 .product(name: "ABCINIO", package: "ABCI"),
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "CosmosProto", package: "swift-cosmos-proto"),
             ]
         ),
         .target(name: "Database"),
