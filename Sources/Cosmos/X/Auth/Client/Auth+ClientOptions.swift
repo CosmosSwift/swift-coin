@@ -26,8 +26,8 @@ public struct NodeURL: ExpressibleByArgument {
             self.port = port
         case 2:
             self.scheme = .tcp
-            self.host = String(parts[1])
-            guard let port = Int(parts[2]) else {
+            self.host = String(parts[0])
+            guard let port = Int(parts[1]) else {
                 return nil
             }
             self.port = port

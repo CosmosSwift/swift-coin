@@ -49,13 +49,18 @@ public struct GetAccountCommand: ParsableCommand {
 
         let client = Cosmos_Auth_V1beta1_QueryClient(channel: channel)
         
-        var request = Cosmos_Auth_V1beta1_QueryAccountRequest()
-        request.address = address.data.hexEncodedString()
+        let request = Cosmos_Auth_V1beta1_QueryAccountRequest.with {
+            $0.address = address.data.hexEncodedString()
+        }
         
-        // TODO: implement
-        let response = client.account(request).response
+        let getAccount = client.account(request)
         
-        print(response)
+        do {
+            let response = try getAccount.response.wait()
+            print(response.account)
+        } catch {
+            print("Getting Account failed: \(error)")
+        }
     }
 }
 /*
