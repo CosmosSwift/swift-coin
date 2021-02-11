@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1200"
+   LastUpgradeVersion = "1240"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -54,34 +54,6 @@
          <CommandLineArgument
             argument = "start --host 0.0.0.0"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "add-genesis-account cosmos1tftr55rs0w9a5yew57v09dt5gxak6al53samzq 123nametoken,10000000stake"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "collect-gentxs"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "gentx --name user1 --keyring-backend test"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "add-genesis-account cosmos1phqfg26hx5wkm5c9d7969kwk0th857u7a3s2h6 1000nametoken,100000000stake"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "add-genesis-account cosmos1x8k6s0qv89wppaeem28ej2przy2v5l64cf595q 1000nametoken,100000000stake"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "validate-genesis"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "init newnode -o"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
