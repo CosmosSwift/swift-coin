@@ -41,8 +41,8 @@
         "package": "ABCI",
         "repositoryURL": "https://github.com/CosmosSwift/swift-abci",
         "state": {
-          "branch": "0.33.x",
-          "revision": "f20e02fb308ddf1d0fdcbc105ba694a96d5e7fe8",
+          "branch": "master",
+          "revision": "5aac68b7959788bfd77b820690d832333a654c91",
           "version": null
         }
       },

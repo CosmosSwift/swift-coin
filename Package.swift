@@ -18,7 +18,7 @@ let package = Package(
         .executable(name: "nameserviced", targets: ["nameserviced"]),
     ],
     dependencies: [
-        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("0.33.x")),
+        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("master")),
         .package(name: "iAVLPlus", url: "https://github.com/CosmosSwift/swift-iavlplus", .branch("master")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
@@ -35,6 +35,7 @@ let package = Package(
             dependencies: [
                 .target(name: "App"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+
             ]
         ),
         .target(
@@ -71,6 +72,11 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "CosmosProto", package: "swift-cosmos-proto"),
+                .product(name: "NIO", package: "swift-nio"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
+                .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
+                .product(name: "NIOTLS", package: "swift-nio"),
+                .product(name: "NIOHTTP1", package: "swift-nio"),
             ]
         ),
         .target(name: "Database"),
