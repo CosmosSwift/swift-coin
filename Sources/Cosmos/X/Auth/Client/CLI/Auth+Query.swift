@@ -66,8 +66,8 @@ extension AccountAddress: ExpressibleByArgument {
 
 
 // GetAccount returns a query account that will display the state of the account at a given address.
-struct GetAccount: ParsableCommand {
-    static let configuration = CommandConfiguration(
+public struct GetAccount: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         commandName: "account",
         abstract: "Query for account by address"
     )
@@ -75,8 +75,10 @@ struct GetAccount: ParsableCommand {
     @OptionGroup var queryFlags: Flags.QueryFlags
 
     @Argument var address: AccountAddress
+    
+    public init() {}
         
-    mutating func run() throws {
+    public mutating func run() throws {
         // Setup an `EventLoopGroup` for the connection to run on.
         //
         // See: https://github.com/apple/swift-nio#eventloops-and-eventloopgroups
