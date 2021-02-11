@@ -149,7 +149,7 @@ public final class NameServiceApp: BaseApp, App {
         )
       
         self.setCommitMultiStoreTracer(tracer: commitMultiStoreTracer)
-        self.setAppVersion(version: VersionInfo.defaultVersion)
+        self.setAppVersion(version: Cosmos.Version.version)
 
         self.moduleManager.setOrderEndBlockers(
             StakingKeys.moduleName

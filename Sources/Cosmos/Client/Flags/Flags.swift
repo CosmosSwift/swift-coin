@@ -8,28 +8,66 @@
 import Foundation
 import ArgumentParser
 
-enum Flags {
+public enum Flags {
+    #warning("NodeURL should probably be moved?")
+    public struct NodeURL: ExpressibleByArgument {
+        public enum URLScheme: String {
+            case tcp
+            case http
+            case https
+        }
+        
+        let scheme: URLScheme
+        let host: String
+        let port: Int
+        
+        public init?(argument: String) {
+            let parts = argument.split(separator: ":")
+            switch parts.count {
+            case 3:
+                guard let scheme = URLScheme(rawValue: String(parts[0]))  else {
+                    return nil
+                }
+                self.scheme = scheme
+                self.host = String(parts[1].dropFirst(2))
+                guard let port = Int(parts[2]) else {
+                    return nil
+                }
+                self.port = port
+            case 2:
+                self.scheme = .tcp
+                self.host = String(parts[0])
+                guard let port = Int(parts[1]) else {
+                    return nil
+                }
+                self.port = port
+            default:
+                return nil
+            }
+        }
+    }
+    
     struct QueryFlags: ParsableArguments {
-        #warning("the <host>:<port> format seems like it could leverage some type safety")
-        @Option(help: "<host>:<port> to Tendermint RPC interface for this chain")
-        var node: String = "tcp://localhost:26657"
-        
-        @Option(help: "Use a specific height to query state at (this can error if the node is pruning state)")
-        var height: Int = 0
-        
-        #warning("where should this live?")
-        enum TextOrJson: String {
+        #warning("where should this live? here? Or somewhere more general?")
+        enum OutputFormat: String, ExpressibleByArgument {
             case text
             case json
         }
         
-        #warning("This actually comes from the tendermint import")
-        @Option(name: .shortLong, help: "Output format (text|json)")
-        var output: TextOrJson = .text
+        #warning("the <host>:<port> format seems like it could leverage some type safety")
+        @Option(help: "<host>:<port> to Tendermint RPC interface for this chain")
+        var node: NodeURL = NodeURL(argument: "tcp://localhost:26657")!
         
-        #warning("this comes from the root command but is marked required for this implementation specifically")
+        @Option(help: "Use a specific height to query state at (this can error if the node is pruning state)")
+        var height: Int = 0
+        
+        #warning("This actually comes from the tendermint import")
+        @Option(name: .shortAndLong, help: "Output format (text|json)")
+        var output: OutputFormat = .text
+        
+        #warning("this comes from the root command but is marked required (in go) for this implementation specifically")
         @Option(help: "The network chain ID")
-        var chainID: String
+        var chainId: String
         
         #warning("Does this need porting?")
         // cmd.SetErr(cmd.ErrOrStderr())
