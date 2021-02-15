@@ -23,6 +23,8 @@ let package = Package(
         .library(name: "XSimulation", targets: ["XSimulation"]),
         .library(name: "XStaking", targets: ["XStaking"]),
         .library(name: "XSupply", targets: ["XSupply"]),
+        
+        .library(name: "XAuthAnte", targets: ["XAuthAnte"]),
                 
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
