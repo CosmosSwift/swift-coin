@@ -6,7 +6,7 @@ import ABCI
 /// process a request.
 public final class Request {
     var multiStore: MultiStore
-    var header: Header
+    public var header: Header
     let chainID: String
     var transactionData: Data = Data()
     let logger: Logger

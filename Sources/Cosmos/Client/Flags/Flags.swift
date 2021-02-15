@@ -17,9 +17,9 @@ public enum Flags {
             case https
         }
         
-        let scheme: URLScheme
-        let host: String
-        let port: Int
+        public let scheme: URLScheme
+        public let host: String
+        public let port: Int
         
         public init?(argument: String) {
             let parts = argument.split(separator: ":")
@@ -47,27 +47,29 @@ public enum Flags {
         }
     }
     
-    struct QueryFlags: ParsableArguments {
+    public struct QueryFlags: ParsableArguments {
         #warning("where should this live? here? Or somewhere more general?")
-        enum OutputFormat: String, ExpressibleByArgument {
+        public enum OutputFormat: String, ExpressibleByArgument {
             case text
             case json
         }
         
         #warning("the <host>:<port> format seems like it could leverage some type safety")
         @Option(help: "<host>:<port> to Tendermint RPC interface for this chain")
-        var node: NodeURL = NodeURL(argument: "tcp://localhost:26657")!
+        public var node: NodeURL = NodeURL(argument: "tcp://localhost:26657")!
         
         @Option(help: "Use a specific height to query state at (this can error if the node is pruning state)")
-        var height: Int = 0
+        public var height: Int = 0
         
         #warning("This actually comes from the tendermint import")
         @Option(name: .shortAndLong, help: "Output format (text|json)")
-        var output: OutputFormat = .text
+        public var output: OutputFormat = .text
         
         #warning("this comes from the root command but is marked required (in go) for this implementation specifically")
         @Option(help: "The network chain ID")
-        var chainId: String
+        public var chainId: String
+        
+        public init() { }
         
         #warning("Does this need porting?")
         // cmd.SetErr(cmd.ErrOrStderr())

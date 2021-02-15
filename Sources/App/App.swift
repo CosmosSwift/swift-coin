@@ -5,6 +5,13 @@ import ABCI
 import Database
 import Cosmos
 import NameService
+import XGenUtil
+import XAuth
+import XParams
+import XBank
+import XSupply
+import XStaking
+import XAuthAnte
 
 
 public final class NameServiceApp: BaseApp, App {

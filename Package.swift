@@ -13,6 +13,17 @@ let package = Package(
         .library(name: "App", targets: ["App"]),
         // App Module
         .library(name: "NameService", targets: ["NameService"]),
+        
+        // X Modules
+        .library(name: "XAuth", targets: ["XAuth"]),
+        .library(name: "XBank", targets: ["XBank"]),
+        .library(name: "XGenUtil", targets: ["XGenUtil"]),
+        .library(name: "XGovernance", targets: ["XGovernance"]),
+        .library(name: "XParams", targets: ["XParams"]),
+        .library(name: "XSimulation", targets: ["XSimulation"]),
+        .library(name: "XStaking", targets: ["XStaking"]),
+        .library(name: "XSupply", targets: ["XSupply"]),
+                
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
         .executable(name: "nameserviced", targets: ["nameserviced"]),
@@ -49,12 +60,20 @@ let package = Package(
             dependencies: [
                 .target(name: "Cosmos"),
                 .target(name: "NameService"),
+                .target(name: "XGenUtil"),
+                .target(name: "XAuth"),
+                .target(name: "XParams"),
+                .target(name: "XBank"),
+                .target(name: "XSupply"),
+                .target(name: "XStaking"),
+                .target(name: "XAuthAnte"),
             ]
         ),
         .target(
             name: "NameService",
             dependencies: [
                 .target(name: "Cosmos"),
+                .target(name: "XBank"),
             ]
         ),
         .target(
@@ -78,6 +97,84 @@ let package = Package(
                 .product(name: "NIOTLS", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
             ]
+        ),
+        .target(
+            name: "XAuth",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Tendermint"),
+                .target(name: "XParams"),
+                .product(name: "ABCI", package: "ABCI"),
+                .product(name: "CosmosProto", package: "swift-cosmos-proto"),
+                .product(name: "NIO", package: "swift-nio"),
+            ],
+            path: "./Sources/X/XAuth"
+        ),
+        .target(
+            name: "XAuthAnte",
+            dependencies: [
+                .target(name: "XAuth"),
+                .target(name: "XSupply"),
+            ],
+            path: "./Sources/X/XAuthAnte"
+        ),
+        .target(
+            name: "XBank",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "XAuth"),
+                .target(name: "XParams"),
+            ],
+            path: "./Sources/X/XBank"
+        ),
+        .target(
+            name: "XGenUtil",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "XAuth"),
+                .target(name: "XStaking"),
+            ],
+            path: "./Sources/X/XGenUtil"
+        ),
+        .target(
+            name: "XGovernance",
+            dependencies: [
+                .target(name: "Cosmos"),
+            ],
+            path: "./Sources/X/XGovernance"
+        ),
+        .target(
+            name: "XParams",
+            dependencies: [
+                .target(name: "Cosmos"),
+            ],
+            path: "./Sources/X/XParams"
+        ),
+        .target(
+            name: "XSimulation",
+            dependencies: [
+                .target(name: "Cosmos"),
+            ],
+            path: "./Sources/X/XSimulation"
+        ),
+        .target(
+            name: "XStaking",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "XParams"),
+                .target(name: "XAuth"),
+                .target(name: "XSupply"),
+            ],
+            path: "./Sources/X/XStaking"
+        ),
+        .target(
+            name: "XSupply",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "XAuth"),
+                .target(name: "XBank"),
+            ],
+            path: "./Sources/X/XSupply"
         ),
         .target(name: "Database"),
         .target(
