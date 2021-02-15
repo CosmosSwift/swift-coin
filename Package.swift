@@ -15,16 +15,16 @@ let package = Package(
         .library(name: "NameService", targets: ["NameService"]),
         
         // X Modules
-        .library(name: "XAuth", targets: ["XAuth"]),
-        .library(name: "XBank", targets: ["XBank"]),
-        .library(name: "XGenUtil", targets: ["XGenUtil"]),
-        .library(name: "XGovernance", targets: ["XGovernance"]),
-        .library(name: "XParams", targets: ["XParams"]),
-        .library(name: "XSimulation", targets: ["XSimulation"]),
-        .library(name: "XStaking", targets: ["XStaking"]),
-        .library(name: "XSupply", targets: ["XSupply"]),
+        .library(name: "Auth", targets: ["Auth"]),
+        .library(name: "Bank", targets: ["Bank"]),
+        .library(name: "GenUtil", targets: ["GenUtil"]),
+        .library(name: "Governance", targets: ["Governance"]),
+        .library(name: "Params", targets: ["Params"]),
+        .library(name: "Simulation", targets: ["Simulation"]),
+        .library(name: "Staking", targets: ["Staking"]),
+        .library(name: "Supply", targets: ["Supply"]),
         
-        .library(name: "XAuthAnte", targets: ["XAuthAnte"]),
+        .library(name: "AuthAnte", targets: ["AuthAnte"]),
                 
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
@@ -62,20 +62,20 @@ let package = Package(
             dependencies: [
                 .target(name: "Cosmos"),
                 .target(name: "NameService"),
-                .target(name: "XGenUtil"),
-                .target(name: "XAuth"),
-                .target(name: "XParams"),
-                .target(name: "XBank"),
-                .target(name: "XSupply"),
-                .target(name: "XStaking"),
-                .target(name: "XAuthAnte"),
+                .target(name: "GenUtil"),
+                .target(name: "Auth"),
+                .target(name: "Params"),
+                .target(name: "Bank"),
+                .target(name: "Supply"),
+                .target(name: "Staking"),
+                .target(name: "AuthAnte"),
             ]
         ),
         .target(
             name: "NameService",
             dependencies: [
                 .target(name: "Cosmos"),
-                .target(name: "XBank"),
+                .target(name: "Bank"),
             ]
         ),
         .target(
@@ -101,82 +101,82 @@ let package = Package(
             ]
         ),
         .target(
-            name: "XAuth",
+            name: "Auth",
             dependencies: [
                 .target(name: "Cosmos"),
                 .target(name: "Tendermint"),
-                .target(name: "XParams"),
+                .target(name: "Params"),
                 .product(name: "ABCI", package: "ABCI"),
                 .product(name: "CosmosProto", package: "swift-cosmos-proto"),
                 .product(name: "NIO", package: "swift-nio"),
             ],
-            path: "./Sources/X/XAuth"
+            path: "./Sources/X/Auth"
         ),
         .target(
-            name: "XAuthAnte",
+            name: "AuthAnte",
             dependencies: [
-                .target(name: "XAuth"),
-                .target(name: "XSupply"),
+                .target(name: "Auth"),
+                .target(name: "Supply"),
             ],
-            path: "./Sources/X/XAuthAnte"
+            path: "./Sources/X/AuthAnte"
         ),
         .target(
-            name: "XBank",
-            dependencies: [
-                .target(name: "Cosmos"),
-                .target(name: "XAuth"),
-                .target(name: "XParams"),
-            ],
-            path: "./Sources/X/XBank"
-        ),
-        .target(
-            name: "XGenUtil",
+            name: "Bank",
             dependencies: [
                 .target(name: "Cosmos"),
-                .target(name: "XAuth"),
-                .target(name: "XStaking"),
+                .target(name: "Auth"),
+                .target(name: "Params"),
             ],
-            path: "./Sources/X/XGenUtil"
+            path: "./Sources/X/Bank"
         ),
         .target(
-            name: "XGovernance",
+            name: "GenUtil",
             dependencies: [
                 .target(name: "Cosmos"),
+                .target(name: "Auth"),
+                .target(name: "Staking"),
             ],
-            path: "./Sources/X/XGovernance"
+            path: "./Sources/X/GenUtil"
         ),
         .target(
-            name: "XParams",
+            name: "Governance",
             dependencies: [
                 .target(name: "Cosmos"),
             ],
-            path: "./Sources/X/XParams"
+            path: "./Sources/X/Governance"
         ),
         .target(
-            name: "XSimulation",
+            name: "Params",
             dependencies: [
                 .target(name: "Cosmos"),
             ],
-            path: "./Sources/X/XSimulation"
+            path: "./Sources/X/Params"
         ),
         .target(
-            name: "XStaking",
+            name: "Simulation",
             dependencies: [
                 .target(name: "Cosmos"),
-                .target(name: "XParams"),
-                .target(name: "XAuth"),
-                .target(name: "XSupply"),
             ],
-            path: "./Sources/X/XStaking"
+            path: "./Sources/X/Simulation"
         ),
         .target(
-            name: "XSupply",
+            name: "Staking",
             dependencies: [
                 .target(name: "Cosmos"),
-                .target(name: "XAuth"),
-                .target(name: "XBank"),
+                .target(name: "Params"),
+                .target(name: "Auth"),
+                .target(name: "Supply"),
             ],
-            path: "./Sources/X/XSupply"
+            path: "./Sources/X/Staking"
+        ),
+        .target(
+            name: "Supply",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Auth"),
+                .target(name: "Bank"),
+            ],
+            path: "./Sources/X/Supply"
         ),
         .target(name: "Database"),
         .target(

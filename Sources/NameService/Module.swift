@@ -1,7 +1,7 @@
 import JSON
 import ABCI
 import Cosmos
-import XBank
+import Bank
 
 // AppModuleBasic defines the basic application module used by the nameservice module.
 public class NameServiceAppModuleBasic: AppModuleBasic {
