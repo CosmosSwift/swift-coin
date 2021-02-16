@@ -23,9 +23,10 @@ public struct QueryCommand: ParsableCommand {
         Query allows to query the blockchain node
         """,
         subcommands: [
-                        GetAccount.self,
-            //            Auth.QueryTxByEventCommand.self,
-            //            Auth.QueryTxCommand.self,
+            GetAccount.self,
+            QueryTransactionsByEvents.self,
+            QueryTransaction.self
+     
             //            RPC.ValidatorCommand.self,
             //            RPC.BlockCommand.self,
         ]

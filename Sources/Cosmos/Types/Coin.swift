@@ -37,11 +37,12 @@ public struct Coin: Codable {
     var isZero: Bool {
         amount == 0
     }
+}
 
-    
-    // Adds amounts of two coins with same denom. If the coins differ in denom then
-    // it panics.
-    static func + (lhs: Coin, rhs: Coin) -> Coin {
+// Adds amounts of two coins with same denom. If the coins differ in denom then
+// it panics.
+extension Coin {
+    public static func + (lhs: Coin, rhs: Coin) -> Coin {
         if lhs.denomination != rhs.denomination {
             fatalError("invalid coin denominations; \(lhs.denomination), \(rhs.denomination)")
         }
@@ -76,11 +77,11 @@ public struct Coins: Codable {
         try container.encode(coins)
     }
    
-    var count: Int {
+    public var count: Int {
         coins.count
     }
     
-    var isEmpty: Bool {
+    public var isEmpty: Bool {
         coins.isEmpty
     }
     
@@ -120,7 +121,7 @@ extension Coins {
     // TODO: Implement this correctly
     // MarshalJSON implements a custom JSON marshaller for the Coins type to allow
     // nil Coins to be encoded as an empty array.
-    func marshalJSON() throws -> Data {
+    public func marshalJSON() throws -> Data {
         let encoder = JSONEncoder()
 
         if coins.isEmpty {
@@ -141,7 +142,7 @@ extension Coins {
     
     // IsValid asserts the Coins are sorted, have positive amount,
     // and Denom does not contain upper case characters.
-    var isValid: Bool {
+    public var isValid: Bool {
         switch coins.count {
         case 0:
             return true
@@ -217,7 +218,7 @@ extension Coins {
     //
     // CONTRACT: Add will never return Coins where one Coin has a non-positive
     // amount. In otherwords, IsValid will always return true.
-    static func + (lhs: Coins, rhs: Coins) -> Coins {
+    public static func + (lhs: Coins, rhs: Coins) -> Coins {
         lhs.safeAdd(other: rhs)
     }
 
@@ -306,7 +307,7 @@ extension Coins {
     }
      
     // Returns the amount of a denom from coins
-    func amountOf(denomination: String) -> UInt {
+    public func amountOf(denomination: String) -> UInt {
         Coins.mustValidate(denomination: denomination)
 
         switch count {
@@ -340,7 +341,7 @@ extension Coins {
 
     // ValidateDenom validates a denomination string returning an error if it is
     // invalid.
-    static func validate(denomination: String) throws {
+    public static func validate(denomination: String) throws {
         if denomination.range(of: denominationRegex, options: .regularExpression) == nil {
             throw Cosmos.Error.invalidDenomination(denomination: denomination)
         }

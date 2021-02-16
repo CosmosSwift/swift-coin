@@ -13,6 +13,6 @@ public protocol InvariantRegistry  {
 }
 
 // FormatInvariant returns a standardized invariant message.
-func formatInvariant(module: String, name: String, message: String) -> String {
+public func formatInvariant(module: String, name: String, message: String) -> String {
     "\(module): \(name) invariant\n\(message)\n"
 }

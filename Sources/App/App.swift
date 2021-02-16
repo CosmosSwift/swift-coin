@@ -5,6 +5,13 @@ import ABCI
 import Database
 import Cosmos
 import NameService
+import GenUtil
+import Auth
+import Params
+import Bank
+import Supply
+import Staking
+import AuthAnte
 
 
 public final class NameServiceApp: BaseApp, App {

@@ -13,6 +13,19 @@ let package = Package(
         .library(name: "App", targets: ["App"]),
         // App Module
         .library(name: "NameService", targets: ["NameService"]),
+        
+        // X Modules
+        .library(name: "Auth", targets: ["Auth"]),
+        .library(name: "Bank", targets: ["Bank"]),
+        .library(name: "GenUtil", targets: ["GenUtil"]),
+        .library(name: "Governance", targets: ["Governance"]),
+        .library(name: "Params", targets: ["Params"]),
+        .library(name: "Simulation", targets: ["Simulation"]),
+        .library(name: "Staking", targets: ["Staking"]),
+        .library(name: "Supply", targets: ["Supply"]),
+        
+        .library(name: "AuthAnte", targets: ["AuthAnte"]),
+                
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
         .executable(name: "nameserviced", targets: ["nameserviced"]),
@@ -49,12 +62,20 @@ let package = Package(
             dependencies: [
                 .target(name: "Cosmos"),
                 .target(name: "NameService"),
+                .target(name: "GenUtil"),
+                .target(name: "Auth"),
+                .target(name: "Params"),
+                .target(name: "Bank"),
+                .target(name: "Supply"),
+                .target(name: "Staking"),
+                .target(name: "AuthAnte"),
             ]
         ),
         .target(
             name: "NameService",
             dependencies: [
                 .target(name: "Cosmos"),
+                .target(name: "Bank"),
             ]
         ),
         .target(
@@ -78,6 +99,84 @@ let package = Package(
                 .product(name: "NIOTLS", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
             ]
+        ),
+        .target(
+            name: "Auth",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Tendermint"),
+                .target(name: "Params"),
+                .product(name: "ABCI", package: "ABCI"),
+                .product(name: "CosmosProto", package: "swift-cosmos-proto"),
+                .product(name: "NIO", package: "swift-nio"),
+            ],
+            path: "./Sources/X/Auth"
+        ),
+        .target(
+            name: "AuthAnte",
+            dependencies: [
+                .target(name: "Auth"),
+                .target(name: "Supply"),
+            ],
+            path: "./Sources/X/AuthAnte"
+        ),
+        .target(
+            name: "Bank",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Auth"),
+                .target(name: "Params"),
+            ],
+            path: "./Sources/X/Bank"
+        ),
+        .target(
+            name: "GenUtil",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Auth"),
+                .target(name: "Staking"),
+            ],
+            path: "./Sources/X/GenUtil"
+        ),
+        .target(
+            name: "Governance",
+            dependencies: [
+                .target(name: "Cosmos"),
+            ],
+            path: "./Sources/X/Governance"
+        ),
+        .target(
+            name: "Params",
+            dependencies: [
+                .target(name: "Cosmos"),
+            ],
+            path: "./Sources/X/Params"
+        ),
+        .target(
+            name: "Simulation",
+            dependencies: [
+                .target(name: "Cosmos"),
+            ],
+            path: "./Sources/X/Simulation"
+        ),
+        .target(
+            name: "Staking",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Params"),
+                .target(name: "Auth"),
+                .target(name: "Supply"),
+            ],
+            path: "./Sources/X/Staking"
+        ),
+        .target(
+            name: "Supply",
+            dependencies: [
+                .target(name: "Cosmos"),
+                .target(name: "Auth"),
+                .target(name: "Bank"),
+            ],
+            path: "./Sources/X/Supply"
         ),
         .target(name: "Database"),
         .target(

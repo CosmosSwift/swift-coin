@@ -25,7 +25,7 @@ let formatter: DateFormatter = {
 }()
 
 // Formats a time.Time into a []byte that can be sorted
-func formatDateData(date: Date) -> Data {
+public func formatDateData(date: Date) -> Data {
     // TODO: This code used to do some more stuff, UTC and Round.
     // return []byte(t.UTC().Round(0).Format(SortableTimeFormat))
     formatter.string(from: date).data
