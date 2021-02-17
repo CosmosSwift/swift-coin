@@ -1,8 +1,9 @@
 import Foundation
 import Logging
 import Crypto
-import ABCI
+import ABCIMessages
 import Database
+import DataConvertible
 
 public enum BaseAppKeys {
     // MainStoreKey is the string representation of the main store

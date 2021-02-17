@@ -1,5 +1,5 @@
 import JSON
-import ABCI
+import ABCIMessages
 import Cosmos
 import Auth
 

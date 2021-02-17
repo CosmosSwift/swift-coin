@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "async-http-client",
+        "repositoryURL": "https://github.com/swift-server/async-http-client.git",
+        "state": {
+          "branch": null,
+          "revision": "a72c5adce3986ff6b5092ae0464a8f2675087860",
+          "version": "1.2.3"
+        }
+      },
+      {
         "package": "BigInt",
         "repositoryURL": "https://github.com/attaswift/BigInt",
         "state": {
@@ -41,8 +50,8 @@
         "package": "ABCI",
         "repositoryURL": "https://github.com/CosmosSwift/swift-abci",
         "state": {
-          "branch": "master",
-          "revision": "5aac68b7959788bfd77b820690d832333a654c91",
+          "branch": "rest_api",
+          "revision": "4f3bdce453cfe8bdd686405a92a3da705881cfba",
           "version": null
         }
       },

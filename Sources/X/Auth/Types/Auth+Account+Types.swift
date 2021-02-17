@@ -130,7 +130,8 @@ public struct BaseAccount: Account, GenesisAccount {
     // if it's used to output to files or something
     public var description: String {
         // TODO: Deal with force try and force unwrap.
-        let data = try! encodeYAML()
+        //let data = try! encodeYAML()
+        let data = try! JSONEncoder().encode(self)
         return String(data: data, encoding: .utf8)!
     }
 

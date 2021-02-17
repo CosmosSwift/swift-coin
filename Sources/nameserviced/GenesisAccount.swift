@@ -3,6 +3,7 @@ import JSON
 import ArgumentParser
 import Tendermint
 import Cosmos
+import Auth
 
 struct AddGenesisAccountCommand: ParsableCommand {
     public static var defaultHome: String!
@@ -131,7 +132,7 @@ struct AddGenesisAccountCommand: ParsableCommand {
         //fatalError()
         
         // TODO: this should be implemented better...
-        var authState = (genesisDocument.appState?.set.first(where: {type(of:$0).metatype == "auth"}) as! Cosmos.AuthGenesisState)
+        var authState = (genesisDocument.appState?.set.first(where: {type(of:$0).metatype == "auth"}) as! AuthGenesisState)
         genesisDocument.appState?.set.removeAll(where: {type(of:$0).metatype == "auth"})
         // TODO: do not append an account which has already been added.
         authState.accounts.append(account)

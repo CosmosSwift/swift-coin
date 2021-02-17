@@ -1,6 +1,6 @@
 import Foundation
 import Logging
-import ABCI
+import ABCIMessages
 
 /// Request is an immutable object contains all information needed to
 /// process a request.

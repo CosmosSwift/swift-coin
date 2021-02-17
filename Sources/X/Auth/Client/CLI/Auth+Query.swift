@@ -4,6 +4,8 @@ import CosmosProto
 import NIO
 import GRPC
 import Cosmos
+import ABCIREST
+import Tendermint
 
 fileprivate let flagEvents = "events"
 
@@ -77,42 +79,27 @@ public struct GetAccount: ParsableCommand {
 
     @Argument var address: AccountAddress
     
-    public init() { }
+    
+    struct GetAccountPayload: RequestPayload {        
+        static var method: ABCIREST.Method { .abci_query }
+        var path: String { "custom/acc/account" }
+        
+        typealias ResponsePayload = AnyProtocolCodable // This is an Account
+
+        let Address: AccountAddress
+        
+    }
+    
+    public init() {}
         
     public mutating func run() throws {
-        // Setup an `EventLoopGroup` for the connection to run on.
-        //
-        // See: https://github.com/apple/swift-nio#eventloops-and-eventloopgroups
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-
-        // Make sure the group is shutdown when we're done with it.
-        defer {
-          try! group.syncShutdownGracefully()
-        }
-
-        // Configure the channel, we're not using TLS so the connection is `insecure`.
-        let channel = ClientConnection.insecure(group: group)
-            .connect(host: queryFlags.node.host, port: queryFlags.node.port)
-
-        // Close the connection when we're done with it.
-        defer {
-          try! channel.close().wait()
-        }
-
-        let client = Cosmos_Auth_V1beta1_QueryClient(channel: channel)
+        let client = ABCIRESTClient<GetAccountPayload>(url: "http://192.168.64.1:26657")
         
-        let request = Cosmos_Auth_V1beta1_QueryAccountRequest.with {
-            $0.address = address.data.hexEncodedString()
-        }
+        let res = try client.syncSend(payload: GetAccountPayload(Address: self.address))
         
-        let getAccount = client.account(request)
+        let data = try JSONEncoder().encode(res)
         
-        do {
-            let response = try getAccount.response.wait()
-            print(response.account)
-        } catch {
-            print("Getting Account failed: \(error)")
-        }
+        print(String(data: data, encoding: .utf8)!)
     }
 }
 

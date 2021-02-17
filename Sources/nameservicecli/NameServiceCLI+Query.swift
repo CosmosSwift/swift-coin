@@ -1,5 +1,6 @@
 import ArgumentParser
 import Cosmos
+import Auth
 
 public struct KeysOptions: ParsableArguments {
     @Option(name: .customLong("keyring-backend"), help: "Select keyring's backend (os|file|test)")

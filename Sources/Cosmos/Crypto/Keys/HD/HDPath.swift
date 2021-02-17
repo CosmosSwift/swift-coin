@@ -1,5 +1,6 @@
 import Foundation
 import Crypto
+import DataConvertible
 
 // BIP44Params wraps BIP 44 params (5 level BIP 32 path).
 // To receive a canonical string representation ala

@@ -1,5 +1,5 @@
 import Foundation
-import ABCI
+import ABCIMessages
 import Database
 import iAVLPlusCore
 
@@ -216,7 +216,7 @@ extension IAVLStore {
     // If latest-1 is not present, use latest (which must be present)
     // if you care to have the latest data to see a tx results, you must
     // explicitly set the height you want to see
-    func query(queryRequest: RequestQuery) -> ResponseQuery {
+    func query(queryRequest: RequestQuery<Data>) -> ResponseQuery<Data> {
         // TODO: Implement
         fatalError()
 //        if len(req.Data) == 0 {

@@ -1,4 +1,5 @@
 import Foundation
+import ABCIMessages
 import Crypto
 
 public class Ed25519PrivateKey: PrivateKey {

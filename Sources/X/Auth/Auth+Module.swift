@@ -1,5 +1,5 @@
 import JSON
-import ABCI
+import ABCIMessages
 import Cosmos
 
 // AppModuleBasic defines the basic application module used by the auth module.

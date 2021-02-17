@@ -31,7 +31,7 @@ let package = Package(
         .executable(name: "nameserviced", targets: ["nameserviced"]),
     ],
     dependencies: [
-        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("master")),
+        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("rest_api")),
         .package(name: "iAVLPlus", url: "https://github.com/CosmosSwift/swift-iavlplus", .branch("master")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
@@ -40,7 +40,7 @@ let package = Package(
         .package(name: "BigInt", url: "https://github.com/attaswift/BigInt", .upToNextMajor(from: "5.2.1")),
         .package(name: "swift-cosmos-proto", url: "https://github.com/cosmosswift/swift-cosmos-proto.git", .branch( "main")),
         .package(name: "swift-nio", url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
-
+        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.0.0")
     ],
     targets: [
         .target(
@@ -48,6 +48,11 @@ let package = Package(
             dependencies: [
                 .target(name: "App"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "NIO", package: "swift-nio"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
+                .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
+                .product(name: "NIOTLS", package: "swift-nio"),
+                .product(name: "NIOHTTP1", package: "swift-nio"),
 
             ]
         ),
@@ -55,7 +60,11 @@ let package = Package(
             name: "nameserviced",
             dependencies: [
                 .target(name: "App"),
-            ]
+                .product(name: "NIO", package: "swift-nio"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
+                .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
+                .product(name: "NIOTLS", package: "swift-nio"),
+                .product(name: "NIOHTTP1", package: "swift-nio"),            ]
         ),
         .target(
             name: "App",
@@ -88,8 +97,11 @@ let package = Package(
                 .product(name: "iAVLPlus", package: "iAVLPlus"),
                 .product(name: "InMemoryNodeDB", package: "iAVLPlus"),
 //                .product(name: "SQLiteNodeDB", package: "iAVLPlus"),
-                .product(name: "ABCI", package: "ABCI"),
+                .product(name: "ABCIMessages", package: "ABCI"),
+                .product(name: "ABCIServer", package: "ABCI"),
+                .product(name: "ABCIREST", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
+                .product(name: "DataConvertible", package: "ABCI"),
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "CosmosProto", package: "swift-cosmos-proto"),
@@ -98,6 +110,7 @@ let package = Package(
                 .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
                 .product(name: "NIOTLS", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
+                .product(name: "AsyncHTTPClient", package: "async-http-client")
             ]
         ),
         .target(
@@ -106,7 +119,7 @@ let package = Package(
                 .target(name: "Cosmos"),
                 .target(name: "Tendermint"),
                 .target(name: "Params"),
-                .product(name: "ABCI", package: "ABCI"),
+                .product(name: "ABCIMessages", package: "ABCI"),
                 .product(name: "CosmosProto", package: "swift-cosmos-proto"),
                 .product(name: "NIO", package: "swift-nio"),
             ],
@@ -186,7 +199,7 @@ let package = Package(
                 .target(name: "JSON"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "ABCI", package: "ABCI"),
+                .product(name: "ABCIMessages", package: "ABCI"),
             ]
         ),
         .target(name: "Bech32"),

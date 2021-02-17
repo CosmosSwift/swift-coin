@@ -1,4 +1,4 @@
-import ABCI
+import ABCIMessages
 import JSON
 import Cosmos
 import Auth

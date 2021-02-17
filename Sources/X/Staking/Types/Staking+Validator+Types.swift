@@ -1,6 +1,6 @@
 import Foundation
 import Tendermint
-import ABCI
+import ABCIMessages
 import Cosmos
 
 // Validator defines the total amount of bond shares and their exchange rate to
@@ -65,7 +65,7 @@ extension Validator {
     // with the full validator power
     var abciValidatorUpdate: ValidatorUpdate {
         ValidatorUpdate(
-            publicKey: ABCI.PublicKey(consensusPublicKey),
+            publicKey: ABCIMessages.PublicKey(consensusPublicKey),
             power: consensusPower
         )
     }
@@ -74,7 +74,7 @@ extension Validator {
     // with zero power used for validator updates.
     var abciValidatorUpdateZero: ValidatorUpdate {
         ValidatorUpdate(
-            publicKey: ABCI.PublicKey(consensusPublicKey),
+            publicKey: ABCIMessages.PublicKey(consensusPublicKey),
             power:  0
         )
     }
