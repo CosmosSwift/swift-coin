@@ -106,6 +106,7 @@ public struct GetAccount: ParsableCommand {
     public init() {}
         
     public mutating func run() throws {
+        // TODO: map url to the proper value
         let client = ABCIRESTClient<GetAccountPayload>(url: "http://192.168.64.1:26657")
         
         let res = try client.syncSend(payload: GetAccountPayload(Address: self.address))
