@@ -1,3 +1,40 @@
+import Foundation
+import ArgumentParser
+import Cosmos
+import ABCIREST
+
+
+// GetEncodeCommand returns the encode command to take a JSONified transaction and turn it into
+// Amino-serialized bytes
+public struct GetValidateSignatures: ParsableCommand {
+    public static let configuration = CommandConfiguration(
+        commandName: "validate-signatures",
+        abstract: "Validate transactions signatures.",
+        discussion: """
+            Print the addresses that must sign the transaction, those who have already
+    signed it, and make sure that signatures are in the correct order.
+    The command would check whether all required signers have signed the transactions, whether
+    the signatures were collected in the right order, and if the signature is valid over the
+    given transaction. If the --offline flag is also set, signature validation over the
+    transaction will be not be performed as that will require RPC communication with a full node.
+    """
+    )
+    
+    @OptionGroup var txFlags: Flags.TransactionFlags
+      
+    @Argument(help: "Signature file.")
+    var signatureFile: String
+    
+    public init() {}
+    
+    
+    
+    // TODO: there is the concept of Prerun commands here
+    public mutating func run() throws {
+        fatalError()
+    }
+}
+
 /*
  
  package cli

@@ -56,8 +56,12 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "query account --chain-id toto cosmos1phqfg26hx5wkm5c9d7969kwk0th857u7a3s2h6 --node &quot;tcp://192.168.64.1:26657&quot;"
+            argument = "tx nameservice buy-name jack.id 5nametoken --from jack -y"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "query account --chain-id toto cosmos1phqfg26hx5wkm5c9d7969kwk0th857u7a3s2h6 --node &quot;tcp://192.168.64.1:26657&quot;"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

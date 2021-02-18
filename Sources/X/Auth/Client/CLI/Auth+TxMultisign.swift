@@ -1,3 +1,55 @@
+import Foundation
+import ArgumentParser
+import Cosmos
+import ABCIREST
+
+
+// GetSignCommand returns the sign command
+public struct GetMultiSign: ParsableCommand {
+    public static let configuration = CommandConfiguration(
+        commandName: "multisign",
+        abstract: "Generate multisig signatures for transactions generated offline.",
+        discussion: """
+            Sign transactions created with the --generate-only flag that require multisig signatures.
+            Read signature(s) from [signature] file(s), generate a multisig signature compliant to the
+            multisig key [name], and attach it to the transaction read from [file].
+            Example:
+            $ %s multisign transaction.json k1k2k3 k1sig.json k2sig.json k3sig.json
+            If the flag --signature-only flag is on, it outputs a JSON representation
+            of the generated signature only.
+            The --offline flag makes sure that the client will not reach out to an external node.
+            Thus account number or sequence number lookups will not be performed and it is
+            recommended to set such parameters manually.
+    """
+    )
+    
+    @OptionGroup var txFlags: Flags.TransactionFlags
+
+    
+    // TODO: add proper args/flags
+//    cmd.Flags().Bool(flagSigOnly, false, "Print only the generated signature, then exit")
+//    cmd.Flags().String(flags.FlagOutputDocument, "", "The document will be written to the given file instead of STDOUT")
+//    cmd.Flags().Bool(flagAmino, false, "Generate Amino encoded JSON suitable for submiting to the txs REST endpoint")
+
+    
+    
+    @Argument(help: "Transaction file to sign.")
+    var transactionFile: String
+    
+    @Argument(help: "Multi signature key name.")
+    var multiSignatureKeyName: String
+    
+    @Argument(help: "Transaction file.")
+    var signatures: [String]
+
+    public init() {}
+    
+    public mutating func run() throws {
+        fatalError()
+
+    }
+}
+
 /*
  
  package cli

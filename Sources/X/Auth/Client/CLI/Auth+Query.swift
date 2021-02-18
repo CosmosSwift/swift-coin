@@ -27,8 +27,9 @@ struct GetQuery: ParsableCommand {
 
 
 // QueryParams returns the command handler for evidence parameter querying.
-struct GetQueryParameters: ParsableCommand {
-    static let configuration = CommandConfiguration(
+// This is a 0.4x.x call
+public struct GetQueryParameters: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         commandName: "params",
         abstract: "Query the current auth parameters",
         discussion: """
@@ -39,8 +40,20 @@ struct GetQueryParameters: ParsableCommand {
     )
     
     @OptionGroup var queryFlags: Flags.QueryFlags
+  
+    public init() {}
     
-    mutating func run() throws {
+    struct GetParamsPayload: RequestPayload {
+        static var method: ABCIREST.Method { .abci_query }
+        var path: String { "custom/acc/" }
+        
+        typealias ResponsePayload = AnyProtocolCodable // This is an Account
+
+        let Address: AccountAddress
+        
+    }
+    
+    public mutating func run() throws {
         fatalError()
         //            RunE: func(cmd *cobra.Command, args []string) error {
         //                clientCtx, err := client.GetClientQueryContext(cmd)
@@ -214,11 +227,28 @@ public struct QueryTransaction: ParsableCommand {
     @OptionGroup var queryFlags: Flags.QueryFlags
     
     #warning("still needs renaming")
-    @Argument var arg0: String
+    @Argument var txHash: String
+    
+    
+//    struct Payload: RequestPayload {
+//        static var method: ABCIREST.Method { .abci_query }
+//        var path: String { "custom/acc/account" }
+//        
+//        typealias ResponsePayload = TxResponse // This is an Account
+//
+//        let hash: String
+//        
+//    }
+    
+    
     
     public init() { }
     
     public mutating func run() throws {
+        
+        
+        
+        
         fatalError()
         //    func QueryTxCmd() *cobra.Command {
         //        cmd := &cobra.Command{
@@ -245,5 +275,22 @@ public struct QueryTransaction: ParsableCommand {
         //        return cmd
         //    }
         //    */
+        
+        
+        
+//        TxResponse{
+//                TxHash:    res.Hash.String(),
+//                Height:    res.Height,
+//                Codespace: res.TxResult.Codespace,
+//                Code:      res.TxResult.Code,
+//                Data:      strings.ToUpper(hex.EncodeToString(res.TxResult.Data)),
+//                RawLog:    res.TxResult.Log,
+//                Logs:      parsedLogs,
+//                Info:      res.TxResult.Info,
+//                GasWanted: res.TxResult.GasWanted,
+//                GasUsed:   res.TxResult.GasUsed,
+//                Tx:        anyTx,
+//                Timestamp: timestamp,
+//            }
     }
 }
