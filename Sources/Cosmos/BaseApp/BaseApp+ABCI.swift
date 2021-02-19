@@ -214,7 +214,7 @@ extension BaseApp: ABCIApplication {
     // Otherwise, the ResponseDeliverTx will contain releveant error information.
     // Regardless of tx execution outcome, the ResponseDeliverTx will contain relevant
     // gas execution context.
-    public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
+    public func deliverTx(request: RequestDeliverTx<Data>) -> ResponseDeliverTx<Data> {
         let transaction: Transaction
        
         do {
