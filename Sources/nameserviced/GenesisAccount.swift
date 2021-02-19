@@ -152,7 +152,7 @@ struct AddGenesisAccountCommand: ParsableCommand {
     
 }
 
-func parseCoins(string: String) -> Coins? {
+func parseCoins(string: String) -> [Coin]? {
     let coinStrArray = string.split(separator: ",")
     
     var coins: [Coin] = []
@@ -172,7 +172,7 @@ func parseCoins(string: String) -> Coins? {
         denomination.removeSubrange(amountRange)
         coins.append(Coin(denomination: String(denomination), amount: amount))
     }
-    return Coins(coins: coins)
+    return coins
 }
 
 /*

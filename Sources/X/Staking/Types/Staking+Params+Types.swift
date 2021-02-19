@@ -126,5 +126,5 @@ func validateBondDenomination(encodable: AnyEncodable) throws {
         throw ValidationError(description: "bond denom cannot be blank")
     }
     
-    try Coins.validate(denomination: value)
+    try [Coin].validate(denomination: value)
 }

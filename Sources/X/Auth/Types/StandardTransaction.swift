@@ -13,6 +13,13 @@ struct StandardTransaction: Transaction {
     let fee: StandardFee
     let signatures: [StandardSignature]
     let memo: String
+    
+    init(messages: [Message], fee: StandardFee, signatures: [StandardSignature], memo: String) {
+        self.messages = messages
+        self.fee = fee
+        self.signatures = signatures
+        self.memo = memo
+    }
 
     // TODO: Find a way to implement Codable for protocols, maybe make StandardTransaction generic?
     init(from decoder: Decoder) throws {
@@ -69,8 +76,31 @@ struct StandardTransaction: Transaction {
 // gas to be used by the transaction. The ratio yields an effective "gasprice",
 // which must be above some miminum to be accepted into the mempool.
 struct StandardFee: Codable {
-    let amount: Coins
+    let amount: [Coin]
     let gas: UInt64
+}
+
+func standardSignBytes(chainID: String, accountNumber: UInt64, sequence: UInt64, fee: StandardFee, messages: [Message], memo: String) -> Data {
+    fatalError()
+//    // StdSignBytes returns the bytes to sign for a transaction.
+//    func StdSignBytes(chainID string, accnum uint64, sequence uint64, fee StdFee, msgs []sdk.Msg, memo string) []byte {
+//        msgsBytes := make([]json.RawMessage, 0, len(msgs))
+//        for _, msg := range msgs {
+//            msgsBytes = append(msgsBytes, json.RawMessage(msg.GetSignBytes()))
+//        }
+//        bz, err := ModuleCdc.MarshalJSON(StdSignDoc{
+//            AccountNumber: accnum,
+//            ChainID:       chainID,
+//            Fee:           json.RawMessage(fee.Bytes()),
+//            Memo:          memo,
+//            Msgs:          msgsBytes,
+//            Sequence:      sequence,
+//        })
+//        if err != nil {
+//            panic(err)
+//        }
+//        return sdk.MustSortJSON(bz)
+//    }
 }
 
 // StdSignature represents a sig

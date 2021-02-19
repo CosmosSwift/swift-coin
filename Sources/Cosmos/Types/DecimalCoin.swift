@@ -4,17 +4,17 @@ import Foundation
 // Decimal Coin
 
 // DecCoin defines a coin which can have additional decimal points
-struct DecimalCoin: Codable {
-    let denomination: String
-    let amount: Decimal
+public struct DecimalCoin: Codable {
+    public let denomination: String
+    public let amount: Decimal
 }
 
 // ----------------------------------------------------------------------------
 // Decimal Coins
 
 // DecCoins defines a slice of coins with decimal values
-struct DecimalCoins {
-    let coins: [DecimalCoin]
+public struct DecimalCoins {
+    public let coins: [DecimalCoin]
     
     init() {
         self.coins = []

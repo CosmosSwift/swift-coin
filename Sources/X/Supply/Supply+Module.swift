@@ -74,7 +74,7 @@ public final class SupplyAppModule: SupplyAppModuleBasic, AppModule {
         let genesisState: SupplyGenesisState = Codec.supplyCodec.mustUnmarshalJSON(data: data)
         
         if genesisState.supply.isEmpty {
-            var totalSupply = Coins()
+            var totalSupply: [Coin] = []
             
             accountKeeper.iterateAccounts(request: request) { account in
                 totalSupply = totalSupply + account.coins

@@ -30,10 +30,10 @@ extension SupplyKeeper {
             )
             
             if start < 0 || end < 0 {
-                totalSupply = Coins()
+                totalSupply = []
             } else {
                 // TODO: Implement Coins slicing
-                totalSupply = Coins(coins: Array(totalSupply.coins[start..<end]))
+                totalSupply = Array(totalSupply[start..<end])
             }
             
             do {

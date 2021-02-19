@@ -60,75 +60,35 @@ extension Coin: Comparable {
     }
 }
 
-public struct Coins: Codable {
-    public let coins: [Coin]
-    
-    public init(coins: [Coin] = []) {
-        self.coins = coins
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.coins = try container.decode([Coin].self)
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(coins)
-    }
-   
-    public var count: Int {
-        coins.count
-    }
-    
-    public var isEmpty: Bool {
-        coins.isEmpty
-    }
-    
-    func prefix(_ maxLength: Int) -> Coins {
-        Coins(coins: Array(coins.prefix(maxLength)))
-    }
-    
-    func suffix(from start: Int) -> Coins {
-        Coins(coins: Array(coins.suffix(from: start)))
-    }
-}
-
-//extension Coins: Sequence {
-//}
-
-extension Coins: Equatable {
-    // IsEqual returns true if the two sets of Coins have the same value
-    public static func == (lhs: Coins, rhs: Coins) -> Bool {
+extension Array where Element == Coin {
+    public static func == (lhs: [Coin], rhs: [Coin]) -> Bool {
         if lhs.count != rhs.count {
             return false
         }
-
-        let coinsA = lhs.coins.sorted()
-        let coinsB = rhs.coins.sorted()
-
-        for i in 0 ..< coinsA.count {
-            if coinsA[i] != coinsB[i] {
-                return false
-            }
+        
+        let a = lhs.sorted()
+        let b = rhs.sorted()
+        
+        for (coinA, coinB) in zip(a, b) {
+            if coinA != coinB { return false }
         }
-
+        
         return true
     }
 }
 
-extension Coins {
+extension Array where Element == Coin {
     // TODO: Implement this correctly
     // MarshalJSON implements a custom JSON marshaller for the Coins type to allow
     // nil Coins to be encoded as an empty array.
     public func marshalJSON() throws -> Data {
         let encoder = JSONEncoder()
 
-        if coins.isEmpty {
-            return try encoder.encode(Coins())
+        if self.isEmpty {
+            return try encoder.encode([Coin]())
         }
 
-        return try encoder.encode(coins)
+        return try encoder.encode(self)
     }
 
     // isAllPositive returns true if there is at least one coin.
@@ -143,25 +103,26 @@ extension Coins {
     // IsValid asserts the Coins are sorted, have positive amount,
     // and Denom does not contain upper case characters.
     public var isValid: Bool {
-        switch coins.count {
+        switch self.count {
         case 0:
             return true
         case 1:
             do {
-                try Self.validate(denomination: coins[0].denomination)
+                try Self.validate(denomination: self[0].denomination)
                 return true
             } catch {
                 return false
             }
         default:
             // check single coin case
-            if !Coins(coins: [coins[0]]).isValid {
+            
+            if ![self[0]].isValid {
                 return false
             }
 
-            var lowDenomination = coins[0].denomination
+            var lowDenomination = self[0].denomination
             
-            for coin in coins.suffix(1) {
+            for coin in self.suffix(1) {
                 if coin.denomination.lowercased() != coin.denomination {
                     return false
                 }
@@ -181,7 +142,7 @@ extension Coins {
     
     // IsAllGT returns true if for every denom in coinsB,
     // the denom is present at a greater amount in coins.
-    public func isAllGreaterThan(coins: Coins) -> Bool {
+    public func isAllGreaterThan(coins: [Coin]) -> Bool {
         if isEmpty {
             return false
         }
@@ -194,8 +155,7 @@ extension Coins {
             return false
         }
 
-        // TODO: Make Coins a sequence
-        for coin in coins.coins {
+        for coin in self {
             let amountA = amountOf(denomination: coin.denomination)
             let amountB = coin.amount
             
@@ -218,7 +178,7 @@ extension Coins {
     //
     // CONTRACT: Add will never return Coins where one Coin has a non-positive
     // amount. In otherwords, IsValid will always return true.
-    public static func + (lhs: Coins, rhs: Coins) -> Coins {
+    public static func + (lhs: [Coin], rhs: [Coin]) -> [Coin] {
         lhs.safeAdd(other: rhs)
     }
 
@@ -227,7 +187,7 @@ extension Coins {
     // other set is returned. Otherwise, the coins are compared in order of their
     // denomination and addition only occurs when the denominations match, otherwise
     // the coin is simply added to the sum assuming it's not zero.
-    func safeAdd(other coinsB: Coins) -> Coins {
+    func safeAdd(other coinsB: [Coin]) -> [Coin] {
         var sum: [Coin] = []
         var indexA = 0
         var indexB = 0
@@ -238,18 +198,19 @@ extension Coins {
             if indexA == lenA {
                 if indexB == lenB {
                     // return nil coins if both sets are empty
-                    return Coins()
+                    return [Coin]()
                 }
 
                 // return set B (excluding zero coins) if set A is empty
-                return Coins(coins: sum) + (coinsB.suffix(from: indexB).removingZeroCoins())
+                
+                return sum + (Array(coinsB.suffix(from: indexB)).removingZeroCoins())
             } else if indexB == lenB {
                 // return set A (excluding zero coins) if set B is empty
-                return Coins(coins: sum) + (self.suffix(from: indexA).removingZeroCoins())
+                return sum + (Array(self.suffix(from: indexA)).removingZeroCoins())
             }
 
-            let coinA = coins[indexA]
-            let coinB = coinsB.coins[indexB]
+            let coinA = self[indexA]
+            let coinB = coinsB[indexB]
 
             let result = coinA.denomination.compare(coinB.denomination)
 
@@ -284,20 +245,19 @@ extension Coins {
     }
     
     // removeZeroCoins removes all zero coins from the given coin set
-    func removingZeroCoins() -> Coins {
-        Coins(coins: coins.filter({ !$0.isZero }))
+    func removingZeroCoins() -> [Coin] {
+        return self.filter({ !$0.isZero })
     }
 
     // DenomsSubsetOf returns true if receiver's denom set
     // is subset of coinsB's denoms.
-    func denominationIsSubset(of coins: Coins) -> Bool {
+    func denominationIsSubset(of coins: [Coin]) -> Bool {
         // more denoms in B than in receiver
         if count > coins.count {
             return false
         }
 
-        // TODO: Make Coins a sequence
-        for coin in self.coins {
+        for coin in self {
             if coins.amountOf(denomination: coin.denomination) == 0 {
                 return false
             }
@@ -308,14 +268,14 @@ extension Coins {
      
     // Returns the amount of a denom from coins
     public func amountOf(denomination: String) -> UInt {
-        Coins.mustValidate(denomination: denomination)
+        [Coin].mustValidate(denomination: denomination)
 
         switch count {
         case 0:
             return 0
 
         case 1:
-            let coin = coins[0]
+            let coin = self[0]
             
             if denomination == coin.denomination {
                 return coin.amount
@@ -325,14 +285,14 @@ extension Coins {
 
         default:
             let midIdx = count / 2 // 2:1, 3:1, 4:2
-            let coin = coins[midIdx]
+            let coin = self[midIdx]
             
             if denomination < coin.denomination {
-                return prefix(midIdx).amountOf(denomination: denomination)
+                return Array(prefix(midIdx)).amountOf(denomination: denomination)
             } else if denomination == coin.denomination {
                 return coin.amount
             } else {
-                return suffix(from: midIdx + 1).amountOf(denomination: denomination)
+                return Array(suffix(from: midIdx + 1)).amountOf(denomination: denomination)
             }
         }
     }

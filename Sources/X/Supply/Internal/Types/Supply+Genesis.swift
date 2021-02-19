@@ -5,10 +5,10 @@ import Cosmos
 public struct SupplyGenesisState: Codable, AppState {
     static public  var metatype: String { "supply" }
 
-    public var supply: Coins
+    public var supply: [Coin]
     
     // NewGenesisState creates a new genesis state.
-    public init(supply: Coins) {
+    public init(supply: [Coin]) {
         self.supply = supply
     }
 }
