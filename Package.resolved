@@ -51,7 +51,7 @@
         "repositoryURL": "https://github.com/CosmosSwift/swift-abci",
         "state": {
           "branch": "rest_api",
-          "revision": "4f3bdce453cfe8bdd686405a92a3da705881cfba",
+          "revision": "28bb258acc2b2de9df20a8aebaede9ebe6d42eab",
           "version": null
         }
       },
@@ -116,15 +116,6 @@
           "branch": null,
           "revision": "08a94c2145797636af24e5bf7e05f485dabb790f",
           "version": "0.3.2"
-        }
-      },
-      {
-        "package": "swift-nio",
-        "repositoryURL": "https://github.com/apple/swift-nio.git",
-        "state": {
-          "branch": null,
-          "revision": "43931b7a7daf8120a487601530c8bc03ce711992",
-          "version": "2.25.1"
         }
       },
       {
