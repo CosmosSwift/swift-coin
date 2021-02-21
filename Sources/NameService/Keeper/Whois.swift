@@ -140,13 +140,13 @@ extension NameServiceKeeper {
     }
     
     // GetPrice - gets the current price of a name
-    func getPrice(request: Request, name: String) -> Coins? {
+    func getPrice(request: Request, name: String) -> [Coin]? {
         let whois = try? getWhois(request: request, key: name)
         return whois?.price
     }
     
     // SetPrice - sets the current price of a name
-    func setPrice(request: Request, name: String, price: Coins) throws {
+    func setPrice(request: Request, name: String, price: [Coin]) throws {
         // TODO: Decide what to actually do when there is no whois mapped to
         // the given hame.
         guard var whois = try getWhois(request: request, key: name) else {

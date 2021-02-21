@@ -19,7 +19,7 @@ extension SupplyKeeper {
 
     // TotalSupply checks that the total supply reflects all the coins held in accounts
     func totalSupply(request: Request) -> (String, Bool) {
-        var expectedTotal = Coins()
+        var expectedTotal: [Coin] = []
         let supply = self.supply(request: request)
 
         accountKeeper.iterateAccounts(request: request) { account in

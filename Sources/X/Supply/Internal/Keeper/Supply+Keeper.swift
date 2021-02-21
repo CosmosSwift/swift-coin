@@ -43,7 +43,7 @@ public struct SupplyKeeper {
         return codec.mustUnmarshalBinaryLengthPrefixed(data: data)
     }
     
-    func setSupply(request: Request, supply: Coins) {
+    func setSupply(request: Request, supply: [Coin]) {
         let store = request.keyValueStore(key: storeKey)
         let data = codec.mustMarshalBinaryLengthPrefixed(value: supply)
         

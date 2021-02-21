@@ -25,7 +25,7 @@ extension BankKeeper {
     func queryBalance(request: Request, queryRequest: RequestQuery<Data>) throws -> Data {
         do {
             let params: QueryBalanceParams = try Codec.bankCodec.unmarshalJSON(data: queryRequest.data)
-            let coins = self.coins(request: request, address: params.address) ?? Coins()
+            let coins = self.coins(request: request, address: params.address) ?? [Coin]()
             
             do {
                 return try Codec.bankCodec.marshalJSONIndent(value: coins)

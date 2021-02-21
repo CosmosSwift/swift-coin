@@ -20,7 +20,7 @@ public struct ModuleAccount: GenesisAccount {
         baseAccount.address
     }
     
-    public var coins: Coins {
+    public var coins: [Coin] {
         baseAccount.coins
     }
     
@@ -81,7 +81,7 @@ public struct ModuleAccount: GenesisAccount {
         try baseAccount.set(sequence: sequence)
     }
     
-    public mutating func set(coins: Coins) throws {
+    public mutating func set(coins: [Coin]) throws {
         try baseAccount.set(coins: coins)
     }
     
@@ -89,7 +89,7 @@ public struct ModuleAccount: GenesisAccount {
         try baseAccount.validate()
     }
 
-    public func spendableCoins(blockTime: TimeInterval) -> Coins {
+    public func spendableCoins(blockTime: TimeInterval) -> [Coin] {
         baseAccount.spendableCoins(blockTime: blockTime)
     }
     
