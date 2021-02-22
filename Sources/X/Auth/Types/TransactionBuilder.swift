@@ -23,7 +23,7 @@ struct TransactionBuilder {
     
     enum TransactionType {
         case fees([Coin])
-        case gasPrices(DecimalCoins)
+        case gasPrices([DecimalCoin])
     }
     
     init(
@@ -61,7 +61,7 @@ struct TransactionBuilder {
             finalFees = fees
         case let .gasPrices(gasPrices):
             let gasDecimal = Decimal(gas)
-            let coins = gasPrices.coins.map { gasPrice -> Coin in
+            let coins = gasPrices.map { gasPrice -> Coin in
                 let fee = gasPrice.amount * gasDecimal
                 let roundedFee = fee.rounded(0, .up)
                 // wrap it in an NSDecimalNumber since Decimal can't be cast to uint itself.

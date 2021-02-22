@@ -32,7 +32,6 @@ extension SupplyKeeper {
             if start < 0 || end < 0 {
                 totalSupply = []
             } else {
-                // TODO: Implement Coins slicing
                 totalSupply = Array(totalSupply[start..<end])
             }
             

@@ -13,7 +13,8 @@ public struct DecimalCoin: Codable {
 // Decimal Coins
 
 // DecCoins defines a slice of coins with decimal values
-public struct DecimalCoins {
+// now implemented using [DecimalCoin]
+/*public struct DecimalCoins {
     public let coins: [DecimalCoin]
     
     init() {
@@ -21,3 +22,4 @@ public struct DecimalCoins {
     }
 }
 
+*/
