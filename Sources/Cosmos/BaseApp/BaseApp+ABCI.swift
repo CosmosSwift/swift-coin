@@ -572,7 +572,7 @@ extension BaseApp: ABCIApplication {
         )
         
         // TODO: Maybe minGasPrices can be not optional?
-        cachedRequest.minGasPrices = self.minGasPrices ?? DecimalCoins()
+        cachedRequest.minGasPrices = self.minGasPrices ?? [DecimalCoin]()
 
         // Passes the rest of the path as an argument to the querier.
         //
