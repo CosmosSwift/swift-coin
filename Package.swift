@@ -47,12 +47,16 @@ let package = Package(
             name: "nameservicecli",
             dependencies: [
                 .target(name: "App"),
+                .target(name: "Auth"),
+                .target(name: "NameService"),
+                .target(name: "Tendermint"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "NIO", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
                 .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
                 .product(name: "NIOTLS", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
+                
 
             ]
         ),
@@ -60,6 +64,8 @@ let package = Package(
             name: "nameserviced",
             dependencies: [
                 .target(name: "App"),
+                .target(name: "Auth"),
+                .target(name: "NameService"),
                 .product(name: "NIO", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
                 .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),

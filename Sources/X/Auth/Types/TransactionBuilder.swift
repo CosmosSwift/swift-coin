@@ -9,7 +9,7 @@ struct Keybase {
     }
 }
 
-struct TransactionBuilder {
+public struct TransactionBuilder {
     var transactionEncoder: TransactionEncoder
     var keybase: Keybase?
     var accountNumber: UInt64

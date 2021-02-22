@@ -2,6 +2,57 @@ import Foundation
 import ArgumentParser
 import Cosmos
 import ABCIREST
+import Auth
+import NameService
+import Tendermint
+
+struct BuyNameMessage: Message {
+    
+    static var metaType: MetaType = Self.metaType(
+        key: "cosmos-sdk/BuyNameMsg" // TODO: is this the right string?
+    )
+    
+    let name: String
+    let bid: [Coin]
+    let buyer: AccountAddress
+}
+
+extension BuyNameMessage {
+    // Route Implements Msg.
+    var route: String {
+        NameServiceKeys.routerKey
+    }
+
+    // Type Implements Msg.
+    var type: String {
+        "buy_name"
+    }
+
+    // ValidateBasic Implements Msg.
+    func validateBasic() throws { // TODO:
+        guard !buyer.isEmpty else {
+            throw Cosmos.Error.invalidAddress(address: "missing buyer address")
+        }
+        
+        guard bid.isValid else {
+            throw Cosmos.Error.invalidCoins(reason: "\(bid)")
+        }
+        
+        guard bid.isAllPositive else {
+            throw Cosmos.Error.invalidCoins(reason: "\(bid)")
+        }
+    }
+
+    // GetSignBytes Implements Msg.
+    var signedData: Data {
+        mustSortJSON(data: Codec.bankCodec.mustMarshalJSON(value: self))
+    }
+
+    // GetSigners Implements Msg.
+    var signers: [AccountAddress] {
+        [buyer]
+    }
+}
 
 public struct BuyName: ParsableCommand {
     public static let configuration = CommandConfiguration(
@@ -16,11 +67,25 @@ public struct BuyName: ParsableCommand {
     
     @Argument(help: "Price.")
     var price: UInt
-
+    
     public init() {}
     
     public mutating func run() throws {
         fatalError()
+        
+//        let txBuilder = TransactionBuilder(transactionEncoder: <#TransactionEncoder#>,
+//                                           accountNumber: <#UInt64#>,
+//                                           sequence: <#UInt64#>,
+//                                           gas: <#UInt64#>,
+//                                           gasAdjustment: <#Double#>,
+//                                           simulateAndExecute: <#Bool#>,
+//                                           chainID: <#String#>,
+//                                           memo: <#String#>,
+//                                           transactionType: <#TransactionBuilder.TransactionType#>
+//                                        )
+        
+        
+        
 //        RunE: func(cmd *cobra.Command, args []string) error {
 //            argsName := string(args[0])
 //
