@@ -1,6 +1,7 @@
 import Foundation
 import Tendermint
 import Database
+import DataConvertible
 
 // Language is a language to create the BIP 39 mnemonic in.
 // Currently, only english is supported though.

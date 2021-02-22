@@ -3,6 +3,7 @@ import Tendermint
 import Database
 import InMemoryNodeDB
 import Merkle
+import DataConvertible
 
 // Store is composed of many CommitStores. Name contrasts with
 // cacheMultiStore which is for cache-wrapping other MultiStores. It implements

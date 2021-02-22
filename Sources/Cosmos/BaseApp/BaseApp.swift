@@ -1,8 +1,9 @@
 import Foundation
 import Logging
 import Crypto
-import ABCI
+import ABCIMessages
 import Database
+import DataConvertible
 
 public enum BaseAppKeys {
     // MainStoreKey is the string representation of the main store
@@ -103,7 +104,7 @@ open class BaseApp: Sealable {
     // transaction. This is mainly used for DoS and spam prevention.
     // TODO: Maybe make minGasPrices start with empty coins
     // instead of being nil
-    var minGasPrices: DecimalCoins? = nil
+    var minGasPrices: [DecimalCoin]? = nil
 
     // flag for sealing options and parameters to a BaseApp
     var sealed: Bool = false

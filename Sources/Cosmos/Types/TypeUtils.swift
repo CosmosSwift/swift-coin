@@ -1,5 +1,7 @@
 import Foundation
 import Database
+import DataConvertible
+
 
 // SortedJSON takes any JSON and returns it sorted by keys. Also, all white-spaces
 // are removed.

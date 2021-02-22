@@ -1,5 +1,5 @@
 import Foundation
-import ABCI
+import ABCIMessages
 import Cosmos
 
 extension BankKeys {
@@ -22,10 +22,10 @@ extension BankKeeper {
 
     // queryBalance fetch an account's balance for the supplied height.
     // Height and account address are passed as first and second path components respectively.
-    func queryBalance(request: Request, queryRequest: RequestQuery) throws -> Data {
+    func queryBalance(request: Request, queryRequest: RequestQuery<Data>) throws -> Data {
         do {
             let params: QueryBalanceParams = try Codec.bankCodec.unmarshalJSON(data: queryRequest.data)
-            let coins = self.coins(request: request, address: params.address) ?? Coins()
+            let coins = self.coins(request: request, address: params.address) ?? [Coin]()
             
             do {
                 return try Codec.bankCodec.marshalJSONIndent(value: coins)

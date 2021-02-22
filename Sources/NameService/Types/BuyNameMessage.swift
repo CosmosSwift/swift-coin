@@ -5,10 +5,10 @@ import Cosmos
 // MsgBuyName defines the BuyName message
 struct BuyNameMessage: Codable {
     let name: String
-    let bid: Coins
+    let bid: [Coin]
     let buyer: AccountAddress
     
-    internal init(name: String, bid: Coins, buyer: AccountAddress) {
+    internal init(name: String, bid: [Coin], buyer: AccountAddress) {
         self.name = name
         self.bid = bid
         self.buyer = buyer

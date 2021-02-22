@@ -2,7 +2,7 @@ import Foundation
 import JSON
 import Logging
 import Tendermint
-import ABCI
+import ABCIServer
 import Database
 
 // AppCreator is a function that allows us to lazily initialize an

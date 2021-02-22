@@ -1,4 +1,4 @@
-import ABCI
+import ABCIMessages
 
 extension CosmosError {
     // SuccessABCICode declares an ABCI response use 0 to signal that the

@@ -4,6 +4,8 @@ import CosmosProto
 import NIO
 import GRPC
 import Cosmos
+import ABCIREST
+import Tendermint
 
 fileprivate let flagEvents = "events"
 
@@ -25,8 +27,9 @@ struct GetQuery: ParsableCommand {
 
 
 // QueryParams returns the command handler for evidence parameter querying.
-struct GetQueryParameters: ParsableCommand {
-    static let configuration = CommandConfiguration(
+// This is a 0.4x.x call
+public struct GetQueryParameters: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         commandName: "params",
         abstract: "Query the current auth parameters",
         discussion: """
@@ -37,8 +40,20 @@ struct GetQueryParameters: ParsableCommand {
     )
     
     @OptionGroup var queryFlags: Flags.QueryFlags
+  
+    public init() {}
     
-    mutating func run() throws {
+    struct GetParamsPayload: RequestPayload {
+        static var method: ABCIREST.Method { .abci_query }
+        var path: String { "custom/acc/" }
+        
+        typealias ResponsePayload = AnyProtocolCodable // This is an Account
+
+        let Address: AccountAddress
+        
+    }
+    
+    public mutating func run() throws {
         fatalError()
         //            RunE: func(cmd *cobra.Command, args []string) error {
         //                clientCtx, err := client.GetClientQueryContext(cmd)
@@ -77,42 +92,28 @@ public struct GetAccount: ParsableCommand {
 
     @Argument var address: AccountAddress
     
-    public init() { }
+    
+    struct GetAccountPayload: RequestPayload {        
+        static var method: ABCIREST.Method { .abci_query }
+        var path: String { "custom/acc/account" }
+        
+        typealias ResponsePayload = AnyProtocolCodable // This is an Account
+
+        let Address: AccountAddress
+        
+    }
+    
+    public init() {}
         
     public mutating func run() throws {
-        // Setup an `EventLoopGroup` for the connection to run on.
-        //
-        // See: https://github.com/apple/swift-nio#eventloops-and-eventloopgroups
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-
-        // Make sure the group is shutdown when we're done with it.
-        defer {
-          try! group.syncShutdownGracefully()
-        }
-
-        // Configure the channel, we're not using TLS so the connection is `insecure`.
-        let channel = ClientConnection.insecure(group: group)
-            .connect(host: queryFlags.node.host, port: queryFlags.node.port)
-
-        // Close the connection when we're done with it.
-        defer {
-          try! channel.close().wait()
-        }
-
-        let client = Cosmos_Auth_V1beta1_QueryClient(channel: channel)
+        // TODO: map url to the proper value
+        let client = ABCIRESTClient<GetAccountPayload>(url: "http://192.168.64.1:26657")
         
-        let request = Cosmos_Auth_V1beta1_QueryAccountRequest.with {
-            $0.address = address.data.hexEncodedString()
-        }
+        let res = try client.syncSend(payload: GetAccountPayload(Address: self.address))
         
-        let getAccount = client.account(request)
+        let data = try JSONEncoder().encode(res)
         
-        do {
-            let response = try getAccount.response.wait()
-            print(response.account)
-        } catch {
-            print("Getting Account failed: \(error)")
-        }
+        print(String(data: data, encoding: .utf8)!)
     }
 }
 
@@ -227,11 +228,28 @@ public struct QueryTransaction: ParsableCommand {
     @OptionGroup var queryFlags: Flags.QueryFlags
     
     #warning("still needs renaming")
-    @Argument var arg0: String
+    @Argument var txHash: String
+    
+    
+//    struct Payload: RequestPayload {
+//        static var method: ABCIREST.Method { .abci_query }
+//        var path: String { "custom/acc/account" }
+//        
+//        typealias ResponsePayload = TxResponse // This is an Account
+//
+//        let hash: String
+//        
+//    }
+    
+    
     
     public init() { }
     
     public mutating func run() throws {
+        
+        
+        
+        
         fatalError()
         //    func QueryTxCmd() *cobra.Command {
         //        cmd := &cobra.Command{
@@ -258,5 +276,22 @@ public struct QueryTransaction: ParsableCommand {
         //        return cmd
         //    }
         //    */
+        
+        
+        
+//        TxResponse{
+//                TxHash:    res.Hash.String(),
+//                Height:    res.Height,
+//                Codespace: res.TxResult.Codespace,
+//                Code:      res.TxResult.Code,
+//                Data:      strings.ToUpper(hex.EncodeToString(res.TxResult.Data)),
+//                RawLog:    res.TxResult.Log,
+//                Logs:      parsedLogs,
+//                Info:      res.TxResult.Info,
+//                GasWanted: res.TxResult.GasWanted,
+//                GasUsed:   res.TxResult.GasUsed,
+//                Tx:        anyTx,
+//                Timestamp: timestamp,
+//            }
     }
 }

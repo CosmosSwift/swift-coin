@@ -1,4 +1,5 @@
 import Foundation
+import ABCIMessages
 
 // An address is a []byte, but hex-encoded even in JSON.
 // []byte leaves us the option to change the address length.

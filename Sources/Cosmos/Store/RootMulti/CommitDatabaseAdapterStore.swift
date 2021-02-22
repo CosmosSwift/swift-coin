@@ -1,6 +1,8 @@
 //----------------------------------------
 // commitDBStoreWrapper should only be used for simulation/debugging,
 // as it doesn't compute any commit hash, and it cannot load older state.
+import DataConvertible
+
 final class CommitDatabaseAdapterStore: DatabaseAdapterStore {}
 
 extension CommitDatabaseAdapterStore: CommitKeyValueStore {

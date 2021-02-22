@@ -1,4 +1,4 @@
-import ABCI
+import ABCIMessages
 import Cosmos
 import Params
 import Supply

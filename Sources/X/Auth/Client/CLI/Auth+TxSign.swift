@@ -1,3 +1,52 @@
+import Foundation
+import ArgumentParser
+import Cosmos
+import ABCIREST
+
+
+// GetSignCommand returns the transaction sign command.
+public struct GetSign: ParsableCommand {
+    public static let configuration = CommandConfiguration(
+        commandName: "sign",
+        abstract: "Sign a transaction generated offline.",
+        discussion: """
+            Sign a transaction created with the --generate-only flag.
+    It will read a transaction from [file], sign it, and print its JSON encoding.
+    If the --signature-only flag is set, it will output the signature parts only.
+    The --offline flag makes sure that the client will not reach out to full node.
+    As a result, the account and sequence number queries will not be performed and
+    it is required to set such parameters manually. Note, invalid values will cause
+    the transaction to fail.
+    The --multisig=<multisig_key> flag generates a signature on behalf of a multisig account
+    key. It implies --signature-only. Full multisig signed transactions may eventually
+    be generated via the 'multisign' command.
+    """
+    )
+    
+    @OptionGroup var txFlags: Flags.TransactionFlags
+      
+    @Argument(help: "Transaction file.")
+    var transactionFile: String
+
+    // TODO: add relevant flags. the preRun command is making some flags required when the offline flag is set
+//    cmd.Flags().String(flagMultisig, "", "Address of the multisig account on behalf of which the transaction shall be signed")
+//    cmd.Flags().Bool(flagOverwrite, false, "Overwrite existing signatures with a new one. If disabled, new signature will be appended")
+//    cmd.Flags().Bool(flagSigOnly, false, "Print only the signatures")
+//    cmd.Flags().String(flags.FlagOutputDocument, "", "The document will be written to the given file instead of STDOUT")
+//    cmd.Flags().String(flags.FlagChainID, "", "The network chain ID")
+//    cmd.Flags().Bool(flagAmino, false, "Generate Amino encoded JSON suitable for submiting to the txs REST endpoint")
+//    cmd.MarkFlagRequired(flags.FlagFrom)
+
+    
+    public init() {}
+    
+    
+    // TODO has a preRun command
+    public mutating func run() throws {
+        fatalError()
+    }
+}
+
 /*
  
  package cli

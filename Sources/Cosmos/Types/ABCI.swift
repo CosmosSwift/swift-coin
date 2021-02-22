@@ -1,4 +1,6 @@
-import ABCI
+
+import Foundation
+import ABCIMessages
 
 // InitChainer initializes application state at genesis
 public typealias InitChainer = (_ request: Request, _ initChainRequest: RequestInitChain) -> ResponseInitChain
@@ -16,4 +18,4 @@ public typealias BeginBlocker = (_ request: Request, _ beginBlockRequest: Reques
 public typealias EndBlocker = (_ request: Request, _ endBlockRequest: RequestEndBlock) -> ResponseEndBlock
 
 // PeerFilter responds to p2p filtering queries from Tendermint
-public typealias PeerFilter = (_ info: String) -> ResponseQuery
+public typealias PeerFilter = (_ info: String) -> ResponseQuery<Data>

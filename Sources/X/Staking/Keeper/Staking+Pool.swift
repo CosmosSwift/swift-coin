@@ -20,7 +20,7 @@ extension StakingKeeper {
 
     // bondedTokensToNotBonded transfers coins from the bonded to the not bonded pool within staking
     func bondedTokensToNotBonded(request: Request, tokens: UInt) {
-        let coins = Coins(coins: [Coin(denomination: bondDenomination(request: request), amount: tokens)])
+        let coins = [Coin(denomination: bondDenomination(request: request), amount: tokens)]
         
         // TODO: Implement
         fatalError()
@@ -34,7 +34,7 @@ extension StakingKeeper {
 
     // notBondedTokensToBonded transfers coins from the not bonded to the bonded pool within staking
     func notBondedTokensToBonded(request: Request, tokens: UInt) {
-        let coins = Coins(coins: [Coin(denomination: bondDenomination(request: request), amount: tokens)])
+        let coins = [Coin(denomination: bondDenomination(request: request), amount: tokens)]
         
         // TODO: Implement
         fatalError()

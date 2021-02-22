@@ -1,5 +1,6 @@
 import Foundation
-import ABCI
+import ABCIMessages
+import DataConvertible
 
 // ----------------------------------------------------------------------------
 // Event Manager
@@ -32,7 +33,7 @@ extension EventManager {
 // ----------------------------------------------------------------------------
 
 // Event is a type alias for an ABCI Event
-public typealias Event = ABCI.Event
+public typealias Event = ABCIMessages.Event
 
 extension Event {
     public init(type: String, attributes: [Attribute]) {

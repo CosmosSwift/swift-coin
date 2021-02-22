@@ -196,9 +196,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XAuth"
-               BuildableName = "XAuth"
-               BlueprintName = "XAuth"
+               BlueprintIdentifier = "test"
+               BuildableName = "test"
+               BlueprintName = "test"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -210,9 +210,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XBank"
-               BuildableName = "XBank"
-               BlueprintName = "XBank"
+               BlueprintIdentifier = "TestClient"
+               BuildableName = "TestClient"
+               BlueprintName = "TestClient"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -224,107 +224,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XGenUtil"
-               BuildableName = "XGenUtil"
-               BlueprintName = "XGenUtil"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XGovernance"
-               BuildableName = "XGovernance"
-               BlueprintName = "XGovernance"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XParams"
-               BuildableName = "XParams"
-               BlueprintName = "XParams"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XSimulation"
-               BuildableName = "XSimulation"
-               BlueprintName = "XSimulation"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XStaking"
-               BuildableName = "XStaking"
-               BlueprintName = "XStaking"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XSupply"
-               BuildableName = "XSupply"
-               BlueprintName = "XSupply"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ParameterSet"
-               BuildableName = "ParameterSet"
-               BlueprintName = "ParameterSet"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XAuthAnte"
-               BuildableName = "XAuthAnte"
-               BlueprintName = "XAuthAnte"
+               BlueprintIdentifier = "TestServer"
+               BuildableName = "TestServer"
+               BlueprintName = "TestServer"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -474,6 +376,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "TestServer"
+            BuildableName = "TestServer"
+            BlueprintName = "TestServer"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
@@ -490,15 +402,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "nameserviced"
-            BuildableName = "nameserviced"
-            BlueprintName = "nameserviced"
+            BlueprintIdentifier = "TestServer"
+            BuildableName = "TestServer"
+            BlueprintName = "TestServer"
             ReferencedContainer = "container:">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -1,5 +1,8 @@
 import Foundation
-import ABCI
+import ABCIServer
+import ABCIMessages
+import DataConvertible
+
 
 extension BaseApp: ABCIApplication {
     // InitChain implements the ABCI interface. It runs the initialization logic
@@ -72,21 +75,21 @@ extension BaseApp: ABCIApplication {
     }
     
     // FilterPeerByAddrPort filters peers by address/port.
-    private func filterPeer(byAddressPort info: String) -> ResponseQuery {
+    private func filterPeer(byAddressPort info: String) -> ResponseQuery<Data> {
         if let filter = addressPeerFilter {
             return filter(info)
         }
         
-        return ResponseQuery()
+        return ResponseQuery<Data>()
     }
 
     // FilterPeerByIDfilters peers by node ID.
-    func filterPeer(byID info: String) -> ResponseQuery {
+    func filterPeer(byID info: String) -> ResponseQuery<Data> {
         if let filter = idPeerFilter {
             return filter(info)
         }
         
-        return ResponseQuery()
+        return ResponseQuery<Data>()
     }
 
     // BeginBlock implements the ABCI application interface.
@@ -211,7 +214,7 @@ extension BaseApp: ABCIApplication {
     // Otherwise, the ResponseDeliverTx will contain releveant error information.
     // Regardless of tx execution outcome, the ResponseDeliverTx will contain relevant
     // gas execution context.
-    public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
+    public func deliverTx(request: RequestDeliverTx<Data>) -> ResponseDeliverTx<Data> {
         let transaction: Transaction
        
         do {
@@ -328,7 +331,7 @@ extension BaseApp: ABCIApplication {
 
     // Query implements the ABCI interface. It delegates to CommitMultiStore if it
     // implements Queryable.
-    public func query(request: RequestQuery) -> ResponseQuery {
+    public func query(request: RequestQuery<Data>) -> ResponseQuery<Data> {
         let path = split(path: request.path)
         
         guard !path.isEmpty else {
@@ -358,7 +361,7 @@ extension BaseApp: ABCIApplication {
         }
     }
 
-    func handleQueryApp(path: [Substring], request: RequestQuery) -> ResponseQuery {
+    func handleQueryApp(path: [Substring], request: RequestQuery<Data>) -> ResponseQuery<Data> {
         if path.count >= 2 {
             switch path[1] {
             case "simulate":
@@ -396,21 +399,21 @@ extension BaseApp: ABCIApplication {
                     result: result
                 )
 
-                return ResponseQuery(
+                return ResponseQuery<Data>(
                     value: Codec.codec.mustMarshalBinaryBare(value: simulationResponse),
                     height: request.height,
                     codespace: CosmosError.rootCodespace
                 )
 
             case "version":
-                return ResponseQuery(
+                return ResponseQuery<Data>(
                     value: appVersion.data,
                     height: request.height,
                     codespace: CosmosError.rootCodespace
                 )
 
             default:
-                return ResponseQuery(
+                return ResponseQuery<Data>(
                     error: CosmosError.wrap(
                         error: CosmosError.unknownRequest,
                         description: "unknown query: \(path)"
@@ -419,7 +422,7 @@ extension BaseApp: ABCIApplication {
             }
         }
 
-        return ResponseQuery(
+        return ResponseQuery<Data>(
             error: CosmosError.wrap(
                 error: CosmosError.unknownRequest,
                 description: "expected second parameter to be either 'simulate' or 'version', neither was present"
@@ -427,7 +430,7 @@ extension BaseApp: ABCIApplication {
         )
     }
 
-    func handleQueryStore(path: [Substring], request: RequestQuery) -> ResponseQuery {
+    func handleQueryStore(path: [Substring], request: RequestQuery<Data>) -> ResponseQuery<Data> {
         // "/store" prefix for store queries
         guard let queryable = commitMultiStore as? Queryable else {
             return ResponseQuery(
@@ -438,15 +441,17 @@ extension BaseApp: ABCIApplication {
             )
         }
 
-        var request = request
-        request.path = "/" + path.suffix(from: 1).joined(separator: "/")
-
-        // when a client did not provide a query height, manually inject the latest
-        if request.height == 0 {
-            // TODO: Maybe this should fatalError?
-            request.height = lastBlockHeight ?? 0
+        let path = "/" + path.suffix(from: 1).joined(separator: "/")
+        
+        let height: Int64
+        if request.height == 0, let lastBlockHeight = lastBlockHeight {
+            height = lastBlockHeight
+        } else {
+            height = request.height
         }
-
+        
+        let request = RequestQuery<Data>(payload: request.payload, path: path, height: height, prove: request.prove)
+        
         if request.height <= 1 && request.prove {
             return ResponseQuery(
                 error: CosmosError.wrap(
@@ -461,7 +466,7 @@ extension BaseApp: ABCIApplication {
         return response
     }
 
-    func handleQueryP2P(path: [Substring]) -> ResponseQuery {
+    func handleQueryP2P(path: [Substring]) -> ResponseQuery<Data> {
         // "/p2p" prefix for p2p queries
         if path.count >= 4 {
             let command = path[1]
@@ -498,7 +503,7 @@ extension BaseApp: ABCIApplication {
         )
     }
 
-    func handleQueryCustom(path: [Substring], request: RequestQuery) -> ResponseQuery {
+    func handleQueryCustom(path: [Substring], request: RequestQuery<Data>) -> ResponseQuery<Data> {
         // path[0] should be "custom" because "/custom" prefix is required for keeper
         // queries.
         //
@@ -523,14 +528,15 @@ extension BaseApp: ABCIApplication {
             )
         }
         
-        var request = request
-
-        // when a client did not provide a query height, manually inject the latest
-        if request.height == 0 {
-            // TODO: Maybe this should fatalError if nil?
-            request.height = lastBlockHeight ?? 0
+        let height: Int64
+        if request.height == 0, let lastBlockHeight = lastBlockHeight {
+            height = lastBlockHeight
+        } else {
+            height = request.height
         }
-
+        
+        let request = RequestQuery<Data>(payload: request.payload, path: request.path, height: height, prove: request.prove)
+        
         if request.height <= 1 && request.prove {
             return ResponseQuery(
                 error: CosmosError.wrap(
@@ -566,7 +572,7 @@ extension BaseApp: ABCIApplication {
         )
         
         // TODO: Maybe minGasPrices can be not optional?
-        cachedRequest.minGasPrices = self.minGasPrices ?? DecimalCoins()
+        cachedRequest.minGasPrices = self.minGasPrices ?? [DecimalCoin]()
 
         // Passes the rest of the path as an argument to the querier.
         //
@@ -580,14 +586,14 @@ extension BaseApp: ABCIApplication {
                 request
             )
             
-            return ResponseQuery(
+            return ResponseQuery<Data>(
                 value: responseData,
                 height: request.height
             )
         } catch {
             let (space, code, log) = abciInfo(error: error, debug: false)
             
-            return ResponseQuery(
+            return ResponseQuery<Data>(
                 code: code,
                 log: log,
                 height: request.height,

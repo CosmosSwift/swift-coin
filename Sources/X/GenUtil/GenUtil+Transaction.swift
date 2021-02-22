@@ -1,3 +1,3 @@
-import ABCI
+import ABCIMessages
 
-public typealias DeliverTxFunction = (_ deliverTxRequest: RequestDeliverTx) -> ResponseDeliverTx
+public typealias DeliverTxFunction<Payload> = (_ deliverTxRequest: RequestDeliverTx<Payload>) -> ResponseDeliverTx<Payload>

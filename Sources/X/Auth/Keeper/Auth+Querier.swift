@@ -1,6 +1,6 @@
 import Foundation
 import Tendermint
-import ABCI
+import ABCIMessages
 import Cosmos
 
 extension AccountKeeper {
@@ -16,7 +16,7 @@ extension AccountKeeper {
         }
     }
 
-    private func queryAccount(request: Request, queryRequest: RequestQuery) throws -> Data {
+    private func queryAccount(request: Request, queryRequest: RequestQuery<Data>) throws -> Data {
         let parameters: QueryAccountParameters
         
         do {

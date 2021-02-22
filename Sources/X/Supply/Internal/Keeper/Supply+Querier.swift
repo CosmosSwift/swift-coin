@@ -1,5 +1,5 @@
 import Foundation
-import ABCI
+import ABCIMessages
 import Cosmos
 
 extension SupplyKeeper {
@@ -17,7 +17,7 @@ extension SupplyKeeper {
         }
     }
 
-    func queryTotalSupply(request: Request, queryRequest: RequestQuery) throws -> Data {
+    func queryTotalSupply(request: Request, queryRequest: RequestQuery<Data>) throws -> Data {
         do {
             let params: QueryTotalSupplyParams = try codec.unmarshalJSON(data: queryRequest.data)
             var totalSupply = supply(request: request).total
@@ -30,10 +30,9 @@ extension SupplyKeeper {
             )
             
             if start < 0 || end < 0 {
-                totalSupply = Coins()
+                totalSupply = []
             } else {
-                // TODO: Implement Coins slicing
-                totalSupply = Coins(coins: Array(totalSupply.coins[start..<end]))
+                totalSupply = Array(totalSupply[start..<end])
             }
             
             do {
@@ -46,7 +45,7 @@ extension SupplyKeeper {
         }
     }
 
-    func querySupplyOf(request: Request, queryRequest: RequestQuery) throws -> Data {
+    func querySupplyOf(request: Request, queryRequest: RequestQuery<Data>) throws -> Data {
         do {
             let params: QuerySupplyOfParams = try codec.unmarshalJSON(data: queryRequest.data)
             let supply = self.supply(request: request).total.amountOf(denomination: params.denomination)

@@ -1,6 +1,6 @@
 import JSON
 import Tendermint
-import ABCI
+import ABCIMessages
 
 // App implements the common methods for a Cosmos SDK-based application
 // specific blockchain.

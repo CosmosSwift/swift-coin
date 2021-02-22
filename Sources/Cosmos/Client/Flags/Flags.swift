@@ -75,6 +75,64 @@ public enum Flags {
         // cmd.SetErr(cmd.ErrOrStderr())
         // cmd.SetOut(cmd.OutOrStdout())
     }
+    
+    public struct TransactionFlags: ParsableArguments {
+        #warning("where should this live? here? Or somewhere more general?")
+        public enum OutputFormat: String, ExpressibleByArgument {
+            case text
+            case json
+        }
+        
+        #warning("the <host>:<port> format seems like it could leverage some type safety")
+        @Option(help: "<host>:<port> to Tendermint RPC interface for this chain")
+        public var node: NodeURL = NodeURL(argument: "tcp://localhost:26657")!
+        
+        @Option(help: "Use a specific height to query state at (this can error if the node is pruning state)")
+        public var height: Int = 0
+        
+        #warning("This actually comes from the tendermint import")
+        @Option(name: .shortAndLong, help: "Output format (text|json)")
+        public var output: OutputFormat = .text
+        
+        #warning("this comes from the root command but is marked required (in go) for this implementation specifically")
+        @Option(help: "The network chain ID")
+        public var chainId: String
+        
+        public init() { fatalError() }
+        
+        #warning("Does this need porting?")
+        // cmd.SetErr(cmd.ErrOrStderr())
+        // cmd.SetOut(cmd.OutOrStdout())
+        
+        // TODO: implement flags
+        
+//        cmd.Flags().String(FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
+//        cmd.Flags().String(FlagFrom, "", "Name or address of private key with which to sign")
+//        cmd.Flags().Uint64P(FlagAccountNumber, "a", 0, "The account number of the signing account (offline mode only)")
+//        cmd.Flags().Uint64P(FlagSequence, "s", 0, "The sequence number of the signing account (offline mode only)")
+//        cmd.Flags().String(FlagMemo, "", "Memo to send along with transaction")
+//        cmd.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 10uatom")
+//        cmd.Flags().String(FlagGasPrices, "", "Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)")
+//        cmd.Flags().String(FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
+//        cmd.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
+//        cmd.Flags().Float64(FlagGasAdjustment, DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
+//        cmd.Flags().StringP(FlagBroadcastMode, "b", BroadcastSync, "Transaction broadcasting mode (sync|async|block)")
+//        cmd.Flags().Bool(FlagDryRun, false, "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it")
+//        cmd.Flags().Bool(FlagGenerateOnly, false, "Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase is not accessible)")
+//        cmd.Flags().Bool(FlagOffline, false, "Offline mode (does not allow any online functionality")
+//        cmd.Flags().BoolP(FlagSkipConfirmation, "y", false, "Skip tx broadcasting prompt confirmation")
+//        cmd.Flags().String(FlagKeyringBackend, DefaultKeyringBackend, "Select keyring's backend (os|file|kwallet|pass|test)")
+//        cmd.Flags().String(FlagSignMode, "", "Choose sign mode (direct|amino-json), this is an advanced feature")
+//        cmd.Flags().Uint64(FlagTimeoutHeight, 0, "Set a block timeout height to prevent the tx from being committed past a certain height")
+//
+//        // --gas can accept integers and "auto"
+//        cmd.Flags().String(FlagGas, "", fmt.Sprintf("gas limit to set per-transaction; set to %q to calculate sufficient gas automatically (default %d)", GasFlagAuto, DefaultGasLimit))
+//
+//        cmd.MarkFlagRequired(FlagChainID)
+//
+//        cmd.SetErr(cmd.ErrOrStderr())
+//        cmd.SetOut(cmd.OutOrStdout())
+    }
 }
 
 

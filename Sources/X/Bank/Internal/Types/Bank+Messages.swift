@@ -15,13 +15,13 @@ struct SendMessage: Message {
     
     let senderAddress: AccountAddress
     let destinationAddress: AccountAddress
-    let amount: Coins
+    let amount: [Coin]
 
     // NewMsgSend - construct arbitrary multi-in, multi-out send msg.
     internal init(
         senderAddress: AccountAddress,
         destinationAddress: AccountAddress,
-        amount: Coins
+        amount: [Coin]
     ) {
         self.senderAddress = senderAddress
         self.destinationAddress = destinationAddress
@@ -129,10 +129,10 @@ extension MultiSendMessage {
 // Input models transaction input
 public struct Input: Codable {
     let address: AccountAddress
-    let coins: Coins
+    let coins: [Coin]
     
     // NewInput - create a transaction input, used with MsgMultiSend
-    internal init(address: AccountAddress, coins: Coins) {
+    internal init(address: AccountAddress, coins: [Coin]) {
         self.address = address
         self.coins = coins
     }
@@ -159,10 +159,10 @@ extension Input {
 // Output models transaction outputs
 public struct Output: Codable {
     let address: AccountAddress
-    let coins: Coins
+    let coins: [Coin]
     
     // NewOutput - create a transaction output, used with MsgMultiSend
-    internal init(address: AccountAddress, coins: Coins) {
+    internal init(address: AccountAddress, coins: [Coin]) {
         self.address = address
         self.coins = coins
     }
@@ -192,8 +192,8 @@ extension MultiSendMessage {
         inputs: [Input],
         outputs: [Output]
     ) throws {
-        var totalIn = Coins()
-        var totalOut = Coins()
+        var totalIn = [Coin]()
+        var totalOut = [Coin]()
 
         for input in inputs {
             try input.validateBasic()
