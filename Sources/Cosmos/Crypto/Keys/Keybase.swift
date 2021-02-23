@@ -52,7 +52,7 @@ extension DatabaseKeybase {
         language: Language,
         password: String,
         algorithm: SigningAlgorithm
-    ) throws -> (info: Info, seed: String) {
+    ) throws -> (info: KeyInfo, seed: String) {
         // TODO: Implement
         fatalError()
 //        return kb.base.CreateMnemonic(kb, name, language, passwd, algo)
@@ -67,7 +67,7 @@ extension DatabaseKeybase {
         encryptPassword: String,
         hdPath: String,
         algorithm: SigningAlgorithm
-    ) throws -> Info {
+    ) throws -> KeyInfo {
          try base.createAccount(
             keyWriter: self,
             name: name,
@@ -87,7 +87,7 @@ extension DatabaseKeybase {
         humanReadablePart: String,
         account: UInt32,
         index: UInt32
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        return kb.base.CreateLedger(kb, name, algo, hrp, account, index)
@@ -99,7 +99,7 @@ extension DatabaseKeybase {
         name: String,
         publicKey: PublicKey,
         algorithm: SigningAlgorithm
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        return kb.base.writeOfflineKey(kb, name, pub, algo), nil
@@ -110,14 +110,14 @@ extension DatabaseKeybase {
     func createMulti(
         name: String,
         publicKey: PublicKey
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        return kb.base.writeMultisigKey(kb, name, pub), nil
     }
 
     // List returns the keys from storage in alphabetical order.
-    func list() throws -> [Info] {
+    func list() throws -> [KeyInfo] {
         // TODO: Implement
         fatalError()
 //        var res []Info
@@ -147,7 +147,7 @@ extension DatabaseKeybase {
     }
 
     // Get returns the public information about one key.
-    func get(name: String) throws -> Info {
+    func get(name: String) throws -> KeyInfo {
         let key = Self.infoKey(name: name)
         
         guard let data = try database.get(key: key) else {
@@ -159,7 +159,7 @@ extension DatabaseKeybase {
 
     // GetByAddress returns Info based on a provided AccAddress. An error is returned
     // if the address does not exist.
-    func getByAddress(address: AccountAddress) throws -> Info {
+    func getByAddress(address: AccountAddress) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        ik, err := kb.db.Get(addrKey(address))
@@ -479,7 +479,7 @@ extension DatabaseKeybase {
         privateKey: PrivateKey,
         passphrase: String,
         algorithm: SigningAlgorithm
-    ) -> Info {
+    ) -> KeyInfo {
         // encrypt private key using passphrase
         let privateKeyArmor = MintKey.encryptArmorPrivateKey(
             privateKey: privateKey,
@@ -501,7 +501,7 @@ extension DatabaseKeybase {
         return info
     }
 
-    func writeInfo(name: String, info: Info) {
+    func writeInfo(name: String, info: KeyInfo) {
         // write the info by key
         let key = Self.infoKey(name: name)
         let serializedInfo = marshal(info: info)

@@ -61,7 +61,7 @@ struct ShowKeysCommand: ParsableCommand {
     public init() {}
     
     func run() throws {
-        let info: Info
+        let info: KeyInfo
 //
         let keybase = try makeKeyring(
             appName: Configuration.keyringServiceName,
@@ -106,9 +106,10 @@ struct ShowKeysCommand: ParsableCommand {
         let bechKeyOutput = try Self.bechKeyOutput(bechPrefix: bechPrefix)
         
         if isShowAddressEnabled {
-            // TODO: Implement
-            fatalError()
-//            printKeyAddress(info, bechKeyOutput)
+            printKeyAddress(
+                info: info,
+                bechKeyOutput: bechKeyOutput
+            )
         } else if isShowPublicKeyEnabled {
             // TODO: Implement
             fatalError()

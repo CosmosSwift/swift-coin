@@ -11,40 +11,28 @@ public enum Crypto {
     }
 }
 
-public class PublicKey: Codable, Equatable {
-    public var address: Address {
-        fatalError("PublicKey must be subclassed.")
-    }
-    
-    var data: Data {
-        fatalError("PublicKey must be subclassed.")
-    }
-    
-    public func verify(message: Data, signature: Data) -> Bool {
-        fatalError("PublicKey must be subclassed.")
-    }
-    
-    public static func == (lhs: PublicKey, rhs: PublicKey) -> Bool {
-        lhs.data == rhs.data
+public protocol PublicKey: ProtocolCodable {
+    var address: Address { get }
+    var data: Data { get }
+    func verify(message: Data, signature: Data) -> Bool
+    func equals(publicKey: PublicKey) -> Bool
+}
+
+public extension PublicKey {
+    func equals(publicKey: PublicKey) -> Bool {
+        self.data == publicKey.data
     }
 }
 
-public class PrivateKey: Codable, Equatable {
-    var data: Data {
-        fatalError("PublicKey must be subclassed.")
-    }
-
-    public var publicKey: PublicKey {
-        fatalError("PublicKey must be subclassed.")
-    }
+public protocol PrivateKey: ProtocolCodable {
+    var data: Data { get }
+    var publicKey: PublicKey { get}
+    func sign(message: Data) throws -> Data
+    func equals(privateKey: PrivateKey) -> Bool
+}
     
-    init() {}
-    
-    public func sign(message: Data) throws -> Data {
-        fatalError("PublicKey must be subclassed.")
-    }
-    
-    public static func == (lhs: PrivateKey, rhs: PrivateKey) -> Bool {
-        lhs.data == rhs.data
+public extension PrivateKey {
+    func equals(privateKey: PrivateKey) -> Bool {
+        self.data == privateKey.data
     }
 }

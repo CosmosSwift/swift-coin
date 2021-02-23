@@ -40,17 +40,32 @@ public struct BaseAccount: Account, GenesisAccount {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.address = try container.decode(AccountAddress.self, forKey: .address)
         self.coins = try container.decode(Coins.self, forKey: .coins)
-        self.publicKey = try container.decodeIfPresent(PublicKey.self, forKey: .publicKey)
+        let publicKeyCodable = try container.decodeIfPresent(AnyProtocolCodable.self, forKey: .publicKey)
+       
+        guard let publicKey = publicKeyCodable?.value as? PublicKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .publicKey,
+                in: container,
+                debugDescription: "Invalid public key type"
+            )
+        }
+        
+        self.publicKey = publicKey
+        
         let accountNumberStr = try container.decode(String.self, forKey: .accountNumber)
+        
         guard let accountNumber = UInt64(accountNumberStr) else {
             throw Cosmos.Error.generic(reason: "Decoding: Invalid accountNumber: \(accountNumberStr)")
         }
+        
         self.accountNumber = accountNumber
         
-        let sequenceStr = try container.decode(String.self, forKey: .sequence)
-        guard let sequence = UInt64(sequenceStr) else {
-            throw Cosmos.Error.generic(reason: "Decoding: Invalid sequence: \(sequenceStr)")
+        let sequenceString = try container.decode(String.self, forKey: .sequence)
+        
+        guard let sequence = UInt64(sequenceString) else {
+            throw Cosmos.Error.generic(reason: "Decoding: Invalid sequence: \(sequenceString)")
         }
+        
         self.sequence = sequence
     }
     
@@ -58,7 +73,11 @@ public struct BaseAccount: Account, GenesisAccount {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(address, forKey: .address)
         try container.encode(coins, forKey: .coins)
-        try container.encode(publicKey, forKey: .publicKey)
+        
+        if let publicKey = self.publicKey {
+            try container.encode(AnyProtocolCodable(publicKey), forKey: .publicKey)
+        }
+        
         try container.encode("\(accountNumber)", forKey: .accountNumber)
         try container.encode("\(sequence)", forKey: .sequence)
 

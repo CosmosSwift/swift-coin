@@ -17,11 +17,11 @@ protocol WriteLocalKeyer {
         privateKey: PrivateKey,
         passphrase: String,
         algorithm: SigningAlgorithm
-    ) -> Info
+    ) -> KeyInfo
 }
 
 protocol InfoWriter {
-    func writeInfo(name: String, info: Info)
+    func writeInfo(name: String, info: KeyInfo)
 }
 
 // baseKeybase is an auxiliary type that groups Keybase storage agnostic features
@@ -113,7 +113,7 @@ struct BaseKeybase {
         encryptPassword: String,
         hdPath: String,
         algorithm: SigningAlgorithm
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // create master key and derive first key for keyring
         let derivedPrivateKey = try options.deriveKey(
             mnemonic,
@@ -146,7 +146,7 @@ struct BaseKeybase {
         name: String,
         publicKey: PublicKey,
         algorithm: SigningAlgorithm
-    ) -> Info {
+    ) -> KeyInfo {
         let info = OfflineInfo(
             name: name,
             publicKey: publicKey,

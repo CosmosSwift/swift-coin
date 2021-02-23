@@ -24,7 +24,7 @@ struct KeyOutput: Codable {
 // Bech32KeyOutput create a KeyOutput in with "acc" Bech32 prefixes. If the
 // public key is a multisig public key, then the threshold and constituent
 // public keys will be added.
-func bech32KeyOutput(keyInfo: Info) throws -> KeyOutput {
+func bech32KeyOutput(keyInfo: KeyInfo) throws -> KeyOutput {
     let accountAddress = AccountAddress(data: keyInfo.publicKey.address.rawValue)
     let publicKey = keyInfo.publicKey.address.rawValue.hexEncodedString()
     // TODO: Implement
