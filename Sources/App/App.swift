@@ -1,10 +1,18 @@
 import Foundation
 import JSON
 import Logging
-import ABCI
+import ABCIServer
+import ABCIMessages
 import Database
 import Cosmos
 import NameService
+import GenUtil
+import Auth
+import Params
+import Bank
+import Supply
+import Staking
+import AuthAnte
 
 
 public final class NameServiceApp: BaseApp, App {
@@ -149,7 +157,7 @@ public final class NameServiceApp: BaseApp, App {
         )
       
         self.setCommitMultiStoreTracer(tracer: commitMultiStoreTracer)
-        self.setAppVersion(version: VersionInfo.defaultVersion)
+        self.setAppVersion(version: Cosmos.Version.version)
 
         self.moduleManager.setOrderEndBlockers(
             StakingKeys.moduleName

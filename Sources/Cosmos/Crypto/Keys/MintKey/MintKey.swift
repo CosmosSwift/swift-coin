@@ -2,6 +2,7 @@ import Foundation
 import Crypto
 import Bcrypt
 import Tendermint
+import DataConvertible
 
 enum MintKey {}
 

@@ -1,5 +1,6 @@
 import Foundation
-import ABCI
+import ABCIMessages
+import DataConvertible
 
 // ----------------------------------------------------------------------------
 // Event Manager
@@ -8,7 +9,7 @@ import ABCI
 // EventManager implements a simple wrapper around a slice of Event objects that
 // can be emitted from.
 public final class EventManager {
-    var events: Events
+    public var events: Events
     
     public init() {
         self.events = []
@@ -17,12 +18,12 @@ public final class EventManager {
 
 extension EventManager {
     // EmitEvent stores a single Event object.
-    func emit(event: Event) {
+    public func emit(event: Event) {
         events.append(event)
     }
 
     // EmitEvents stores a series of Event objects.
-    func emit(events: Events) {
+    public func emit(events: Events) {
         self.events.append(contentsOf: events)
     }
 }
@@ -32,10 +33,10 @@ extension EventManager {
 // ----------------------------------------------------------------------------
 
 // Event is a type alias for an ABCI Event
-public typealias Event = ABCI.Event
+public typealias Event = ABCIMessages.Event
 
-extension ABCI.Event {
-    init(type: String, attributes: [Attribute]) {
+extension Event {
+    public init(type: String, attributes: [Attribute]) {
         self.init(
             type: type,
             attributes: attributes.map(EventAttribute.init)
@@ -48,6 +49,11 @@ extension ABCI.Event {
 public struct Attribute: Codable {
     let key: String
     let value: String?
+    
+    public init(key: String, value: String?) {
+        self.key = key
+        self.value = value
+    }
 }
 
 extension EventAttribute {
@@ -63,18 +69,18 @@ extension EventAttribute {
 public typealias Events = [Event]
 
 // Common event types and attribute keys
-enum EventType {
-    static let message = "message"
+public enum EventType {
+    public static let message = "message"
 }
 
-enum AttributeKey {
-    static let action = "action"
-    static let module = "module"
-    static let sender = "sender"
-    static let amount = "amount"
+public enum AttributeKey {
+    public static let action = "action"
+    public static let module = "module"
+    public static let sender = "sender"
+    public static let amount = "amount"
 }
 
-enum AttributeValue {}
+public enum AttributeValue {}
 
     // StringAttribute defines en Event object wrapper where all the attributes
     // contain key/value pairs that are strings instead of raw bytes.

@@ -8,6 +8,7 @@ struct NameserviceCLI: ParsableCommand {
         abstract: "Command line interface for interacting with nameserviced",
         subcommands: [
             KeysCommand.self,
+            QueryCommand.self,
         ]
     )
 }

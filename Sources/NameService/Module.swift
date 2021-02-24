@@ -1,6 +1,8 @@
 import JSON
-import ABCI
+import ABCIServer
+import ABCIMessages
 import Cosmos
+import Bank
 
 // AppModuleBasic defines the basic application module used by the nameservice module.
 public class NameServiceAppModuleBasic: AppModuleBasic {

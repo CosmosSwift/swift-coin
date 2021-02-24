@@ -6,7 +6,7 @@ public typealias Handler = (_ request: Request, _ message: Message) throws -> Re
 public typealias AnteHandler = (_ request: Request, _ transaction: Transaction, _ simulate: Bool) throws -> Request?
 
 // AnteDecorator wraps the next AnteHandler to perform custom pre- and post-processing.
-protocol AnteDecorator {
+public protocol AnteDecorator {
     func anteHandle(
         request: Request,
         transaction: Transaction,
@@ -29,7 +29,7 @@ protocol AnteDecorator {
 // transactions to be processed with an infinite gasmeter and open a DOS attack vector.
 // Use `ante.SetUpContextDecorator` or a custom Decorator with similar functionality.
 // Returns nil when no AnteDecorator are supplied.
-func chainAnteDecorators(_ chain: [AnteDecorator]) -> AnteHandler? {
+public func chainAnteDecorators(_ chain: [AnteDecorator]) -> AnteHandler? {
     var chain = chain
     
     guard !chain.isEmpty else {

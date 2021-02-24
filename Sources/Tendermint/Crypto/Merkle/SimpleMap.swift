@@ -26,7 +26,7 @@ extension SimpleMap {
         let valueHash = Hash.sum(data: value)
         
         let pair = KeyValuePair(
-            key: key.data,
+            key: key.toData() ?? Data(),
             value: valueHash
         )
         

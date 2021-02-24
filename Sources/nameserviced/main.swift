@@ -2,11 +2,16 @@ import JSON
 import ArgumentParser
 import Logging
 import Tendermint
-import ABCI
+import ABCIServer
 import Database
 import Cosmos
 import App
 import NameService
+import Auth
+import GenUtil
+import Staking
+import Bank
+import Supply
 
 struct NameserviceDaemon: ParsableCommand {
     static var configuration = CommandConfiguration(
@@ -73,11 +78,11 @@ func exportApp(
 let codec = NameServiceApp.makeCodec()
 
 AppStateMetatype.register(NameService.GenesisState.self) // Nameservice
-AppStateMetatype.register(Cosmos.AuthGenesisState.self) // Auth
-AppStateMetatype.register(Cosmos.StakingGenesisState.self) // Staking
-AppStateMetatype.register(Cosmos.SupplyGenesisState.self) // Supply
-AppStateMetatype.register(Cosmos.GenUtilGenesisState.self) // GenUtil
-AppStateMetatype.register(Cosmos.BankGenesisState.self) // Bank
+AppStateMetatype.register(AuthGenesisState.self) // Auth
+AppStateMetatype.register(StakingGenesisState.self) // Staking
+AppStateMetatype.register(SupplyGenesisState.self) // Supply
+AppStateMetatype.register(GenUtilGenesisState.self) // GenUtil
+AppStateMetatype.register(BankGenesisState.self) // Bank
 
 NameServiceApp.configure()
 ServerContext.defaultHome = NameServiceApp.defaultNodeHome

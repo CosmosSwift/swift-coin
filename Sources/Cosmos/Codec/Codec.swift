@@ -13,7 +13,7 @@ public class Codec {
     
     public static let codec = Codec()
 
-    func marshalJSON<T: Encodable>(value: T) throws -> Data {
+    public func marshalJSON<T: Encodable>(value: T) throws -> Data {
         try encoder.encode(value)
     }
 
@@ -41,7 +41,7 @@ public class Codec {
     // MarshalBinaryBare encodes the object o according to the Amino spec.
     // MarshalBinaryBare doesn't prefix the byte-length of the encoding,
     // so the caller must handle framing.
-    func marshalBinaryBare<T: Encodable>(value: T) throws -> Data {
+    public func marshalBinaryBare<T: Encodable>(value: T) throws -> Data {
         try encoder.encode(value)
 //        // Dereference value if pointer.
 //        var rv, _, isNilPtr = derefPointers(reflect.ValueOf(o))

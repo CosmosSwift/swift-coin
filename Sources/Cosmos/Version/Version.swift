@@ -1,14 +1,13 @@
-public struct VersionInfo {
+#warning("these seem very go specific version could be inferred maybe? also weird to define application name as a variable")
+public enum Version {
     // application's name
-    public static let defaultName = ""
-    // server binary name
-    public static let defaultServerName = "<appd>"
-    // client binary name
-    public static let defaultClientName = "<appcli>"
+    public static var name = ""
+    // application binary name
+    public static var appName = "<appd>"
     // application's version string
-    public static let defaultVersion = ""
+    public static var version = ""
     // commit
-    public static let defaultCommit = ""
+    public static var commit = ""
     // build tags
-    public static let defaultBuildTags = ""
+    public static var buildTags = ""
 }

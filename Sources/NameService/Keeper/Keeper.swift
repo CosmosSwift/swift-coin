@@ -1,4 +1,5 @@
 import Cosmos
+import Bank
 
 // Keeper of the nameservice store
 public struct NameServiceKeeper {

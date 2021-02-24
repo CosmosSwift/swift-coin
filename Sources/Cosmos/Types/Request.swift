@@ -1,12 +1,12 @@
 import Foundation
 import Logging
-import ABCI
+import ABCIMessages
 
 /// Request is an immutable object contains all information needed to
 /// process a request.
 public final class Request {
     var multiStore: MultiStore
-    var header: Header
+    public var header: Header
     let chainID: String
     var transactionData: Data = Data()
     let logger: Logger
@@ -24,7 +24,7 @@ public final class Request {
         }
     }
     
-    var minGasPrices: DecimalCoins
+    var minGasPrices: [DecimalCoin]
     var consensusParams: ConsensusParams? = nil
     public var eventManager:  EventManager
     
@@ -41,7 +41,7 @@ public final class Request {
         self.checkTransaction = isCheckTransaction
         self.logger = logger
         self.gasMeter = InfiniteGasMeter()
-        self.minGasPrices = DecimalCoins()
+        self.minGasPrices = [DecimalCoin]()
         self.eventManager = EventManager()
     }
 

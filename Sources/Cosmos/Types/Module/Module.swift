@@ -1,6 +1,6 @@
 import Foundation
 import JSON
-import ABCI
+import ABCIMessages
 
 // AppModuleBasic is the standard form for basic non-dependant elements of an application module.
 public protocol AppModuleBasic {

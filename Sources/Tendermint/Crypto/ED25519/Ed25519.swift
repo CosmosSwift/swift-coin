@@ -1,4 +1,5 @@
 import Foundation
+import ABCIMessages
 import Crypto
 
 public struct Ed25519PrivateKey: PrivateKey {

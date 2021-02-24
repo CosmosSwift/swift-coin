@@ -4,7 +4,7 @@
 // values are returned signaling the request is invalid.
 //
 // NOTE: The start page is assumed to be 1-indexed.
-func paginate(count: Int, page: Int, limit: Int, definitiveLimit: Int) -> (Int, Int) {
+public func paginate(count: Int, page: Int, limit: Int, definitiveLimit: Int) -> (Int, Int) {
     var limit = limit
     
     if page == 0 {

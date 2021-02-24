@@ -1,6 +1,6 @@
-import ABCI
+import ABCIMessages
 
-extension ABCI.PublicKey {
+extension ABCIMessages.PublicKey {
     // XXX: panics on nil or unknown pubkey type
     // TODO: add cases when new pubkey types are added to crypto
     public init(_ publicKey: PublicKey) {

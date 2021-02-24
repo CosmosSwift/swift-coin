@@ -1,5 +1,5 @@
 import Foundation
-import ABCI
+import ABCIMessages
 import Database
 
 
@@ -82,7 +82,7 @@ public protocol CommitStore: Commiter, Store {}
 //
 // This is an optional, but useful extension to any CommitStore
 protocol Queryable {
-    func query(queryRequest: RequestQuery) -> ResponseQuery
+    func query(queryRequest: RequestQuery<Data>) -> ResponseQuery<Data>
 }
 
 
