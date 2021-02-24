@@ -21,5 +21,4 @@ ClientOptions.defaultHome = NameServiceApp.defaultCLIHome
 
 let executor = Executor(command: NameserviceCLI.self)
 
-print("Executing!")
 executor.execute()
