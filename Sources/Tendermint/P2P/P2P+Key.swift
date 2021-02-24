@@ -7,9 +7,6 @@ import Foundation
 // NodeKey is the persistent peer key.
 // It contains the nodes private key for authentication.
 public struct NodeKey: Codable {
-    // TODO: This used to be an abstract PrivateKey
-    // Using PrivateKey as an "abstract" class did not work
-    // We should think about what to do later
     let privateKey: PrivateKey
     
     private enum CodingKeys: String, CodingKey {
