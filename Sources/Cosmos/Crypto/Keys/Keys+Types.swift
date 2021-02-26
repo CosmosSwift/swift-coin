@@ -2,7 +2,7 @@ import Foundation
 import Tendermint
 
 // Keybase exposes operations on a generic keystore
-protocol Keybase {
+public protocol Keybase {
     // CRUD on the keystore
     func list() throws -> [KeyInfo]
     // Get returns the public information about one key.
@@ -126,13 +126,13 @@ extension Keybase {
 }
 
 // KeyType reflects a human-readable type for key listing.
-enum KeyType: UInt, CustomStringConvertible {
+public enum KeyType: UInt, CustomStringConvertible {
     case local = 0
     case ledger = 1
     case offline = 2
     case multi = 3
     
-    var description: String {
+    public var description: String {
         switch self {
         case .local:
             return "local"
@@ -148,7 +148,7 @@ enum KeyType: UInt, CustomStringConvertible {
 }
 
 // Info is the publicly exposed information about a keypair
-protocol KeyInfo: ProtocolCodable {
+public protocol KeyInfo: ProtocolCodable {
     // Human-readable type for key listing
     var type: KeyType { get }
     // Name of the key

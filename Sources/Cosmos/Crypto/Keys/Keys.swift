@@ -1,7 +1,7 @@
 import ArgumentParser
 
 // SigningAlgo defines an algorithm to derive key-pairs which can be used for cryptographic signing.
-enum SigningAlgorithm: String, ExpressibleByArgument, Codable {
+public enum SigningAlgorithm: String, ExpressibleByArgument, Codable {
     // MultiAlgo implies that a pubkey is a multisignature
     case multi = "multi"
     // Secp256k1 uses the Bitcoin secp256k1 ECDSA parameters.

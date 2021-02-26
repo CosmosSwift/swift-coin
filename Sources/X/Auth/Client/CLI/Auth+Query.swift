@@ -72,15 +72,6 @@ public struct GetQueryParameters: ParsableCommand {
     }
 }
 
-
-#warning("This should probably be moved elsewhere")
-extension AccountAddress: ExpressibleByArgument {
-    public init?(argument: String) {
-        try? self.init(bech32Encoded: argument)
-    }
-}
-
-
 // GetAccount returns a query account that will display the state of the account at a given address.
 public struct GetAccount: ParsableCommand {
     public static let configuration = CommandConfiguration(

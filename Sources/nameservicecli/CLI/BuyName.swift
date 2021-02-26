@@ -72,6 +72,7 @@ public struct BuyName: ParsableCommand {
     
     public mutating func run() throws {
         fatalError()
+        txFlags
         
 //        let txBuilder = TransactionBuilder(transactionEncoder: <#TransactionEncoder#>,
 //                                           accountNumber: <#UInt64#>,

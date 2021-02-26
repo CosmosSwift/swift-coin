@@ -2,12 +2,6 @@ import Foundation
 import Tendermint
 import Cosmos
 
-#warning("STUB")
-struct Keybase {
-    func sign(name: String, passPhrase: String, data: Data) -> StandardSignature {
-        fatalError()
-    }
-}
 
 public struct TransactionBuilder {
     var transactionEncoder: TransactionEncoder
@@ -19,9 +13,9 @@ public struct TransactionBuilder {
     let simulateAndExecute: Bool
     var chainID: String
     var memo: String
-    var transactionType: TransactionType
+    var feeType: FeeType
     
-    enum TransactionType {
+    enum FeeType {
         case fees([Coin])
         case gasPrices([DecimalCoin])
     }
@@ -35,7 +29,7 @@ public struct TransactionBuilder {
         simulateAndExecute: Bool,
         chainID: String,
         memo: String,
-        transactionType: TransactionType
+        feeType: FeeType
     ) throws {
         if chainID.isEmpty {
             throw TransactionBuilderError.chainIDRequired
@@ -50,13 +44,13 @@ public struct TransactionBuilder {
         self.simulateAndExecute = simulateAndExecute
         self.chainID = chainID
         self.memo = memo
-        self.transactionType = transactionType
+        self.feeType = feeType
     }
     
     func buildSignMessage(messages: [Message]) throws -> StandardSignedMessage {
         let finalFees: [Coin]
         
-        switch transactionType {
+        switch feeType {
         case let .fees(fees):
             finalFees = fees
         case let .gasPrices(gasPrices):
@@ -94,6 +88,7 @@ public struct TransactionBuilder {
     struct KeyringServiceName {
         #warning("STUB")
     }
+    
     static func newKeyring(_ keyringServiceName: KeyringServiceName, keyringBackend: String, homeFlag: String) -> Keybase {
         #warning("STUB")
         fatalError()
@@ -102,7 +97,7 @@ public struct TransactionBuilder {
     // MakeSignature builds a StdSignature given keybase, key name, passphrase, and a StdSignMsg.
     static func makeSignature(keybase: Keybase?, name: String, passPhrase: String, message: StandardSignedMessage) throws -> StandardSignature {
         let keybase = keybase ?? newKeyring(KeyringServiceName(), keyringBackend: "", homeFlag: "")
-        return keybase.sign(name: name, passPhrase: passPhrase, data: message.data)
+        return keybase.sign(name: name, passphrase: passPhrase, message: message.data)
     }
     
     // BuildAndSign builds a single message to be signed, and signs a transaction

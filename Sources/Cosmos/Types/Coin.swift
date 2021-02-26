@@ -17,6 +17,24 @@ public struct Coin: Codable {
         case amount
     }
     
+}
+extension Coin {
+    public init?(string: String) {
+        // get the first char which is not number (or . when we handle DecCoin)
+        // from there, it's the denom
+        // the denom should be btw 3 and 16 char long, start with a lowercase letter, and the rest should be lowercase or number
+        //
+        let pattern = "[0-9]+"
+        guard let amountRange = string.range(of: pattern, options:.regularExpression) else {
+            return nil
+        }
+        
+        let amount = UInt(string[amountRange]) ?? 0
+        var denomination = string
+        denomination.removeSubrange(amountRange)
+        self.init(denomination: denomination, amount: amount)
+    }
+    
     // This si required because Tendermint 0.33.9 ser/deser UInt64 as strings
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -38,6 +56,7 @@ public struct Coin: Codable {
         amount == 0
     }
 }
+
 
 // Adds amounts of two coins with same denom. If the coins differ in denom then
 // it panics.
@@ -74,6 +93,20 @@ extension Array where Element == Coin {
         }
         
         return true
+    }
+    
+    public init?(string: String) {
+        let coinStrArray = string.split(separator: ",")
+        
+        var coins: [Coin] = []
+        
+        for coinStr in coinStrArray {
+            guard let coin = Coin(string: String(coinStr)) else {
+                return nil
+            }
+            coins.append(coin)
+        }
+        self = coins
     }
 }
 

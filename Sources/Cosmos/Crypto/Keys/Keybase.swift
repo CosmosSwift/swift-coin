@@ -6,7 +6,7 @@ import DataConvertible
 // Language is a language to create the BIP 39 mnemonic in.
 // Currently, only english is supported though.
 // Find a list of all supported languages in the BIP 39 spec (word lists).
-enum Language: Int {
+public enum Language: Int {
     // English is the default language to create a mnemonic.
     // It is the only supported language by this package.
     case english = 1
