@@ -7,13 +7,34 @@ import Foundation
 // NodeKey is the persistent peer key.
 // It contains the nodes private key for authentication.
 public struct NodeKey: Codable {
-    // TODO: This used to be an abstract PrivateKey
-    // Using PrivateKey as an "abstract" class did not work
-    // We should think about what to do later
-    let privateKey: Ed25519PrivateKey
+    let privateKey: PrivateKey
     
     private enum CodingKeys: String, CodingKey {
         case privateKey = "priv_key"
+    }
+    
+    init(privateKey: PrivateKey) {
+        self.privateKey = privateKey
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let privateKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .privateKey)
+        
+        guard let privateKey = privateKeyCodable.value as? PrivateKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .privateKey,
+                in: container,
+                debugDescription: "Invalid type for private key"
+            )
+        }
+        
+        self.privateKey = privateKey
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(AnyProtocolCodable(privateKey), forKey: .privateKey)
     }
 }
 

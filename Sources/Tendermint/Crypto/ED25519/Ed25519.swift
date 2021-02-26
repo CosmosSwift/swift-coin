@@ -2,66 +2,45 @@ import Foundation
 import ABCIMessages
 import Crypto
 
-public class Ed25519PrivateKey: PrivateKey {
-    let key: Curve25519.Signing.PrivateKey
+public struct Ed25519PrivateKey: PrivateKey {
+    public static var metaType: MetaType = Self.metaType(
+        key: "tendermint/PrivKeyEd25519"
+    )
     
-    override var data: Data {
+    private let key: Curve25519.Signing.PrivateKey
+    
+    public var data: Data {
         key.rawRepresentation
     }
     
     public init(data: Data) throws {
         self.key = try Curve25519.Signing.PrivateKey(rawRepresentation: data)
-        super.init()
     }
     
     init(key: Curve25519.Signing.PrivateKey) {
         self.key = key
-        super.init()
     }
     
-    override init() {
+    init() {
         self.key = Curve25519.Signing.PrivateKey()
-        super.init()
     }
 
-    struct WrappedValue: Codable {
-        let type: String
-        let value: Data
-    }
-    
-    static let type = "tendermint/PrivKeyEd25519"
-    
-    public required convenience init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let wrappedValue = try container.decode(WrappedValue.self)
-        
-        guard wrappedValue.type == Self.type else {
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "invalid type"
-            )
-        }
-        
-        let key = try Curve25519.Signing.PrivateKey(rawRepresentation: wrappedValue.value[0..<32])
-        self.init(key: key)
+        let data = try container.decode(Data.self)
+        try self.init(data: data)
     }
     
-    public override func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        
-        let wrappedValue = WrappedValue(
-            type: Self.type,
-            value: key.rawRepresentation
-        )
-        
-        try container.encode(wrappedValue)
+        try container.encode(data)
     }
     
-    override public func sign(message: Data) throws -> Data {
+    public func sign(message: Data) throws -> Data {
         try key.signature(for: message)
     }
     
-    override public var publicKey: PublicKey {
+    public var publicKey: PublicKey {
         Ed25519PublicKey(key: key.publicKey)
     }
 }
@@ -75,55 +54,41 @@ extension Ed25519PrivateKey {
     }
 }
 
-public class Ed25519PublicKey: PublicKey {
-    let key: Curve25519.Signing.PublicKey
+public struct Ed25519PublicKey: PublicKey {
+    public static var metaType: MetaType = Self.metaType(
+        key: "tendermint/PubKeyEd25519"
+    )
     
-    override public var address: Address {
+    private let key: Curve25519.Signing.PublicKey
+    
+    public var address: Address {
         Crypto.addressHash(data: data)
     }
     
-    override var data: Data {
+    public var data: Data {
         key.rawRepresentation
+    }
+    
+    init(data: Data) throws {
+        self.key = try Curve25519.Signing.PublicKey(rawRepresentation: data)
     }
 
     init(key: Curve25519.Signing.PublicKey) {
         self.key = key
-        super.init()
     }
-    
-    struct WrappedValue: Codable {
-        let type: String
-        let value: Data
-    }
-    
-    static let type = "tendermint/PubKeyEd25519"
 
-    public required convenience init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let wrappedValue = try container.decode(WrappedValue.self)
-        
-        guard wrappedValue.type == Self.type else {
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "invalid type"
-            )
-        }
-        let key = try Curve25519.Signing.PublicKey(rawRepresentation: wrappedValue.value)
-        self.init(key: key)
+        let data = try container.decode(Data.self)
+        try self.init(data: data)
     }
     
-    public override func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        
-        let wrappedValue = WrappedValue(
-            type: Self.type,
-            value: key.rawRepresentation
-        )
-        
-        try container.encode(wrappedValue)
+        try container.encode(data)
     }
     
-    override public func verify(message: Data, signature: Data) -> Bool {
+    public func verify(message: Data, signature: Data) -> Bool {
         key.isValidSignature(signature, for: message)
     }
 }

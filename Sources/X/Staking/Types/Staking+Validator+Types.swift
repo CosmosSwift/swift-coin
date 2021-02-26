@@ -10,7 +10,7 @@ import Cosmos
 // delegation whose number of bond shares is based on the amount of coins delegated
 // divided by the current exchange rate. Voting power can be calculated as total
 // bonded shares multiplied by exchange rate.
-struct Validator: Codable  {
+struct Validator: Codable {
     // address of the validator's operator; bech encoded in JSON
     let operatorAddress: ValidatorAddress
     // the consensus public key of the validator; bech encoded in JSON
@@ -35,6 +35,55 @@ struct Validator: Codable  {
 //    let commission: Commission
     // validator's self declared minimum self delegation
     let minSelfDelegation: Int
+    
+    private enum CodingKeys: String, CodingKey {
+        case operatorAddress
+        case consensusPublicKey
+        case jailed
+        case status
+        case tokens
+        case delegatorShares
+        case unbondingHeight
+        case unbondingCompletionTime
+        case minSelfDelegation
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.operatorAddress = try container.decode(ValidatorAddress.self, forKey: .operatorAddress)
+        
+        let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .consensusPublicKey)
+        
+        guard let publicKey = publicKeyCodable.value as? Tendermint.PublicKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .consensusPublicKey,
+                in: container,
+                debugDescription: "Invalid public key type"
+            )
+        }
+        
+        self.consensusPublicKey = publicKey
+        self.jailed = try container.decode(Bool.self, forKey: .jailed)
+        self.status = try container.decode(BondStatus.self, forKey: .status)
+        self.tokens = try container.decode(UInt.self, forKey: .tokens)
+        self.delegatorShares = try container.decode(Decimal.self, forKey: .delegatorShares)
+        self.unbondingHeight = try container.decode(Int64.self, forKey: .unbondingHeight)
+        self.unbondingCompletionTime = try container.decode(Date.self, forKey: .unbondingCompletionTime)
+        self.minSelfDelegation = try container.decode(Int.self, forKey: .minSelfDelegation)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(operatorAddress, forKey: .operatorAddress)
+        try container.encode(AnyProtocolCodable(consensusPublicKey), forKey: .consensusPublicKey)
+        try container.encode(jailed, forKey: .jailed)
+        try container.encode(status, forKey: .status)
+        try container.encode(tokens, forKey: .tokens)
+        try container.encode(delegatorShares, forKey: .delegatorShares)
+        try container.encode(unbondingHeight, forKey: .unbondingHeight)
+        try container.encode(unbondingCompletionTime, forKey: .unbondingCompletionTime)
+        try container.encode(minSelfDelegation, forKey: .minSelfDelegation)
+    }
 }
 
 

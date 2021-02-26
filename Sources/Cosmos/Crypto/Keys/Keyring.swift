@@ -4,23 +4,55 @@ import Tendermint
 
 // TODO: This was inside a dependency called 99designs/keyring
 // Check where is the best place to put this
-//
+
+struct KeyringItem: Codable {
+    let key: String
+    let data: Data
+}
+
 // Keyring provides the uniform interface over the underlying backends
 protocol Keyring {
     // Returns an Item matching the key or ErrKeyNotFound
-//    func get(key: string) throws -> Item
+    func get(key: String) throws -> KeyringItem
     // Returns the non-secret parts of an Item
 //    func metadata(key: String) throws -> Metadata
     // Stores an Item on the keyring
-//    func set(item: Item) throws
+    func set(item: KeyringItem) throws
     // Removes the item with matching key
 //    func remove(key: String) throws
     // Provides a slice of all keys stored on the keyring
 //    func keys() throws -> [String]
 }
 
+struct FileKeyring: Keyring {
+    let rootDirectory: String
+   
+    var path: String {
+        rootDirectory + "/file-keyring"
+    }
 
-public enum KeyringBacked: String, ExpressibleByArgument {
+    init(rootDirectory: String) throws {
+        self.rootDirectory = rootDirectory
+        
+        try FileManager.default.createDirectory(
+            atPath: path,
+            withIntermediateDirectories: true
+        )
+    }
+    
+    func get(key: String) throws -> KeyringItem {
+        let url = URL(fileURLWithPath: path + "/" + key)
+        let data = try Data(contentsOf: url)
+        return KeyringItem(key: key, data: data)
+    }
+     
+    func set(item: KeyringItem) throws {
+        let url = URL(fileURLWithPath: path + "/" + item.key)
+        try item.data.write(to: url)
+    }
+}
+
+public enum KeyringBackend: String, ExpressibleByArgument {
     case file = "file"
     case os = "os"
     case keyWallet = "kwallet"
@@ -42,13 +74,12 @@ struct KeyringKeybase: Keybase, KeyWriter {
     }
 }
 
-
 // NewKeyring creates a new instance of a keyring. Keybase
 // options can be applied when generating this new Keybase.
 // Available backends are "os", "file", "test".
 func makeKeyring(
     appName: String,
-    backend: KeyringBacked,
+    backend: KeyringBackend,
     rootDirectory: String,
 //    userInput: Reader,
     options: [KeybaseOption] = []
@@ -65,8 +96,8 @@ func makeKeyring(
         fatalError()
 //        database = try open(newFileBackendKeyringConfig(appName, rootDir, userInput))
     case .os:
+        database = try FileKeyring(rootDirectory: rootDirectory)
         // TODO: Implement
-        fatalError("This open function is from github.com/99designs/keyring")
 //        database = try open(lkbToKeyringConfig(appName, rootDir, userInput, false))
     case .keyWallet:
         // TODO: Implement
@@ -91,7 +122,7 @@ extension KeyringKeybase {
         language: Language,
         password: String,
         algorithm: SigningAlgorithm
-    ) throws -> (info: Info, seed: String) {
+    ) throws -> (info: KeyInfo, seed: String) {
         // TODO: Implement
         fatalError()
 //        base.createMnemonic(
@@ -112,7 +143,7 @@ extension KeyringKeybase {
         encryptPassword: String,
         hdPath: String,
         algorithm: SigningAlgorithm
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         try base.createAccount(
             keyWriter: self,
             name: name,
@@ -132,7 +163,7 @@ extension KeyringKeybase {
         humanReadablePart: String,
         account: UInt32,
         index: UInt32
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        base.createLedger(
@@ -151,7 +182,7 @@ extension KeyringKeybase {
         name: String,
         publicKey: PublicKey,
         algorithm: SigningAlgorithm
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        base.createOffline(
@@ -167,7 +198,7 @@ extension KeyringKeybase {
     func createMulti(
         name: String,
         publicKey: PublicKey
-    ) throws -> Info {
+    ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        base.writeMultiSignatureKey(
@@ -178,7 +209,7 @@ extension KeyringKeybase {
     }
 
     // List returns the keys from storage in alphabetical order.
-    func list() throws -> [Info] {
+    func list() throws -> [KeyInfo] {
         // TODO: Implement
         fatalError()
 //        var res []Info
@@ -213,25 +244,14 @@ extension KeyringKeybase {
     }
 
     // Get returns the public information about one key.
-    func get(name: String) throws -> Info {
-        // TODO: Implement
-        fatalError()
-//        key := infoKey(name)
-//
-//        bs, err := kb.db.Get(string(key))
-//        if err != nil {
-//            return nil, err
-//        }
-//
-//        if len(bs.Data) == 0 {
-//            return nil, keyerror.NewErrKeyNotFound(name)
-//        }
-//
-//        return unmarshalInfo(bs.Data)
+    func get(name: String) throws -> KeyInfo {
+        let key = DatabaseKeybase.infoKey(name: name)
+        let info = try database.get(key: key.string)
+        return try unmarshalInfo(data: info.data)
     }
 
     // GetByAddress fetches a key by address and returns its public information.
-    func getByAddress(address: AccountAddress) throws -> Info {
+    func getByAddress(address: AccountAddress) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
 //        ik, err := kb.db.Get(string(addrKey(address)))
@@ -536,39 +556,36 @@ extension KeyringKeybase {
     // CloseDB releases the lock and closes the storage backend.
     func closeDatabase() {}
 
-    func writeLocalKey(name: String, privateKey: PrivateKey, passphrase: String, algorithm: SigningAlgorithm) -> Info {
-        // TODO: Implement
-        fatalError()
-//        // encrypt private key using keyring
-//        pub := priv.PubKey()
-//        info := newLocalInfo(name, pub, string(priv.Bytes()), algo)
-//
-//        kb.writeInfo(name, info)
-//        return info
+    func writeLocalKey(name: String, privateKey: PrivateKey, passphrase: String, algorithm: SigningAlgorithm) -> KeyInfo {
+        // encrypt private key using keyring
+        let publicKey = privateKey.publicKey
+        
+        let info = LocalInfo(
+            name: name,
+            publicKey: publicKey,
+            // TODO: Check if using hex encoded string is good enough.
+            privateKeyArmor: privateKey.data.hexEncodedString(),
+            algorithm: algorithm
+        )
+
+        writeInfo(name: name, info: info)
+        return info
     }
 
-    func writeInfo(name: String, info: Info) {
-        // TODO: Implement
-        fatalError()
-//        // write the info by key
-//        key := infoKey(name)
-//        serializedInfo := marshalInfo(info)
-//
-//        err := kb.db.Set(keyring.Item{
-//            Key:  string(key),
-//            Data: serializedInfo,
-//        })
-//        if err != nil {
-//            panic(err)
-//        }
-//
-//        err = kb.db.Set(keyring.Item{
-//            Key:  string(addrKey(info.GetAddress())),
-//            Data: key,
-//        })
-//        if err != nil {
-//            panic(err)
-//        }
+    func writeInfo(name: String, info: KeyInfo) {
+        // write the info by key
+        let key = DatabaseKeybase.infoKey(name: name)
+        let serializedInfo = marshal(info: info)
+
+        try! database.set(item: KeyringItem(
+            key: key.string,
+            data: serializedInfo
+        ))
+
+        try! database.set(item: KeyringItem(
+            key: DatabaseKeybase.addressKey(address: info.address).string,
+            data: key
+        ))
     }
 
     // TODO: Implement

@@ -4,12 +4,12 @@ import Tendermint
 // Keybase exposes operations on a generic keystore
 protocol Keybase {
     // CRUD on the keystore
-    func list() throws -> [Info]
+    func list() throws -> [KeyInfo]
     // Get returns the public information about one key.
-    func get(name: String) throws -> Info
+    func get(name: String) throws -> KeyInfo
     // Get performs a by-address lookup and returns the public
     // information about one key if there's any.
-    func getByAddress(address: AccountAddress) throws -> Info
+    func getByAddress(address: AccountAddress) throws -> KeyInfo
     // Delete removes a key.
     func delete(name: String, passphrase: String, skipPass: Bool) throws
     // Sign bytes, looking up the private key to use.
@@ -25,7 +25,7 @@ protocol Keybase {
         language: Language,
         password: String,
         algorithm: SigningAlgorithm
-    ) throws -> (info: Info, seed: String)
+    ) throws -> (info: KeyInfo, seed: String)
 
     // CreateAccount converts a mnemonic to a private key and BIP 32 HD Path
     // and persists it, encrypted with the given password.
@@ -36,7 +36,7 @@ protocol Keybase {
         encryptPassword: String,
         hdPath: String,
         algorithm: SigningAlgorithm
-    ) throws -> Info
+    ) throws -> KeyInfo
 
     // CreateLedger creates, stores, and returns a new Ledger key reference
     func createLedger(
@@ -45,20 +45,20 @@ protocol Keybase {
         humanReadablePart: String,
         account: UInt32,
         index: UInt32
-    ) throws -> Info
+    ) throws -> KeyInfo
 
     // CreateOffline creates, stores, and returns a new offline key reference
     func createOffline(
         name: String,
         publicKey: PublicKey,
         algorithm: SigningAlgorithm
-    ) throws -> Info
+    ) throws -> KeyInfo
 
     // CreateMulti creates, stores, and returns a new multsig (offline) key reference
     func createMulti(
         name: String,
         publicKey: PublicKey
-    ) throws -> Info
+    ) throws -> KeyInfo
 
     // The following operations will *only* work on locally-stored keys
     func update(
@@ -148,7 +148,7 @@ enum KeyType: UInt, CustomStringConvertible {
 }
 
 // Info is the publicly exposed information about a keypair
-protocol Info: ProtocolCodable {
+protocol KeyInfo: ProtocolCodable {
     // Human-readable type for key listing
     var type: KeyType { get }
     // Name of the key
@@ -165,7 +165,7 @@ protocol Info: ProtocolCodable {
 
 // localInfo is the public information about a locally stored key
 // Note: Algo must be last field in struct for backwards amino compatibility
-struct LocalInfo: Info {
+struct LocalInfo: KeyInfo {
     static let metaType: MetaType = Self.metaType(
         key: "crypto/keys/localInfo"
     )
@@ -180,6 +180,45 @@ struct LocalInfo: Info {
         case publicKey = "pubkey"
         case privateKeyArmor = "privkey.armor"
         case algorithm = "algo"
+    }
+    
+    init(
+        name: String,
+        publicKey: PublicKey,
+        privateKeyArmor: String,
+        algorithm: SigningAlgorithm
+    ) {
+        self.name = name
+        self.publicKey = publicKey
+        self.privateKeyArmor = privateKeyArmor
+        self.algorithm = algorithm
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        
+        let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .publicKey)
+        
+        guard let publicKey = publicKeyCodable.value as? PublicKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .publicKey,
+                in: container,
+                debugDescription: "Invalid public key type"
+            )
+        }
+        
+        self.publicKey = publicKey
+        self.privateKeyArmor = try container.decode(String.self, forKey: .privateKeyArmor)
+        self.algorithm = try container.decode(SigningAlgorithm.self, forKey: .algorithm)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(AnyProtocolCodable(publicKey), forKey: .publicKey)
+        try container.encode(privateKeyArmor, forKey: .privateKeyArmor)
+        try container.encode(algorithm, forKey: .algorithm)
     }
 }
 
@@ -203,7 +242,7 @@ extension LocalInfo {
 
 // offlineInfo is the public information about an offline key
 // Note: Algo must be last field in struct for backwards amino compatibility
-struct OfflineInfo: Info {
+struct OfflineInfo: KeyInfo {
     static let metaType: MetaType = Self.metaType(
         key: "crypto/keys/offlineInfo"
     )
@@ -216,6 +255,41 @@ struct OfflineInfo: Info {
         case name
         case publicKey = "pubkey"
         case algorithm = "algo"
+    }
+    
+    init(
+        name: String,
+        publicKey: PublicKey,
+        algorithm: SigningAlgorithm
+    ) {
+        self.name = name
+        self.publicKey = publicKey
+        self.algorithm = algorithm
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        
+        let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .publicKey)
+        
+        guard let publicKey = publicKeyCodable.value as? PublicKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .publicKey,
+                in: container,
+                debugDescription: "Invalid public key type"
+            )
+        }
+        
+        self.publicKey = publicKey
+        self.algorithm = try container.decode(SigningAlgorithm.self, forKey: .algorithm)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(AnyProtocolCodable(publicKey), forKey: .publicKey)
+        try container.encode(algorithm, forKey: .algorithm)
     }
 }
 
@@ -240,15 +314,19 @@ extension OfflineInfo {
 }
 
 // encoding info
-func marshal(info: Info) -> Data {
+func marshal(info: KeyInfo) -> Data {
     let value = AnyProtocolCodable(info)
-    return Codec.keysCodec.mustMarshalBinaryLengthPrefixed(value: value)
+    return Codec.keysCodec.mustMarshalJSON(value: value)
+    // TODO: Check if this is required
+//    return Codec.keysCodec.mustMarshalBinaryLengthPrefixed(value: value)
 }
 
 // decoding info
-func unmarshalInfo(data: Data) throws -> Info {
-    let value: AnyProtocolCodable = try Codec.keysCodec.unmarshalBinaryLengthPrefixed(data: data)
-    return value as! Info
+func unmarshalInfo(data: Data) throws -> KeyInfo {
+    // TODO: Check if this is required
+//    let value: AnyProtocolCodable = try Codec.keysCodec.unmarshalBinaryLengthPrefixed(data: data)
+    let codable: AnyProtocolCodable = try Codec.keysCodec.unmarshalJSON(data: data)
+    return codable.value as! KeyInfo
 }
 
 // DeriveKeyFunc defines the function to derive a new key from a seed and hd path

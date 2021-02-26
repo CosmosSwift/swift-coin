@@ -57,6 +57,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "tx nameservice buy-name jack.id 5nametoken --from jack -y"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "keys show jack -a"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

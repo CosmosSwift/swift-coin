@@ -134,17 +134,16 @@ public struct AddKeyCommand: ParsableCommand {
     }
     
     func keybase(transient: Bool) throws -> Keybase { //, buffer: Reader) throws -> Keybase {
-//        if transient {
+        if transient {
             return DatabaseKeybase.inMemory()
-//        }
+        }
 
-        fatalError()
-//        return Keyring(
-//            sdk.KeyringServiceName(),
-//            viper.GetString(flags.FlagKeyringBackend),
-//            viper.GetString(flags.FlagHome),
-//            buf
-//        )
+        return try makeKeyring(
+            appName: Configuration.keyringServiceName,
+            backend: keysOptions.keyringBackend,
+            rootDirectory: clientOptions.home
+            // buffer: buffer
+        )
     }
     
     /*
@@ -177,7 +176,7 @@ public struct AddKeyCommand: ParsableCommand {
 //                    return errors.New("aborted")
 //                }
             } catch {
-                
+                // Noop
             }
 
             if !multiSignatureKeys.isEmpty {
@@ -335,7 +334,7 @@ public struct AddKeyCommand: ParsableCommand {
         )
     }
     
-    func printOutput(info: Info, showMnemonic: Bool, mnemonic: String) throws {
+    func printOutput(info: KeyInfo, showMnemonic: Bool, mnemonic: String) throws {
         switch clientOptions.output {
         case .text:
             print("", to: &OutputStream.standardError)

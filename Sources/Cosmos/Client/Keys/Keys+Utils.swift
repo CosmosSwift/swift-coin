@@ -1,6 +1,6 @@
-typealias BechKeyOutput = (_ keyInfo: Info) throws -> KeyOutput
+typealias BechKeyOutput = (_ keyInfo: KeyInfo) throws -> KeyOutput
 
-func printKeyInfo(keyInfo: Info, bechKeyOutput: BechKeyOutput, output: ClientOptions.OutputFormat) {
+func printKeyInfo(keyInfo: KeyInfo, bechKeyOutput: BechKeyOutput, output: ClientOptions.OutputFormat) {
     let keyOutput = try! bechKeyOutput(keyInfo)
 
     switch output {
@@ -32,3 +32,7 @@ func printTextInfos(keyOutputs: [KeyOutput]) {
 //    fmt.Println(string(out))
 }
 
+func printKeyAddress(info: KeyInfo, bechKeyOutput: BechKeyOutput) {
+    let keyOutput = try! bechKeyOutput(info)
+    print(keyOutput.address)
+}
