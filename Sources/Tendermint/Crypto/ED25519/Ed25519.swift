@@ -28,7 +28,7 @@ public struct Ed25519PrivateKey: PrivateKey {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let data = try container.decode(Data.self)
-        try self.init(data: data)
+        try self.init(data: data[0..<32]) // CurveE25519 take the seed tendermint encodes the private key as the seed (firstr 32 bytes) + the pub key (last 32 bytes)
     }
     
     public func encode(to encoder: Encoder) throws {

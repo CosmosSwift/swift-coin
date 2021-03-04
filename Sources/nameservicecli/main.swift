@@ -9,6 +9,8 @@ struct NameserviceCLI: ParsableCommand {
         subcommands: [
             KeysCommand.self,
             QueryCommand.self,
+            TransactionCommand.self,
+            QueryCommand.self
         ]
     )
 }

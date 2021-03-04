@@ -125,21 +125,45 @@ public enum Flags {
             case amino_json // TODO: amino should be removed
         }
         
-        public enum GasLimitPerTransaction: ExpressibleByArgument {
+        public enum GasLimitPerTransaction: CustomStringConvertible, ExpressibleByArgument {
             public init?(argument: String) {
                 if argument == "auto" {
                     self = .auto
+                    return
                 }
-                if let limit = UInt(argument) {
+                if let limit = UInt64(argument) {
                     self = .limit(perTransaction: limit)
+                    return
                 }
                 return nil
             }
             
             case auto
-            case limit(perTransaction: UInt)
+            case limit(perTransaction: UInt64 = 20000)
+            
+            public var description: String {
+                switch self {
+                    case .auto:
+                     return "auto"
+                    case let .limit(perTransaction: value):
+                    return String(value)
+                }
+            }
         }
         
+        public enum AddressOrName: ExpressibleByArgument {
+            public init?(argument: String) {
+                if let address = AccountAddress(argument: argument) {
+                    self = .address(address)
+                } else {
+                    self = .name(argument)
+                }
+                return
+            }
+            
+            case name(String)
+            case address(AccountAddress)
+        }
         
         #warning("the <host>:<port> format seems like it could leverage some type safety")
         @Option(help: "<host>:<port> to Tendermint RPC interface for this chain")
@@ -157,34 +181,34 @@ public enum Flags {
         public var chainId: String // TODO: this is required
                 
         @Option(help: "The client Keyring directory; if omitted, the default 'home' directory will be used")
-        public var keyringDir: String
+        public var keyringDir: String? // TODO: this should have a default
         
         @Option(help: "Name or address of private key with which to sign")
-        public var from: AccountAddress // TODO: this can also be a name (String)
+        public var from: AddressOrName // TODO: this can also be a name (String)
         
         @Option(name: .customShort("a"), help:"The account number of the signing account (offline mode only)")
-        public var accountNumber: UInt64
+        public var accountNumber: UInt64? // TODO: this should have a default
         
         @Option(name: .customShort("s"), help: "The sequence number of the signing account (offline mode only)")
-        public var sequence: UInt64
+        public var sequence: UInt64? // TODO: this should have a default
         
         @Option(help: "Memo to send along with transaction")
-        public var memo: String
+        public var memo: String? // TODO: this should have a default
         
         @Option(help: "Fees to pay along with transaction; eg: 10uatom")
-        public var fees: Coin
+        public var fees: Coin? // TODO: this should have a default
         
         @Option(help: "Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)")
-        public var gasPrice: DecimalCoin
+        public var gasPrice: DecimalCoin?
         
         @Flag(help: "Use a connected Ledger device")
         public var useLedger: Bool = false
         
         @Option(help: "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
-        public var gasAdjustment: Float64 = DefaultGasAdjustment // TODO: set adjustment
+        public var gasAdjustment: Float64 = 1.0
         
         @Option(name: .customShort("b"), help: "Transaction broadcasting mode (sync|async|block)")
-        public var broadcastMode: BroadcastMode
+        public var broadcastMode: BroadcastMode = .sync // TODO: what should be teh default?
         
         @Flag(help: "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it")
         public var dryRun: Bool = false
@@ -199,20 +223,20 @@ public enum Flags {
         public var skipConfirmation: Bool = false
 
         @Option(help: "Select keyring's backend (os|file|kwallet|pass|test)")
-        public var keyringBackend: KeyringBackend = DefaultKeyringBackend // TODO set default
+        public var keyringBackend: KeyringBackend = .os
         
         @Option(help: "Choose sign mode (direct|amino-json), this is an advanced feature")
-        public var signMode: SignMode
+        public var signMode: SignMode = .direct // TODO: what should be the default?
         
         @Option(help: "Set a block timeout height to prevent the tx from being committed past a certain height")
-        public var timeOutHeight: UInt64
-
+        public var timeOutHeight: UInt64? // TODO: what should be the default here?
         // --gas can accept integers and "auto"
-        @Option(help: "gas limit to set per-transaction; set to \(GasFlagAuto) to calculate sufficient gas automatically (default \(DefaultGasLimit)")
-        public var gas: GasLimitPerTransaction
+        // auto means that the system will run in simulation mode an compute a suitable value
+        @Option(help: "gas limit to set per-transaction; set to \(GasLimitPerTransaction.auto) to calculate sufficient gas automatically (default \(GasLimitPerTransaction.limit)")
+        public var gas: GasLimitPerTransaction = .limit() // TODO: what should be the default here?
         
         
-        public init() { fatalError() }
+        public init() { }
         
         #warning("Does this need porting?")
         // cmd.SetErr(cmd.ErrOrStderr())

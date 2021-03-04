@@ -5,13 +5,48 @@ public struct FilePrivateValidatorKey: Codable {
     // TODO: The key below should be an abstract PrivateKey
     // Using PrivateKey as an "abstract" class did not work
     // We should think about what to do later (see P2P/P2P+Key.swift)
-    public let publicKey: Ed25519PublicKey
-    public let privateKey: Ed25519PrivateKey
+    public let publicKey: PublicKey
+    public let privateKey: PrivateKey
     
     private enum CodingKeys: String, CodingKey {
         case address
         case publicKey = "pub_key"
         case privateKey = "priv_key"
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.address = try container.decode(Address.self, forKey: .address)
+        let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .publicKey)
+
+        guard let publicKey = publicKeyCodable.value as? PublicKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .publicKey,
+                in: container,
+                debugDescription: "Invalid type for public key"
+            )
+        }
+
+        self.publicKey = publicKey
+        
+        let privateKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .privateKey)
+        
+        guard let privateKey = privateKeyCodable.value as? PrivateKey else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .privateKey,
+                in: container,
+                debugDescription: "Invalid type for private key"
+            )
+        }
+        
+        self.privateKey = privateKey
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
+        try container.encode(AnyProtocolCodable(publicKey), forKey: .publicKey)
+        try container.encode(AnyProtocolCodable(privateKey), forKey: .privateKey)
     }
 }
 
