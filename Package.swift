@@ -31,7 +31,7 @@ let package = Package(
         .executable(name: "nameserviced", targets: ["nameserviced"]),
     ],
     dependencies: [
-        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("rest_api")),
+        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("rest-api-new-approach")),
         .package(name: "iAVLPlus", url: "https://github.com/CosmosSwift/swift-iavlplus", .branch("master")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),

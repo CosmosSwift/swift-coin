@@ -5,7 +5,9 @@ import NIO
 import GRPC
 import Cosmos
 import ABCIREST
+import ABCIMessages
 import Tendermint
+import AsyncHTTPClient
 
 fileprivate let flagEvents = "events"
 
@@ -43,7 +45,7 @@ public struct GetQueryParameters: ParsableCommand {
   
     public init() {}
     
-    struct GetParamsPayload: RequestPayload {
+    /*struct GetParamsPayload: RequestPayload {
         static var method: ABCIREST.Method { .abci_query }
         var path: String { "custom/acc/" }
         
@@ -51,7 +53,7 @@ public struct GetQueryParameters: ParsableCommand {
 
         let Address: AccountAddress
         
-    }
+    }*/
     
     public mutating func run() throws {
         fatalError()
@@ -84,25 +86,23 @@ public struct GetAccount: ParsableCommand {
     @Argument var address: AccountAddress
     
     
-    struct GetAccountPayload: RequestPayload {        
-        static var method: ABCIREST.Method { .abci_query }
-        var path: String { "custom/acc/account" }
-        
-        typealias ResponsePayload = AnyProtocolCodable // This is an Account
-
+    struct GetAccountPayload: Codable {
         let Address: AccountAddress
-        
     }
     
     public init() {}
         
     public mutating func run() throws {
         // TODO: map url to the proper value
-        let client = ABCIRESTClient<GetAccountPayload>(url: "http://192.168.64.1:26657")
+        let httpClient = HTTPClient(eventLoopGroupProvider: .createNew)
+        let client = RESTClient(url: "http://192.168.64.1:26657", httpClient: httpClient)
+        let height: Int64 = 4
+        let prove = false
         
-        let res = try client.syncSend(payload: GetAccountPayload(Address: self.address))
-        
-        let data = try JSONEncoder().encode(res)
+        let params = RequestQuery(data: GetAccountPayload(Address: self.address), path: "custom/acc/account", height: height, prove: prove)
+        let response: RESTResponse<ResponseQuery<Account>> = try client.abciQuery(id: 10, params: params).wait()
+                
+        let data = try JSONEncoder().encode(response)
         
         print(String(data: data, encoding: .utf8)!)
     }
