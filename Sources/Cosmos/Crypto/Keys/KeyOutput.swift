@@ -21,6 +21,15 @@ struct KeyOutput: Codable {
     }
 }
 
+// Bech32KeysOutput returns a slice of KeyOutput objects, each with the "acc"
+// Bech32 prefixes, given a slice of Info objects. It returns an error if any
+// call to Bech32KeyOutput fails.
+func bech32KeysOutput(infos: [KeyInfo]) throws -> [KeyOutput] {
+    try infos.map { keyInfo in
+        try bech32KeyOutput(keyInfo: keyInfo)
+    }
+}
+
 // Bech32KeyOutput create a KeyOutput in with "acc" Bech32 prefixes. If the
 // public key is a multisig public key, then the threshold and constituent
 // public keys will be added.
