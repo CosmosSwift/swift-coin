@@ -182,7 +182,7 @@ extension GenesisDocument {
             self.consensusParameters = .default
         }
         
-        var validators = self.validators ?? []
+    var validators = self.validators ?? []
 
         for (i, validator) in validators.enumerated() {
             if validator.power == 0 {

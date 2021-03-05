@@ -29,7 +29,7 @@ public struct KeysCommand: ParsableCommand {
             AddKeyCommand.self,
 //            ExportKeyCommand.self,
 //            ImportKeyCommand.self,
-//            ListKeysCommand.self,
+            ListKeysCommand.self,
             ShowKeysCommand.self,
 //            DeleteKeyCommand.self,
 //            UpdateKeyCommand.self,
