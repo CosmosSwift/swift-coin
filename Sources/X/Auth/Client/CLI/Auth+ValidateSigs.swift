@@ -1,7 +1,6 @@
 import Foundation
 import ArgumentParser
 import Cosmos
-import ABCIREST
 
 
 // GetEncodeCommand returns the encode command to take a JSONified transaction and turn it into

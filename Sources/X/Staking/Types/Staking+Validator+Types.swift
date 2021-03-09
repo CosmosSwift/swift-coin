@@ -14,7 +14,7 @@ struct Validator: Codable {
     // address of the validator's operator; bech encoded in JSON
     let operatorAddress: ValidatorAddress
     // the consensus public key of the validator; bech encoded in JSON
-    let consensusPublicKey: Tendermint.PublicKey
+    let consensusPublicKey: Tendermint.PublicKeyProtocol
     // has the validator been jailed from bonded status?
     let jailed: Bool
     // validator status (bonded/unbonding/unbonded)
@@ -54,7 +54,7 @@ struct Validator: Codable {
         
         let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .consensusPublicKey)
         
-        guard let publicKey = publicKeyCodable.value as? Tendermint.PublicKey else {
+        guard let publicKey = publicKeyCodable.value as? Tendermint.PublicKeyProtocol else {
             throw DecodingError.dataCorruptedError(
                 forKey: .consensusPublicKey,
                 in: container,

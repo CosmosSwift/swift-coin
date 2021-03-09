@@ -12,7 +12,7 @@ extension GenesisDocument {
 
 extension Tendermint.Configuration {
     // InitializeNodeValidatorFiles creates private validator and p2p configuration files.
-    func initializeNodeValidatorFiles() throws -> (nodeID: String, validatorPublicKey: PublicKey?) {
+    func initializeNodeValidatorFiles() throws -> (nodeID: String, validatorPublicKey: PublicKeyProtocol?) {
         try FileManager.default.ensureDirectoryExists(
             atPath: FilePath.directoryPath(for: nodeKeyFilePath),
             mode: 0o777

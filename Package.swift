@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.4
 import PackageDescription
 
 let package = Package(
@@ -7,7 +7,6 @@ let package = Package(
         .macOS(.v10_15),
     ],
     products: [
-        .library(name: "Tendermint", targets: ["Tendermint"]),
         .library(name: "Database", targets: ["Database"]),
         .library(name: "Cosmos", targets: ["Cosmos"]),
         .library(name: "App", targets: ["App"]),
@@ -25,13 +24,15 @@ let package = Package(
         .library(name: "Supply", targets: ["Supply"]),
         
         .library(name: "AuthAnte", targets: ["AuthAnte"]),
-                
+        .library(name: "JSON", targets: ["JSON"]),
+
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
         .executable(name: "nameserviced", targets: ["nameserviced"]),
     ],
     dependencies: [
-        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("rest_api")),
+        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .upToNextMajor(from: "0.50.0")),
+        .package(name: "Tendermint", url: "https://github.com/CosmosSwift/swift-tendermint", .upToNextMajor(from: "0.0.1")),
         .package(name: "iAVLPlus", url: "https://github.com/CosmosSwift/swift-iavlplus", .branch("master")),
         .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "swift-crypto", url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "1.0.0")),
@@ -49,15 +50,13 @@ let package = Package(
                 .target(name: "App"),
                 .target(name: "Auth"),
                 .target(name: "NameService"),
-                .target(name: "Tendermint"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "NIO", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
                 .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
                 .product(name: "NIOTLS", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
-                
-
+                .product(name: "Tendermint", package: "Tendermint"),
             ]
         ),
         .target(
@@ -97,17 +96,17 @@ let package = Package(
             name: "Cosmos",
             dependencies: [
                 .target(name: "Database"),
-                .target(name: "Tendermint"),
                 .target(name: "BIP39"),
                 .target(name: "Bcrypt"),
+                .target(name: "JSON"),
                 .product(name: "iAVLPlus", package: "iAVLPlus"),
                 .product(name: "InMemoryNodeDB", package: "iAVLPlus"),
 //                .product(name: "SQLiteNodeDB", package: "iAVLPlus"),
                 .product(name: "ABCIMessages", package: "ABCI"),
                 .product(name: "ABCIServer", package: "ABCI"),
-                .product(name: "ABCIREST", package: "ABCI"),
                 .product(name: "ABCINIO", package: "ABCI"),
                 .product(name: "DataConvertible", package: "ABCI"),
+                .product(name: "Tendermint", package: "Tendermint"),
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "CosmosProto", package: "swift-cosmos-proto"),
@@ -123,9 +122,9 @@ let package = Package(
             name: "Auth",
             dependencies: [
                 .target(name: "Cosmos"),
-                .target(name: "Tendermint"),
                 .target(name: "Params"),
                 .product(name: "ABCIMessages", package: "ABCI"),
+                .product(name: "Tendermint", package: "Tendermint"),
                 .product(name: "CosmosProto", package: "swift-cosmos-proto"),
                 .product(name: "NIO", package: "swift-nio"),
             ],
@@ -199,17 +198,6 @@ let package = Package(
         ),
         .target(name: "Database"),
         .target(
-            name: "Tendermint",
-            dependencies: [
-                .target(name: "Bech32"),
-                .target(name: "JSON"),
-                .product(name: "Crypto", package: "swift-crypto"),
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "ABCIMessages", package: "ABCI"),
-            ]
-        ),
-        .target(name: "Bech32"),
-        .target(
             name: "BIP39",
             dependencies: [
                 .product(name: "CryptoSwift", package: "CryptoSwift"),
@@ -217,13 +205,13 @@ let package = Package(
                 .product(name: "BigInt", package: "BigInt"),
             ]
         ),
+        .target(name: "JSON"),
         .target(name: "CBcrypt"),
         .target(
             name: "Bcrypt",
             dependencies: [
                 .target(name: "CBcrypt"),
             ]
-        ),
-        .target(name: "JSON"),
+        )
     ]
 )

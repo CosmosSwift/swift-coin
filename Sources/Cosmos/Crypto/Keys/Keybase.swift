@@ -98,7 +98,7 @@ extension DatabaseKeybase {
     // created key info.
     func createOffline(
         name: String,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         algorithm: SigningAlgorithm
     ) throws -> KeyInfo {
         // TODO: Implement
@@ -110,7 +110,7 @@ extension DatabaseKeybase {
     // returns the created key info.
     func createMulti(
         name: String,
-        publicKey: PublicKey
+        publicKey: PublicKeyProtocol
     ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
@@ -192,7 +192,7 @@ extension DatabaseKeybase {
         name: String,
         passphrase: String,
         message: Data
-    ) throws -> (Data, PublicKey) {
+    ) throws -> (Data, PublicKeyProtocol) {
         
         let infoKey = try self.get(name: name)
         
@@ -217,8 +217,6 @@ extension DatabaseKeybase {
         //            return kb.base.DecodeSignature(info, msg)
 
         }
-        
-        
         
 //        info, err := kb.Get(name)
 //        if err != nil {

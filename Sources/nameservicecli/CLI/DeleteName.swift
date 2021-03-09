@@ -1,7 +1,6 @@
 import Foundation
 import ArgumentParser
 import Cosmos
-import ABCIREST
 
 public struct DeleteName: ParsableCommand {
     public static let configuration = CommandConfiguration(

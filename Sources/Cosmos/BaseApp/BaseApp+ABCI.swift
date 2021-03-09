@@ -214,7 +214,7 @@ extension BaseApp: ABCIApplication {
     // Otherwise, the ResponseDeliverTx will contain releveant error information.
     // Regardless of tx execution outcome, the ResponseDeliverTx will contain relevant
     // gas execution context.
-    public func deliverTx(request: RequestDeliverTx<Data>) -> ResponseDeliverTx<Data> {
+    public func deliverTx(request: RequestDeliverTx) -> ResponseDeliverTx {
         let transaction: Transaction
        
         do {
@@ -450,7 +450,7 @@ extension BaseApp: ABCIApplication {
             height = request.height
         }
         
-        let request = RequestQuery<Data>(payload: request.payload, path: path, height: height, prove: request.prove)
+        let request = RequestQuery<Data>(data: request.data, path: path, height: height, prove: request.prove)
         
         if request.height <= 1 && request.prove {
             return ResponseQuery(
@@ -535,7 +535,7 @@ extension BaseApp: ABCIApplication {
             height = request.height
         }
         
-        let request = RequestQuery<Data>(payload: request.payload, path: request.path, height: height, prove: request.prove)
+        let request = RequestQuery<Data>(data: request.data, path: request.path, height: height, prove: request.prove)
         
         if request.height <= 1 && request.prove {
             return ResponseQuery(
