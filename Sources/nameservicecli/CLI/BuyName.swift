@@ -101,7 +101,7 @@ public struct BuyName: ParsableCommand {
             rootDirectory: clientOptions.home
         )
         
-        txBuilder.keybase = keybase
+        //txBuilder.keybase = keybase
         
         let buyerKey: KeyInfo
         switch self.txFlags.from {
