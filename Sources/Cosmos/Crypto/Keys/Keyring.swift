@@ -21,7 +21,7 @@ protocol Keyring {
     // Removes the item with matching key
 //    func remove(key: String) throws
     // Provides a slice of all keys stored on the keyring
-//    func keys() throws -> [String]
+    func keys() throws -> [String]
 }
 
 struct FileKeyring: Keyring {
@@ -49,6 +49,10 @@ struct FileKeyring: Keyring {
     func set(item: KeyringItem) throws {
         let url = URL(fileURLWithPath: path + "/" + item.key)
         try item.data.write(to: url)
+    }
+    
+    func keys() throws -> [String] {
+        try FileManager.default.contentsOfDirectory(atPath: path)
     }
 }
 
@@ -210,37 +214,22 @@ extension KeyringKeybase {
 
     // List returns the keys from storage in alphabetical order.
     func list() throws -> [KeyInfo] {
-        // TODO: Implement
-        fatalError()
-//        var res []Info
-//        keys, err := kb.db.Keys()
-//        if err != nil {
-//            return nil, err
-//        }
-//
-//        sort.Strings(keys)
-//
-//        for _, key := range keys {
-//            if strings.HasSuffix(key, infoSuffix) {
-//                rawInfo, err := kb.db.Get(key)
-//                if err != nil {
-//                    return nil, err
-//                }
-//
-//                if len(rawInfo.Data) == 0 {
-//                    return nil, keyerror.NewErrKeyNotFound(key)
-//                }
-//
-//                info, err := unmarshalInfo(rawInfo.Data)
-//                if err != nil {
-//                    return nil, err
-//                }
-//
-//                res = append(res, info)
-//            }
-//        }
-//
-//        return res, nil
+        try database.keys().sorted().reduce(into: []) { result, key in
+            guard key.hasSuffix(DatabaseKeybase.infoSuffix) else {
+               return
+            }
+            
+            let rawInfo = try database.get(key: key)
+
+            guard !rawInfo.data.isEmpty else {
+                return
+                // TODO: throw error
+                // throw KeyNotFound
+            }
+
+            let info = try unmarshalInfo(data: rawInfo.data)
+            result.append(info)
+        }
     }
 
     // Get returns the public information about one key.
