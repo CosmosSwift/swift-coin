@@ -100,7 +100,7 @@ public struct GetAccount: ParsableCommand {
         let prove = false
         
         let params = RequestQuery(data: GetAccountPayload(Address: self.address), path: "custom/acc/account", height: height, prove: prove)
-        let response: RESTResponse<ResponseQuery<Account>> = try client.abciQuery(id: 10, params: params).wait()
+        let response: RESTResponse<ResponseQuery<AnyProtocolCodable>> = try client.abciQuery(id: 10, params: params).wait()
                 
         let data = try JSONEncoder().encode(response)
         
