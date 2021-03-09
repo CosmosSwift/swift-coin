@@ -2,7 +2,7 @@ import Foundation
 import BIP39
 import Tendermint
 
-struct KeybaseOptions {
+public struct KeybaseOptions {
     let generateKey: GeneratePrivateKey
     let deriveKey: DeriveKey
     let supportedAlgorithms: [SigningAlgorithm]

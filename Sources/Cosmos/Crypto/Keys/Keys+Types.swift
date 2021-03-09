@@ -344,4 +344,4 @@ typealias GeneratePrivateKey = (
 ) throws -> PrivateKey
 
 // KeybaseOption overrides options for the db
-typealias KeybaseOption = (inout KeybaseOptions) -> ()
+public typealias KeybaseOption = (inout KeybaseOptions) -> ()

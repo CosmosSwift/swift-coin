@@ -4,7 +4,7 @@ import Foundation
 // This could be used to initialize certain configuration parameters for the SDK.
 public class Configuration: Sealable {
     // DefaultKeyringServiceName defines a default service name for the keyring.
-    static let defaultKeyringServiceName = "cosmos"
+    public static let defaultKeyringServiceName = "cosmos"
     
 //    fullFundraiserPath  string
     var bech32AddressPrefix: [String: String]
@@ -102,7 +102,7 @@ public class Configuration: Sealable {
         configuration.bech32AddressPrefix[Bech32AddressPrefixKeys.consensusNodePublicKey]!
     }
     
-    static var keyringServiceName: String {
+    public static var keyringServiceName: String {
         // TODO: Check this
 //        if len(version.Name) == 0 {
             return defaultKeyringServiceName

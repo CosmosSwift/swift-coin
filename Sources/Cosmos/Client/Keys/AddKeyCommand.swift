@@ -165,8 +165,7 @@ public struct AddKeyCommand: ParsableCommand {
 
         if !isDryRunEnabled {
             do {
-                _ = try keybase.get(name: name)
-               
+                let k = try keybase.get(name: name)
                 // TODO: Implement
                 fatalError()
 //                // account exists, ask for user confirmation
