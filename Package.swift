@@ -202,7 +202,6 @@ let package = Package(
             name: "Tendermint",
             dependencies: [
                 .target(name: "Bech32"),
-                .target(name: "JSON"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "ABCIMessages", package: "ABCI"),
@@ -223,7 +222,6 @@ let package = Package(
             dependencies: [
                 .target(name: "CBcrypt"),
             ]
-        ),
-        .target(name: "JSON"),
+        )
     ]
 )
