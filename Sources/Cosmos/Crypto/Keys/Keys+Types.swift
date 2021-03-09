@@ -13,7 +13,7 @@ public protocol Keybase {
     // Delete removes a key.
     func delete(name: String, passphrase: String, skipPass: Bool) throws
     // Sign bytes, looking up the private key to use.
-    func sign(name: String, passphrase: String, message: Data) throws -> (Data, PublicKey)
+    func sign(name: String, passphrase: String, message: Data) throws -> (Data, PublicKeyProtocol)
 
     // CreateMnemonic generates a new mnemonic, derives a hierarchical deterministic
     // key from that. and persists it to storage, encrypted using the provided password.
@@ -50,14 +50,14 @@ public protocol Keybase {
     // CreateOffline creates, stores, and returns a new offline key reference
     func createOffline(
         name: String,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         algorithm: SigningAlgorithm
     ) throws -> KeyInfo
 
     // CreateMulti creates, stores, and returns a new multsig (offline) key reference
     func createMulti(
         name: String,
-        publicKey: PublicKey
+        publicKey: PublicKeyProtocol
     ) throws -> KeyInfo
 
     // The following operations will *only* work on locally-stored keys
@@ -154,7 +154,7 @@ public protocol KeyInfo: ProtocolCodable {
     // Name of the key
     var name: String { get }
     // Public key
-    var publicKey: PublicKey { get }
+    var publicKey: PublicKeyProtocol { get }
     // Address
     var address: AccountAddress { get }
     // Bip44 Path
@@ -171,7 +171,7 @@ struct LocalInfo: KeyInfo {
     )
     
     let name: String
-    let publicKey: PublicKey
+    let publicKey: PublicKeyProtocol
     let privateKeyArmor: String
     let algorithm: SigningAlgorithm
     
@@ -184,7 +184,7 @@ struct LocalInfo: KeyInfo {
     
     init(
         name: String,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         privateKeyArmor: String,
         algorithm: SigningAlgorithm
     ) {
@@ -200,7 +200,7 @@ struct LocalInfo: KeyInfo {
         
         let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .publicKey)
         
-        guard let publicKey = publicKeyCodable.value as? PublicKey else {
+        guard let publicKey = publicKeyCodable.value as? PublicKeyProtocol else {
             throw DecodingError.dataCorruptedError(
                 forKey: .publicKey,
                 in: container,
@@ -248,7 +248,7 @@ struct OfflineInfo: KeyInfo {
     )
     
     let name: String
-    let publicKey: PublicKey
+    let publicKey: PublicKeyProtocol
     let algorithm: SigningAlgorithm
     
     private enum CodingKeys: String, CodingKey {
@@ -259,7 +259,7 @@ struct OfflineInfo: KeyInfo {
     
     init(
         name: String,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         algorithm: SigningAlgorithm
     ) {
         self.name = name
@@ -273,7 +273,7 @@ struct OfflineInfo: KeyInfo {
         
         let publicKeyCodable = try container.decode(AnyProtocolCodable.self, forKey: .publicKey)
         
-        guard let publicKey = publicKeyCodable.value as? PublicKey else {
+        guard let publicKey = publicKeyCodable.value as? PublicKeyProtocol else {
             throw DecodingError.dataCorruptedError(
                 forKey: .publicKey,
                 in: container,

@@ -24,7 +24,7 @@ public struct ModuleAccount: GenesisAccount {
         baseAccount.coins
     }
     
-    public var publicKey: PublicKey? {
+    public var publicKey: PublicKeyProtocol? {
         baseAccount.publicKey
     }
     
@@ -69,7 +69,7 @@ public struct ModuleAccount: GenesisAccount {
         try baseAccount.set(address: address)
     }
 
-    public mutating func set(publicKey: PublicKey) throws {
+    public mutating func set(publicKey: PublicKeyProtocol) throws {
         try baseAccount.set(publicKey: publicKey)
     }
     

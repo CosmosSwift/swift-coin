@@ -50,9 +50,9 @@
         "package": "ABCI",
         "repositoryURL": "https://github.com/CosmosSwift/swift-abci",
         "state": {
-          "branch": "rest-api-new-approach",
-          "revision": "04f0c9a84204c92d079a409c815816b9a51df8f1",
-          "version": null
+          "branch": null,
+          "revision": "198b3736a40846d622f7de14bf888a476163566f",
+          "version": "0.50.1"
         }
       },
       {
@@ -170,6 +170,15 @@
           "branch": null,
           "revision": "e1904bf5a5f79cb7e0ff68a427a53a93b652fcd1",
           "version": "1.15.0"
+        }
+      },
+      {
+        "package": "Tendermint",
+        "repositoryURL": "https://github.com/CosmosSwift/swift-tendermint",
+        "state": {
+          "branch": null,
+          "revision": "ee64eea0d4e5e5d3896ed3f7ea71a142b6c91aea",
+          "version": "0.0.2"
         }
       }
     ]

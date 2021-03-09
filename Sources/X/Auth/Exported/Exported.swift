@@ -14,8 +14,8 @@ public protocol Account: ProtocolCodable, CustomStringConvertible {
     mutating func set(address: AccountAddress) throws
 
     // can return nil.
-    var publicKey: PublicKey? { get }
-    mutating func set(publicKey: PublicKey) throws
+    var publicKey: PublicKeyProtocol? { get }
+    mutating func set(publicKey: PublicKeyProtocol) throws
 
     var accountNumber: UInt64 { get }
     mutating func set(accountNumber: UInt64) throws

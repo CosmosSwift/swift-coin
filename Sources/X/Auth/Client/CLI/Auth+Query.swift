@@ -4,7 +4,6 @@ import CosmosProto
 import NIO
 import GRPC
 import Cosmos
-import ABCIREST
 import ABCIMessages
 import Tendermint
 import AsyncHTTPClient
@@ -99,8 +98,9 @@ public struct GetAccount: ParsableCommand {
         let height: Int64 = 4
         let prove = false
         
-        let params = RequestQuery(data: GetAccountPayload(Address: self.address), path: "custom/acc/account", height: height, prove: prove)
-        let response: RESTResponse<ResponseQuery<AnyProtocolCodable>> = try client.abciQuery(id: 10, params: params).wait()
+        let params = RESTABCIQueryParameters(path: "custom/acc/account", data: GetAccountPayload(Address: self.address), height: height, prove: prove)
+        
+        let response: RESTResponse<ABCIQueryResponse<AnyProtocolCodable>> = try client.abciQueryMapToData(id: 10, parameters: params).wait()
                 
         let data = try JSONEncoder().encode(response)
         
