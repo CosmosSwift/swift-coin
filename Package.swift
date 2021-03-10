@@ -7,13 +7,15 @@ let package = Package(
         .macOS(.v10_15),
     ],
     products: [
-        // App Module
-        .library(name: "App", targets: ["App"]),
-        .library(name: "NameService", targets: ["NameService"]),
-
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
         .executable(name: "nameserviced", targets: ["nameserviced"]),
+
+        // App Module
+        .library(name: "App", targets: ["App"]),
+
+        // X Modules
+        .library(name: "NameService", targets: ["NameService"]),
     ],
     dependencies: [
         .package(name: "swift-cosmos", url: "https://github.com/CosmosSwift/swift-cosmos", .branch("main")),
