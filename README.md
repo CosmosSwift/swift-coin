@@ -1,6 +1,6 @@
 # swift-coin / nameservice [ALPHA]
 
-![Swift5.3+](https://img.shields.io/badge/Swift-5.3+-blue.svg)
+![Swift5.4+](https://img.shields.io/badge/Swift-5.4+-blue.svg)
 ![platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20linux-orange.svg)
 
 Build blockchain applications in Swift on top of the Tendermint consensus using [SwiftNIO](https://github.com/apple/swift-nio) as the server core.
@@ -11,35 +11,14 @@ To make the porting more exciting, we have chosen to use the [nameservice](https
 
 The primary focus is to get to parity with the Cosmos-SDK version 0.40. We are currently tracking version 0.33.9 because the Go nameservice still requires it.
 
-## Work in progress
-This is work in progress. What we currrently have is the following:
-
-| Module/App  |  completion  |  notes
-|:-----------|:---------:|:-------
-| Framework  | ✔️ |   Framework mimics the CosmosSDK framework, including the directory structure.
-| Store  | ✔️ |  Currently using in memory version of iAVLPlus.
-| Bech32 | ✔️    |
-| Auth   | ✔️    | Staking, Governance, Bank requirements in progress (see respective Modules)
-| Params |   ✔️|    
-| Nameservice  | 70%| Allows us to test modules.
-| GenUtils | 80%|
-| Supply  |  50%  |  
-| Governance  |  0% |   
-| Staking | 50%    |
-| Simulation  |  50%|    
-| Bank |   70% |   
-| IBC | 0% |
-
-We currently bundle the nameservice, all modules and the framework as one repository, however, we will redistribute this into decoupled libraries when we get closer to parity with the Cosmos-sdk.
-
 ## Requirements
-- Swift version: 5.3.x
+- Swift version: 5.4.x
 - SwiftNIO version: 2.0.x
 - Tendermint/ABCI version: 0.33.9 (tendermint 0.33.9)
 
 ## Installation
 
-Requires macOS or a variant of Linux with the Swift 5.3.x toolchain installed.
+Requires macOS or a variant of Linux with the Swift 5.4.x toolchain installed.
 
 When running on an Apple M1 from XCode, you need to set the minimum macOS version to 11 in `Package.swift` as such:
 ```

@@ -65,6 +65,15 @@
         }
       },
       {
+        "package": "swift-cosmos",
+        "repositoryURL": "https://github.com/CosmosSwift/swift-cosmos",
+        "state": {
+          "branch": "main",
+          "revision": "b1eb27ba7838da9e4fa5dbbc94aee722ccd4dd5f",
+          "version": null
+        }
+      },
+      {
         "package": "swift-cosmos-proto",
         "repositoryURL": "https://github.com/cosmosswift/swift-cosmos-proto.git",
         "state": {
