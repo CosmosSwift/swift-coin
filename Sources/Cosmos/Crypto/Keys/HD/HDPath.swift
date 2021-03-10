@@ -6,7 +6,7 @@ import DataConvertible
 // To receive a canonical string representation ala
 // m / purpose' / coinType' / account' / change / addressIndex
 // call String() on a BIP44Params instance.
-struct BIP44Params: Codable, CustomStringConvertible {
+public struct BIP44Params: Codable, CustomStringConvertible {
     let purpose: UInt32
     let coinType: UInt32
     let account: UInt32
@@ -15,7 +15,7 @@ struct BIP44Params: Codable, CustomStringConvertible {
 }
 
 extension BIP44Params {
-    var description: String {
+    public var description: String {
         // m / Purpose' / coin_type' / Account' / Change / address_index
         "\(purpose)'/\(coinType)'/\(account)'/\(change ? "1" : "0")/\(addressIndex)"
     }

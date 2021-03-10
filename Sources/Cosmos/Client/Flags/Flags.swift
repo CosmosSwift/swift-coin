@@ -8,6 +8,29 @@
 import Foundation
 import ArgumentParser
 
+
+
+#warning("This should probably be moved elsewhere")
+extension AccountAddress: ExpressibleByArgument {
+    public init?(argument: String) {
+        try? self.init(bech32Encoded: argument)
+    }
+}
+
+extension Coin: ExpressibleByArgument {
+    public init?(argument: String) {
+        
+        try? self.init(string: argument)
+    }
+}
+
+extension DecimalCoin: ExpressibleByArgument {
+    public init?(argument: String) {
+        
+        try? self.init(string: argument)
+    }
+}
+
 public enum Flags {
     #warning("NodeURL should probably be moved?")
     public struct NodeURL: ExpressibleByArgument {
@@ -83,6 +106,65 @@ public enum Flags {
             case json
         }
         
+        public enum BroadcastMode: String, ExpressibleByArgument {
+            case sync
+            case async
+            case block
+        }
+        
+        public enum KeyringBackend: String, ExpressibleByArgument {
+            case os
+            case file
+            case kwallet
+            case pass
+            case test
+        }
+        
+        public enum SignMode: String, ExpressibleByArgument {
+            case direct
+            case amino_json // TODO: amino should be removed
+        }
+        
+        public enum GasLimitPerTransaction: CustomStringConvertible, ExpressibleByArgument {
+            public init?(argument: String) {
+                if argument == "auto" {
+                    self = .auto
+                    return
+                }
+                if let limit = UInt64(argument) {
+                    self = .limit(perTransaction: limit)
+                    return
+                }
+                return nil
+            }
+            
+            case auto
+            case limit(perTransaction: UInt64 = 20000)
+            
+            public var description: String {
+                switch self {
+                    case .auto:
+                     return "auto"
+                    case let .limit(perTransaction: value):
+                    return String(value)
+                }
+            }
+        }
+        
+        public enum AddressOrName: ExpressibleByArgument {
+            public init?(argument: String) {
+                if let address = AccountAddress(argument: argument) {
+                    self = .address(address)
+                } else {
+                    self = .name(argument)
+                }
+                return
+            }
+            
+            case name(String)
+            case address(AccountAddress)
+        }
+        
         #warning("the <host>:<port> format seems like it could leverage some type safety")
         @Option(help: "<host>:<port> to Tendermint RPC interface for this chain")
         public var node: NodeURL = NodeURL(argument: "tcp://localhost:26657")!
@@ -96,42 +178,70 @@ public enum Flags {
         
         #warning("this comes from the root command but is marked required (in go) for this implementation specifically")
         @Option(help: "The network chain ID")
-        public var chainId: String
+        public var chainId: String // TODO: this is required
+                
+        @Option(help: "The client Keyring directory; if omitted, the default 'home' directory will be used")
+        public var keyringDir: String? // TODO: this should have a default
         
-        public init() { fatalError() }
+        @Option(help: "Name or address of private key with which to sign")
+        public var from: AddressOrName // TODO: this can also be a name (String)
+        
+        @Option(name: .customShort("a"), help:"The account number of the signing account (offline mode only)")
+        public var accountNumber: UInt64? // TODO: this should have a default
+        
+        @Option(name: .customShort("s"), help: "The sequence number of the signing account (offline mode only)")
+        public var sequence: UInt64? // TODO: this should have a default
+        
+        @Option(help: "Memo to send along with transaction")
+        public var memo: String? // TODO: this should have a default
+        
+        @Option(help: "Fees to pay along with transaction; eg: 10uatom")
+        public var fees: Coin? // TODO: this should have a default
+        
+        @Option(help: "Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)")
+        public var gasPrice: DecimalCoin?
+        
+        @Flag(help: "Use a connected Ledger device")
+        public var useLedger: Bool = false
+        
+        @Option(help: "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
+        public var gasAdjustment: Float64 = 1.0
+        
+        @Option(name: .customShort("b"), help: "Transaction broadcasting mode (sync|async|block)")
+        public var broadcastMode: BroadcastMode = .sync // TODO: what should be teh default?
+        
+        @Flag(help: "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it")
+        public var dryRun: Bool = false
+        
+        @Flag(help: "Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase is not accessible)")
+        public var generateOnly: Bool = false
+        
+        @Flag(help: "Offline mode (does not allow any online functionality")
+        public var offline: Bool = false
+        
+        @Flag(name: .customShort("y"), help: "Skip tx broadcasting prompt confirmation")
+        public var skipConfirmation: Bool = false
+
+        @Option(help: "Select keyring's backend (os|file|kwallet|pass|test)")
+        public var keyringBackend: KeyringBackend = .os
+        
+        @Option(help: "Choose sign mode (direct|amino-json), this is an advanced feature")
+        public var signMode: SignMode = .direct // TODO: what should be the default?
+        
+        @Option(help: "Set a block timeout height to prevent the tx from being committed past a certain height")
+        public var timeOutHeight: UInt64? // TODO: what should be the default here?
+        // --gas can accept integers and "auto"
+        // auto means that the system will run in simulation mode an compute a suitable value
+        @Option(help: "gas limit to set per-transaction; set to \(GasLimitPerTransaction.auto) to calculate sufficient gas automatically (default \(GasLimitPerTransaction.limit)")
+        public var gas: GasLimitPerTransaction = .limit() // TODO: what should be the default here?
+        
+        
+        public init() { }
         
         #warning("Does this need porting?")
         // cmd.SetErr(cmd.ErrOrStderr())
         // cmd.SetOut(cmd.OutOrStdout())
-        
-        // TODO: implement flags
-        
-//        cmd.Flags().String(FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
-//        cmd.Flags().String(FlagFrom, "", "Name or address of private key with which to sign")
-//        cmd.Flags().Uint64P(FlagAccountNumber, "a", 0, "The account number of the signing account (offline mode only)")
-//        cmd.Flags().Uint64P(FlagSequence, "s", 0, "The sequence number of the signing account (offline mode only)")
-//        cmd.Flags().String(FlagMemo, "", "Memo to send along with transaction")
-//        cmd.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 10uatom")
-//        cmd.Flags().String(FlagGasPrices, "", "Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)")
-//        cmd.Flags().String(FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
-//        cmd.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
-//        cmd.Flags().Float64(FlagGasAdjustment, DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
-//        cmd.Flags().StringP(FlagBroadcastMode, "b", BroadcastSync, "Transaction broadcasting mode (sync|async|block)")
-//        cmd.Flags().Bool(FlagDryRun, false, "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it")
-//        cmd.Flags().Bool(FlagGenerateOnly, false, "Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase is not accessible)")
-//        cmd.Flags().Bool(FlagOffline, false, "Offline mode (does not allow any online functionality")
-//        cmd.Flags().BoolP(FlagSkipConfirmation, "y", false, "Skip tx broadcasting prompt confirmation")
-//        cmd.Flags().String(FlagKeyringBackend, DefaultKeyringBackend, "Select keyring's backend (os|file|kwallet|pass|test)")
-//        cmd.Flags().String(FlagSignMode, "", "Choose sign mode (direct|amino-json), this is an advanced feature")
-//        cmd.Flags().Uint64(FlagTimeoutHeight, 0, "Set a block timeout height to prevent the tx from being committed past a certain height")
-//
-//        // --gas can accept integers and "auto"
-//        cmd.Flags().String(FlagGas, "", fmt.Sprintf("gas limit to set per-transaction; set to %q to calculate sufficient gas automatically (default %d)", GasFlagAuto, DefaultGasLimit))
-//
-//        cmd.MarkFlagRequired(FlagChainID)
-//
-//        cmd.SetErr(cmd.ErrOrStderr())
-//        cmd.SetOut(cmd.OutOrStdout())
+
     }
 }
 

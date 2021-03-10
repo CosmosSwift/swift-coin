@@ -144,7 +144,7 @@ struct BaseKeybase {
     func writeOfflineKey(
         keyWriter: InfoWriter,
         name: String,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         algorithm: SigningAlgorithm
     ) -> KeyInfo {
         let info = OfflineInfo(

@@ -52,6 +52,10 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
+            argument = "init new_node -o"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "start --host 0.0.0.0"
             isEnabled = "YES">
          </CommandLineArgument>

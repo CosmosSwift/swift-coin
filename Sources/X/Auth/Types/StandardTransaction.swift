@@ -4,35 +4,40 @@ import Cosmos
 
 // StdTx is a standard way to wrap a Msg with Fee and Signatures.
 // NOTE: the first signature is the fee payer (Signatures must not be nil).
-struct StandardTransaction: Transaction {
-    static let metaType: MetaType = Self.metaType(key: "cosmos-sdk/StdTx")
+public struct StandardTransaction: Transaction {
+    static public let metaType: MetaType = Self.metaType(key: "cosmos-sdk/StdTx")
     
-    static let maxGasWanted = UInt64((1 << 63) - 1)
+    static public let maxGasWanted = UInt64((1 << 63) - 1)
 
-    let messages: [Message]
-    let fee: StandardFee
-    let signatures: [StandardSignature]
-    let memo: String
+    public let messages: [Message]
+    public let fee: StandardFee
+    public let signatures: [StandardSignature]
+    public let memo: String
     
-    init(messages: [Message], fee: StandardFee, signatures: [StandardSignature], memo: String) {
+    public init(messages: [Message], fee: StandardFee, signatures: [StandardSignature], memo: String) {
         self.messages = messages
         self.fee = fee
         self.signatures = signatures
         self.memo = memo
     }
+    
+    
+    public var encoded: Data? {
+        return try? JSONEncoder().encode(self)
+    }
 
     // TODO: Find a way to implement Codable for protocols, maybe make StandardTransaction generic?
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         fatalError()
     }
     
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         fatalError()
     }
 
     // ValidateBasic does a simple and lightweight validation check that doesn't
     // require access to any other information.
-    func validateBasic() throws {
+    public func validateBasic() throws {
         let standardSignatures = signatures
 
         if fee.gas > Self.maxGasWanted {
@@ -72,13 +77,7 @@ struct StandardTransaction: Transaction {
 
 //__________________________________________________________
 
-// StdFee includes the amount of coins paid in fees and the maximum
-// gas to be used by the transaction. The ratio yields an effective "gasprice",
-// which must be above some miminum to be accepted into the mempool.
-struct StandardFee: Codable {
-    let amount: [Coin]
-    let gas: UInt64
-}
+
 
 func standardSignBytes(chainID: String, accountNumber: UInt64, sequence: UInt64, fee: StandardFee, messages: [Message], memo: String) -> Data {
     fatalError()
@@ -101,13 +100,6 @@ func standardSignBytes(chainID: String, accountNumber: UInt64, sequence: UInt64,
 //        }
 //        return sdk.MustSortJSON(bz)
 //    }
-}
-
-// StdSignature represents a sig
-struct StandardSignature: Codable {
-    // TODO: Find a way to implement Codable for protocols, maybe make StandardSignature generic?
-//    let publicKey: PublicKey?
-    let signature: Data
 }
 
 

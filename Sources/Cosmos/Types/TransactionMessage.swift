@@ -1,6 +1,35 @@
 import Foundation
 import Tendermint
 
+// StdFee includes the amount of coins paid in fees and the maximum
+// gas to be used by the transaction. The ratio yields an effective "gasprice",
+// which must be above some miminum to be accepted into the mempool.
+public struct StandardFee {
+    public let amount: [Coin]
+    public let gas: UInt64
+    
+    public init(amount: [Coin], gas: UInt64) {
+        self.amount = amount
+        self.gas = gas
+    }
+}
+
+extension StandardFee: Codable {}
+
+
+// StdSignature represents a sig
+public struct StandardSignature {
+    // TODO: Find a way to implement Codable for protocols, maybe make StandardSignature generic?
+//    let publicKey: PublicKey?
+    public let signature: Data
+    
+    public init(signature: Data) {
+        self.signature = signature
+    }
+}
+
+extension StandardSignature: Codable {}
+
 // Transactions messages must fulfill the `Message`
 public protocol Message: ProtocolCodable {
     // Return the message type.
@@ -28,6 +57,12 @@ public protocol Message: ProtocolCodable {
 
 // Transactions objects must fulfill the Tx
 public protocol Transaction: ProtocolCodable {
+    
+    
+    init(messages: [Message], fee: StandardFee, signatures: [StandardSignature], memo: String)
+    
+    var encoded: Data? { get }
+    
     // Gets the all the transaction's messages.
     var messages: [Message] { get }
 

@@ -13,7 +13,7 @@ public struct BaseAccount: Account, GenesisAccount {
     
     public private(set) var address: AccountAddress
     public private(set) var coins: [Coin]
-    public private(set) var publicKey: PublicKey?
+    public private(set) var publicKey: PublicKeyProtocol?
     public private(set) var accountNumber: UInt64
     public private(set) var sequence: UInt64
     
@@ -21,7 +21,7 @@ public struct BaseAccount: Account, GenesisAccount {
     public init(
         address: AccountAddress,
         coins: [Coin] = [],
-        publicKey: PublicKey? = nil,
+        publicKey: PublicKeyProtocol? = nil,
         accountNumber: UInt64 = 0,
         sequence: UInt64 = 0
     ) {
@@ -43,7 +43,7 @@ public struct BaseAccount: Account, GenesisAccount {
         self.coins = try container.decode([Coin].self, forKey: .coins)
         let publicKeyCodable = try container.decodeIfPresent(AnyProtocolCodable.self, forKey: .publicKey)
        
-        guard let publicKey = publicKeyCodable?.value as? PublicKey else {
+        guard let publicKey = publicKeyCodable?.value as? PublicKeyProtocol else {
             throw DecodingError.dataCorruptedError(
                 forKey: .publicKey,
                 in: container,
@@ -92,7 +92,7 @@ public struct BaseAccount: Account, GenesisAccount {
         self.address = address
     }
 
-    public mutating func set(publicKey: PublicKey) throws {
+    public mutating func set(publicKey: PublicKeyProtocol) throws {
         self.publicKey = publicKey
     }
     

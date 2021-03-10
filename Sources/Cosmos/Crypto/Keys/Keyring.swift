@@ -184,7 +184,7 @@ extension KeyringKeybase {
     // created key info.
     func createOffline(
         name: String,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         algorithm: SigningAlgorithm
     ) throws -> KeyInfo {
         // TODO: Implement
@@ -201,7 +201,7 @@ extension KeyringKeybase {
     // returns the created key Info object.
     func createMulti(
         name: String,
-        publicKey: PublicKey
+        publicKey: PublicKeyProtocol
     ) throws -> KeyInfo {
         // TODO: Implement
         fatalError()
@@ -262,7 +262,7 @@ extension KeyringKeybase {
 
     // Sign signs an arbitrary set of bytes with the named key. It returns an error
     // if the key doesn't exist or the decryption fails.
-    func sign(name: String, passphrase: String, message: Data) throws -> (Data, PublicKey) {
+    func sign(name: String, passphrase: String, message: Data) throws -> (Data, PublicKeyProtocol) {
         // TODO: Implement
         fatalError()
 //        info, err := kb.Get(name)

@@ -83,7 +83,7 @@ docker run -it --rm -v "/tmp:/tendermint" tendermint/tendermint:v0.34.0 init
 swift run nameserviced init new_node -o
 
 # run a single tendermint node
-docker run -it --rm -v "/tmp:/tendermint" -p "26656-26657:26656-26657"  tendermint/tendermint:v0.34 node --proxy_app="tcp://host.docker.internal:26658"
+docker run -it --rm --platform linux/amd64 -v "/tmp:/tendermint" -p "26656-26657:26656-26657"  tendermint/tendermint:v0.34.0 node --proxy_app="tcp://host.docker.internal:26658"
 # when using Docker for Apple M1 preview 7, add --platform linux/amd64 --add-host=host.docker.internal:host-gateway
 # also, possibly replace the proxy_app flag with this: --proxy_app="tcp://192.168.64.1:26658"
 

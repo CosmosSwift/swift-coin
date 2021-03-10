@@ -2,46 +2,40 @@ import Foundation
 import Tendermint
 import Cosmos
 
-#warning("STUB")
-struct Keybase {
-    func sign(name: String, passPhrase: String, data: Data) -> StandardSignature {
-        fatalError()
-    }
+
+public enum FeeStructure {
+    case fees([Coin])
+    case gasPrice([DecimalCoin])
 }
 
-public struct TransactionBuilder {
-    var transactionEncoder: TransactionEncoder
+public struct TransactionBuilder<Tx: Transaction> {
+    //var transactionEncoder: (_ transaction: Tx) throws -> Data
     var keybase: Keybase?
     var accountNumber: UInt64
     var sequence: UInt64
-    var gas: UInt64
+    var gas: Flags.TransactionFlags.GasLimitPerTransaction
     let gasAdjustment: Double
     let simulateAndExecute: Bool
     var chainID: String
     var memo: String
-    var transactionType: TransactionType
+    var feeStructure: FeeStructure
     
-    enum TransactionType {
-        case fees([Coin])
-        case gasPrices([DecimalCoin])
-    }
-    
-    init(
-        transactionEncoder: @escaping TransactionEncoder,
+    public init(
+        //transactionEncoder: @escaping (_ transaction: Tx) throws -> Data,
         accountNumber: UInt64,
         sequence: UInt64,
-        gas: UInt64,
+        gas: Flags.TransactionFlags.GasLimitPerTransaction,
         gasAdjustment: Double,
         simulateAndExecute: Bool,
         chainID: String,
         memo: String,
-        transactionType: TransactionType
+        feeStructure: FeeStructure
     ) throws {
         if chainID.isEmpty {
             throw TransactionBuilderError.chainIDRequired
         }
         
-        self.transactionEncoder = transactionEncoder
+        //self.transactionEncoder = transactionEncoder
         self.keybase = nil
         self.accountNumber = accountNumber
         self.sequence = sequence
@@ -50,17 +44,26 @@ public struct TransactionBuilder {
         self.simulateAndExecute = simulateAndExecute
         self.chainID = chainID
         self.memo = memo
-        self.transactionType = transactionType
+        self.feeStructure = feeStructure
     }
     
     func buildSignMessage(messages: [Message]) throws -> StandardSignedMessage {
         let finalFees: [Coin]
+        let limit: UInt64
+        switch gas {
+        case .auto:
+            #warning("auto mode should lead to simulation of the transaction to compute a cost.")
+            #warning("not sure if it should be done at that level or higher in the call stack.")
+            fatalError("Auto gas is not implemented")
+        case let .limit(perTransaction: l):
+            limit = l
+        }
         
-        switch transactionType {
+        switch feeStructure {
         case let .fees(fees):
             finalFees = fees
-        case let .gasPrices(gasPrices):
-            let gasDecimal = Decimal(gas)
+        case let .gasPrice(gasPrices):
+            let gasDecimal = Decimal(limit)
             let coins = gasPrices.map { gasPrice -> Coin in
                 let fee = gasPrice.amount * gasDecimal
                 let roundedFee = fee.rounded(0, .up)
@@ -71,7 +74,7 @@ public struct TransactionBuilder {
             finalFees = coins
         }
         
-        let fee = StandardFee(amount: finalFees, gas: gas)
+        let fee = StandardFee(amount: finalFees, gas: limit)
         
         return StandardSignedMessage(
             chainID: chainID,
@@ -87,13 +90,17 @@ public struct TransactionBuilder {
     // signed. An error is returned if signing fails.
     func sign(name: String, passPhrase: String, message: StandardSignedMessage) throws -> Data {
         let signature = try TransactionBuilder.makeSignature(keybase: keybase, name: name, passPhrase: passPhrase, message: message)
-        let transaction = StandardTransaction(messages: message.messages, fee: message.fee, signatures: [signature], memo: message.memo)
-        return try transactionEncoder(transaction)
+        let transaction = Tx(messages: message.messages, fee: message.fee, signatures: [signature], memo: message.memo)
+        guard let encoded = transaction.encoded else {
+            throw CosmosError.init(codespace: "TransactionBuilder", code: 1, description: "Can't encode transaction")
+        }
+        return encoded
     }
     
     struct KeyringServiceName {
         #warning("STUB")
     }
+    
     static func newKeyring(_ keyringServiceName: KeyringServiceName, keyringBackend: String, homeFlag: String) -> Keybase {
         #warning("STUB")
         fatalError()
@@ -102,7 +109,7 @@ public struct TransactionBuilder {
     // MakeSignature builds a StdSignature given keybase, key name, passphrase, and a StdSignMsg.
     static func makeSignature(keybase: Keybase?, name: String, passPhrase: String, message: StandardSignedMessage) throws -> StandardSignature {
         let keybase = keybase ?? newKeyring(KeyringServiceName(), keyringBackend: "", homeFlag: "")
-        return keybase.sign(name: name, passPhrase: passPhrase, data: message.data)
+        return StandardSignature(signature: try keybase.sign(name: name, passphrase: passPhrase, message: message.data).0)
     }
     
     // BuildAndSign builds a single message to be signed, and signs a transaction
@@ -120,14 +127,18 @@ public struct TransactionBuilder {
         fatalError("This is not correct yet")
         //let signatures = [StandardSig]
         
-        return try transactionEncoder(
-            StandardTransaction(
+        let transaction =
+            Tx(
                 messages: signedMessage.messages,
                 fee: signedMessage.fee,
                 signatures: [], // this probably shouldn't be empty
                 memo: signedMessage.memo
             )
-        )
+        
+        guard let encoded = transaction.encoded else {
+            throw CosmosError.init(codespace: "TransactionBuilder", code: 1, description: "Can't encode transaction")
+        }
+        return encoded
         
 //        func (bldr TxBuilder) BuildTxForSim(msgs []sdk.Msg) ([]byte, error) {
 //            signMsg, err := bldr.BuildSignMsg(msgs)

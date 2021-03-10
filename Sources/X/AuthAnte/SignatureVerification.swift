@@ -6,7 +6,7 @@ import Auth
 // SignatureVerificationGasConsumer is the type of function that is used to both
 // consume gas when verifying signatures and also to accept or reject different types of pubkeys
 // This is where apps can define their own PubKey
-public typealias SignatureVerificationGasConsumer = (_ gasMeter: GasMeter, _ signature: Data, _ publicKey: PublicKey, _ params: AuthParameters) throws -> Void
+public typealias SignatureVerificationGasConsumer = (_ gasMeter: GasMeter, _ signature: Data, _ publicKey: PublicKeyProtocol, _ params: AuthParameters) throws -> Void
 
 extension Auth {
     // DefaultSigVerificationGasConsumer is the default implementation of SignatureVerificationGasConsumer. It consumes gas
@@ -15,7 +15,7 @@ extension Auth {
     public static func defaultSignatureVerificationGasConsumer(
         gasMeter: GasMeter,
         signatue: Data,
-        publicKey: PublicKey,
+        publicKey: PublicKeyProtocol,
         parameters: AuthParameters
     ) throws {
         // TODO: Implement

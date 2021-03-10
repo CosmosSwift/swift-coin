@@ -62,7 +62,7 @@ public struct InitCommand: ParsableCommand {
         }
 
         let nodeID: String
-        let vpk: PublicKey? // TODO: this should be replaced when we can properly unserialize a PublicKey from an Ed25519PublicKey
+        let vpk: PublicKeyProtocol? // TODO: this should be replaced when we can properly unserialize a PublicKey from an Ed25519PublicKey
         let validatorPublicKey: Ed25519PublicKey
         
         do {

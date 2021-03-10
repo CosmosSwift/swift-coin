@@ -66,24 +66,48 @@ public struct BuyName: ParsableCommand {
     var name: String
     
     @Argument(help: "Price.")
-    var price: UInt
+    var price: [Coin]
     
     public init() {}
     
     public mutating func run() throws {
-        fatalError()
+        var fs: FeeStructure?
+        if let fee = txFlags.fees {
+            fs = .fees([fee])
+        } else if let gasPrice = txFlags.gasPrice {
+            fs = .gasPrice([gasPrice])
+        }
+        guard let feeStructure = fs else {
+            throw Cosmos.Error.generic(reason: "missing fee or gasPrice")
+        }
         
-//        let txBuilder = TransactionBuilder(transactionEncoder: <#TransactionEncoder#>,
-//                                           accountNumber: <#UInt64#>,
-//                                           sequence: <#UInt64#>,
-//                                           gas: <#UInt64#>,
-//                                           gasAdjustment: <#Double#>,
-//                                           simulateAndExecute: <#Bool#>,
-//                                           chainID: <#String#>,
-//                                           memo: <#String#>,
-//                                           transactionType: <#TransactionBuilder.TransactionType#>
-//                                        )
+        let txBuilder = try TransactionBuilder<StandardTransaction>(
+                                           accountNumber: txFlags.accountNumber ?? 0,
+                                           sequence: txFlags.sequence ?? 0,
+                                           gas: txFlags.gas,
+                                           gasAdjustment: txFlags.gasAdjustment,
+                                           simulateAndExecute: !txFlags.generateOnly,
+                                           chainID: txFlags.chainId,
+                                           memo: txFlags.memo ?? "",
+                                           feeStructure: feeStructure
+                                        )
         
+        // get buyer account address
+        let buyer: AccountAddress
+        switch self.txFlags.from {
+        case let .address(address):
+            buyer = address
+        case let .name(name):
+            // TODO: get address from name
+            fatalError()
+        }
+        let message = BuyNameMessage(name: self.name, bid: self.price, buyer: buyer)
+        
+        // TODO: sign transaction
+        
+        // TODO: send an broadcast transaction
+        
+        // TODO: print response ?
         
         
 //        RunE: func(cmd *cobra.Command, args []string) error {

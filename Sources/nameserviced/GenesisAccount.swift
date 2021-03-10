@@ -77,7 +77,7 @@ struct AddGenesisAccountCommand: ParsableCommand {
 
         }
         // Get coins
-        guard let coins = try? parseCoins(string: coinsStr) else {
+        guard let coins = try? [Coin](string: coinsStr) else {
             fatalError("Coins not properly defined.")
         }
         
@@ -150,29 +150,6 @@ struct AddGenesisAccountCommand: ParsableCommand {
         }
     }
     
-}
-
-func parseCoins(string: String) -> [Coin]? {
-    let coinStrArray = string.split(separator: ",")
-    
-    var coins: [Coin] = []
-    
-    for coinStr in coinStrArray {
-        // get the first char which is not number (or . when we handle DecCoin)
-        // from there, it's the denom
-        // the denom should be btw 3 and 16 char long, start with a lowercase letter, and the rest should be lowercase or number
-        //
-        let pattern = "[0-9]+"
-        guard let amountRange = coinStr.range(of: pattern, options:.regularExpression) else {
-            return nil
-        }
-        
-        let amount = UInt(coinStr[amountRange]) ?? 0
-        var denomination = coinStr
-        denomination.removeSubrange(amountRange)
-        coins.append(Coin(denomination: String(denomination), amount: amount))
-    }
-    return coins
 }
 
 /*
