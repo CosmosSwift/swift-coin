@@ -100,24 +100,10 @@ public enum Flags {
     }
     
     public struct TransactionFlags: ParsableArguments {
-        #warning("where should this live? here? Or somewhere more general?")
-        public enum OutputFormat: String, ExpressibleByArgument {
-            case text
-            case json
-        }
-        
         public enum BroadcastMode: String, ExpressibleByArgument {
             case sync
             case async
             case block
-        }
-        
-        public enum KeyringBackend: String, ExpressibleByArgument {
-            case os
-            case file
-            case kwallet
-            case pass
-            case test
         }
         
         public enum SignMode: String, ExpressibleByArgument {
@@ -171,10 +157,6 @@ public enum Flags {
         
         @Option(help: "Use a specific height to query state at (this can error if the node is pruning state)")
         public var height: Int = 0
-        
-        #warning("This actually comes from the tendermint import")
-        @Option(name: .shortAndLong, help: "Output format (text|json)")
-        public var output: OutputFormat = .text
         
         #warning("this comes from the root command but is marked required (in go) for this implementation specifically")
         @Option(help: "The network chain ID")

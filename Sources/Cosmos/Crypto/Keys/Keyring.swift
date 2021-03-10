@@ -81,7 +81,7 @@ struct KeyringKeybase: Keybase, KeyWriter {
 // NewKeyring creates a new instance of a keyring. Keybase
 // options can be applied when generating this new Keybase.
 // Available backends are "os", "file", "test".
-func makeKeyring(
+public func makeKeyring(
     appName: String,
     backend: KeyringBackend,
     rootDirectory: String,
@@ -241,30 +241,58 @@ extension KeyringKeybase {
 
     // GetByAddress fetches a key by address and returns its public information.
     func getByAddress(address: AccountAddress) throws -> KeyInfo {
-        // TODO: Implement
-        fatalError()
-//        ik, err := kb.db.Get(string(addrKey(address)))
-//        if err != nil {
-//            return nil, err
-//        }
-//
-//        if len(ik.Data) == 0 {
-//            return nil, fmt.Errorf("key with address %s not found", address)
-//        }
-//
-//        bs, err := kb.db.Get(string(ik.Data))
-//        if err != nil {
-//            return nil, err
-//        }
-//
-//        return unmarshalInfo(bs.Data)
+        let key = DatabaseKeybase.addressKey(address: address)
+        if let infoStr = String(data: try database.get(key: key.string).data, encoding: .utf8) {
+            let info = try database.get(key: infoStr)
+            return try unmarshalInfo(data: info.data)
+        }
+        throw Cosmos.Error.generic(reason: "Can't find address: \(address) in Keyring.")
     }
 
     // Sign signs an arbitrary set of bytes with the named key. It returns an error
     // if the key doesn't exist or the decryption fails.
     func sign(name: String, passphrase: String, message: Data) throws -> (Data, PublicKeyProtocol) {
-        // TODO: Implement
-        fatalError()
+        let keyInfo = try self.get(name: name)
+            
+        switch keyInfo.type {
+        case .local:
+            guard let localInfo = keyInfo as? LocalInfo else {
+                fatalError("Malformed LocalInfo Key: \(keyInfo)")
+            }
+
+            guard let privateKey = MintKey.decryptArmorPrivateKey(armoredKey: localInfo.privateKeyArmor, passphrase: passphrase, algorithm: localInfo.algorithm.rawValue) else {
+                throw Cosmos.Error.generic(reason: "Invalid Private Key Armor for LocalInfo Key: \(keyInfo)")
+            }
+            
+            let sig = try privateKey.sign(message: message)
+            
+            return (sig, privateKey.publicKey)
+            
+            //privateKey
+        //            if i.PrivKeyArmor == "" {
+        //                return nil, nil, fmt.Errorf("private key not available")
+        //            }
+        //
+        //            priv, err = cryptoAmino.PrivKeyFromBytes([]byte(i.PrivKeyArmor))
+        //            if err != nil {
+        //                return nil, nil, err
+        //            }
+        //        sig, err = priv.Sign(msg)
+        //        if err != nil {
+        //            return nil, nil, err
+        //        }
+        //
+        //        return sig, priv.PubKey(), nil
+        case .ledger:
+            fatalError()
+        //            return kb.base.SignWithLedger(info, msg)
+
+        case .multi, .offline:
+            fatalError()
+        //            return kb.base.DecodeSignature(info, msg)
+        }
+
+        
 //        info, err := kb.Get(name)
 //        if err != nil {
 //            return

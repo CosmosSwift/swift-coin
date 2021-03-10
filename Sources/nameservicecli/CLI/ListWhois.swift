@@ -1,7 +1,6 @@
 import Foundation
 import ArgumentParser
 import Cosmos
-import ABCIREST
 
 public struct ListWhois: ParsableCommand {
     public static let configuration = CommandConfiguration(

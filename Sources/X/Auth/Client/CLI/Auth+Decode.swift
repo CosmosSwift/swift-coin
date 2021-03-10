@@ -1,7 +1,6 @@
 import Foundation
 import ArgumentParser
 import Cosmos
-import ABCIREST
 
 
 // GetDecodeCommand returns the decode command to take serialized bytes and turn

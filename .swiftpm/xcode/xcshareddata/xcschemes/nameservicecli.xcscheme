@@ -53,7 +53,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "keys add jack"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--help"
@@ -64,11 +64,19 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "keys list -n"
+            argument = "tx nameservice buy-name jack.id 5nametoken --from jack -y --chain-id toto --gas-price 1000"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "tx nameservice buy-name jack.id 5nametoken --from cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj -y --chain-id toto --gas-price 1000"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "tx nameservice buy-name jack.id 5nametoken --from jack -y --chain-id toto"
+            argument = "keys list -n"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "keys show jack -a"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

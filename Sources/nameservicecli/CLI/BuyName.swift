@@ -1,7 +1,6 @@
 import Foundation
 import ArgumentParser
 import Cosmos
-import ABCIREST
 import Auth
 import NameService
 import Tendermint
@@ -59,7 +58,9 @@ public struct BuyName: ParsableCommand {
         commandName: "buy-name",
         abstract: "Buys a new name."
     )
-    
+    @OptionGroup
+    private var clientOptions: ClientOptions
+
     @OptionGroup var txFlags: Flags.TransactionFlags
       
     @Argument(help: "Domain name to buy.")
@@ -92,20 +93,38 @@ public struct BuyName: ParsableCommand {
                                            feeStructure: feeStructure
                                         )
         
-        // get buyer account address
-        let buyer: AccountAddress
+
+        let keybase = try makeKeyring(
+            appName: Configuration.keyringServiceName,
+            backend: txFlags.keyringBackend,
+            rootDirectory: clientOptions.home
+        )
+        
+        //txBuilder.keybase = keybase
+        
+        let buyerKey: KeyInfo
         switch self.txFlags.from {
         case let .address(address):
-            buyer = address
+            buyerKey = try keybase.getByAddress(address: address)
         case let .name(name):
-            // TODO: get address from name
-            fatalError()
+            buyerKey = try keybase.get(name: name)
         }
-        let message = BuyNameMessage(name: self.name, bid: self.price, buyer: buyer)
+
+        print(buyerKey)
         
-        // TODO: sign transaction
+
         
-        // TODO: send an broadcast transaction
+        // TODO: incorporate memo, chainId, accountNumber, sequence
+        let message = try JSONEncoder().encode(BuyNameMessage(name: self.name, bid: self.price, buyer: buyerKey.address))
+        
+        let (sig, _) = try keybase.sign(name: buyerKey.name, passphrase: "", message: message)
+        
+        print(sig.hexEncodedString())
+        
+        
+        // TODO: sign transaction using the key
+        
+        // TODO: send a broadcast transaction
         
         // TODO: print response ?
         

@@ -24,7 +24,8 @@ let package = Package(
         .library(name: "Supply", targets: ["Supply"]),
         
         .library(name: "AuthAnte", targets: ["AuthAnte"]),
-                
+        .library(name: "JSON", targets: ["JSON"]),
+
         // Executables
         .executable(name: "nameservicecli", targets: ["nameservicecli"]),
         .executable(name: "nameserviced", targets: ["nameserviced"]),
@@ -97,6 +98,7 @@ let package = Package(
                 .target(name: "Database"),
                 .target(name: "BIP39"),
                 .target(name: "Bcrypt"),
+                .target(name: "JSON"),
                 .product(name: "iAVLPlus", package: "iAVLPlus"),
                 .product(name: "InMemoryNodeDB", package: "iAVLPlus"),
 //                .product(name: "SQLiteNodeDB", package: "iAVLPlus"),
@@ -203,6 +205,7 @@ let package = Package(
                 .product(name: "BigInt", package: "BigInt"),
             ]
         ),
+        .target(name: "JSON"),
         .target(name: "CBcrypt"),
         .target(
             name: "Bcrypt",

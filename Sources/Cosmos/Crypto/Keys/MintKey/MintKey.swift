@@ -56,8 +56,20 @@ extension MintKey {
         key = Data(SHA256.hash(data: key)) // get 32 bytes
         
         return (salt.data, key)
-        // TODO: Actually encrypt the key
+        #warning("Private keys are not encrypted")
+        // TODO: Actually encrypt the key (and adjust decryption below)
 //        return (salt.data, xsalsa20symmetric.encryptSymmetric(privateKey.data, key))
+    }
+    
+    static func decryptArmorPrivateKey(armoredKey: String,
+                                       passphrase: String,
+                                       algorithm: String) -> PrivateKey? {
+        #warning("Private keys are not encrypted")
+        // TODO: when encryption is performed, effectively decrypt the key]
+        guard let data = Data(hexEncoded: armoredKey) else {
+            return nil
+        }
+        return try? Ed25519PrivateKey(data: data)
     }
 
 }

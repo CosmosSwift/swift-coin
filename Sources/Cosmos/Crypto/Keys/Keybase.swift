@@ -161,8 +161,14 @@ extension DatabaseKeybase {
     // GetByAddress returns Info based on a provided AccAddress. An error is returned
     // if the address does not exist.
     func getByAddress(address: AccountAddress) throws -> KeyInfo {
-        // TODO: Implement
-        fatalError()
+        let key = Self.addressKey(address: address)
+        
+        guard let name = try database.get(key: key), let data = try database.get(key: name.data) else {
+            throw Cosmos.Error.generic(reason: "Address not found: \(address)")
+        }
+
+        return try unmarshalInfo(data: data)
+
 //        ik, err := kb.db.Get(addrKey(address))
 //        if err != nil {
 //            return nil, err
@@ -187,8 +193,31 @@ extension DatabaseKeybase {
         passphrase: String,
         message: Data
     ) throws -> (Data, PublicKeyProtocol) {
-        // TODO: Implement
-        fatalError()
+        
+        let infoKey = try self.get(name: name)
+        
+        switch infoKey.type {
+        case .local:
+            guard let localInfo = infoKey as? LocalInfo else {
+                throw Cosmos.Error.generic(reason: "LocalInfo key malformed: \(infoKey)")
+            }
+            
+            guard let privateKey = MintKey.decryptArmorPrivateKey(armoredKey: localInfo.privateKeyArmor, passphrase: passphrase, algorithm: localInfo.algorithm.rawValue) else {
+                throw Cosmos.Error.generic(reason: "Not able to decrypt private key for \(localInfo.name)")
+            }
+            
+            let sig = try privateKey.sign(message: message)
+            
+            return (sig, privateKey.publicKey)
+        case .ledger:
+            fatalError()
+        //            return kb.base.SignWithLedger(info, msg)
+        case .offline, .multi:
+            fatalError()
+        //            return kb.base.DecodeSignature(info, msg)
+
+        }
+        
 //        info, err := kb.Get(name)
 //        if err != nil {
 //            return
