@@ -4,6 +4,10 @@ import Cosmos
 
 // MsgSetName defines a SetName message
 struct SetNameMessage: Codable, Message {
+    var toSign: Data {
+        fatalError()
+    }
+    
     static let metaType: MetaType = Self.metaType(
         key: "nameservice/SetName"
     )

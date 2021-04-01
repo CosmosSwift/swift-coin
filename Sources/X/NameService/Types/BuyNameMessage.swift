@@ -3,55 +3,57 @@ import Tendermint
 import Cosmos
 
 // MsgBuyName defines the BuyName message
-struct BuyNameMessage: Codable {
+
+public struct BuyNameMessage: Message {
+    
+    public static var metaType: MetaType = Self.metaType(
+        key: "cosmos-sdk/BuyName" // TODO: is this the right string?
+    )
+    
     let name: String
     let bid: [Coin]
     let buyer: AccountAddress
     
-    internal init(name: String, bid: [Coin], buyer: AccountAddress) {
+    public init(name: String, bid: [Coin], buyer: AccountAddress) {
         self.name = name
         self.bid = bid
         self.buyer = buyer
     }
 }
 
-extension BuyNameMessage: Message {
-    static let metaType: MetaType = Self.metaType(
-        key: "nameservice/BuyName"
-    )
-    
-    // Route should return the name of the module
-    var route: String {
+extension BuyNameMessage {
+    // Route Implements Msg.
+    public var route: String {
         NameServiceKeys.routerKey
     }
-
-    // Type should return the action
-    var type: String {
+    
+    // Type Implements Msg.
+    public var type: String {
         "buy_name"
     }
-
-    // ValidateBasic runs stateless checks on the message
-    func validateBasic() throws {
+    
+    // ValidateBasic Implements Msg.
+    public func validateBasic() throws { // TODO:
         guard !buyer.isEmpty else {
-            throw Cosmos.Error.invalidAddress(address: buyer.description)
+            throw Cosmos.Error.invalidAddress(address: "missing buyer address")
         }
         
-        guard !name.isEmpty else {
-            throw Cosmos.Error.unknownRequest(reason: "Name cannot be empty")
+        guard bid.isValid else {
+            throw Cosmos.Error.invalidCoins(reason: "\(bid)")
         }
         
         guard bid.isAllPositive else {
-            throw Cosmos.Error.insufficientFunds(reason: "")
+            throw Cosmos.Error.invalidCoins(reason: "\(bid)")
         }
     }
-
-    // GetSignBytes encodes the message for signing
-    var signedData: Data {
-        mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
+    
+    // GetSignBytes Implements Msg.
+    public var toSign: Data {
+        mustSortJSON(data: Codec.bankCodec.mustMarshalJSON(value: self))
     }
-
-    // GetSigners defines whose signature is required
-    var signers: [AccountAddress] {
+    
+    // GetSigners Implements Msg.
+    public var signers: [AccountAddress] {
         [buyer]
     }
 }

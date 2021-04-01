@@ -13,6 +13,10 @@ struct DeleteNameMessage: Codable {
 }
 
 extension DeleteNameMessage: Message {
+    var toSign: Data {
+        fatalError()
+    }
+    
     static let metaType: MetaType = Self.metaType(
         key: "nameservice/DeleteName"
     )
