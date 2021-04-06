@@ -1,7 +1,7 @@
 # ================================
 # Build image
 # ================================
-FROM swift:nightly-5.4-focal AS build
+FROM swiftlang/swift:nightly-5.4-focal AS build
 LABEL stage=intermediate
 
 RUN apt-get update && apt-get install -y libsqlite3-dev
