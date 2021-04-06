@@ -28,7 +28,7 @@ func handleBuyNameMessage(request: Request, keeper: NameServiceKeeper, message: 
     } else {
         // If so, deduct the Bid amount from the sender
         try keeper.coinKeeper.subtractCoins(
-            requet: request,
+            request: request,
             address: message.buyer,
             amount: message.bid
         )
