@@ -19,8 +19,8 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "swift-cosmos", url: "https://github.com/CosmosSwift/swift-cosmos", .branch("main")),
-        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .upToNextMajor(from: "0.50.0")),
-        .package(name: "Tendermint", url: "https://github.com/CosmosSwift/swift-tendermint", .upToNextMajor(from: "0.0.1")),
+        .package(name: "ABCI", url: "https://github.com/CosmosSwift/swift-abci", .branch("main")),
+        .package(name: "Tendermint", url: "https://github.com/CosmosSwift/swift-tendermint", .branch("main")),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
         .package(name: "swift-nio", url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
     ],
