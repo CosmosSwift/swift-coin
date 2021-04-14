@@ -22,7 +22,8 @@ let package = Package(
         .package(name: "swift-abci", url: "https://github.com/CosmosSwift/swift-abci", .branch("main")),
         .package(name: "swift-tendermint", url: "https://github.com/CosmosSwift/swift-tendermint", .branch("main")),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
-        .package(name: "swift-nio", url: "https://github.com/apple/swift-nio.git",  .upToNextMajor(from: "2.26.0")),
+        .package(name: "swift-nio", url: "https://github.com/apple/swift-nio",  .upToNextMajor(from: "2.26.0")),
+        
     ],
     targets: [
         .executableTarget(

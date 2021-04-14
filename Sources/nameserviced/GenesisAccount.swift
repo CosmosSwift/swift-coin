@@ -77,7 +77,7 @@ struct AddGenesisAccountCommand: ParsableCommand {
 
         }
         // Get coins
-        guard let coins = try? [Coin](string: coinsStr) else {
+        guard let coins = [Coin](string: coinsStr) else {
             fatalError("Coins not properly defined.")
         }
         
