@@ -8,9 +8,9 @@ struct Whois: Codable {
     var owner: AccountAddress
     var price: [Coin]
     
-    init() {
-        self.value = ""
-        self.owner = AccountAddress()
-        self.price = minNamePrice
+    init(value: String, owner: AccountAddress, price: [Coin] = minNamePrice) {
+        self.value = value
+        self.owner = owner
+        self.price = price
     }
 }

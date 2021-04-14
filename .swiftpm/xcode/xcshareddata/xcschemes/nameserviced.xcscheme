@@ -56,6 +56,14 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "add-genesis-account cosmos18lhmek936l5etegnvvm9y8x0jjxhpsc0jcmn6p 1000nametoken,100000000stake"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "add-genesis-account cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj 1000nametoken,100000000stake"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "start --host 0.0.0.0"
             isEnabled = "YES">
          </CommandLineArgument>

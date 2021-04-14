@@ -28,7 +28,7 @@ extension NameServiceKeeper {
             // TODO: throw a specific error
             throw Cosmos.Error.unknownRequest(reason: "invalid key")
         }
-        
+        print("Storing \(key) with value \(data)")
         store.set(key: key, value: data)
     }
     

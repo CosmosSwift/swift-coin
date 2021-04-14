@@ -6,7 +6,7 @@ func handleBuyNameMessage(request: Request, keeper: NameServiceKeeper, message: 
     
     if let price = keeper.getPrice(request: request, name: message.name)  {
         // In this case, the name is owned already
-
+        print("\(message.name) is already owned, checking if we can buy")
         // Checks if the the bid price is greater than the price paid by the current owner
         if price.isAllGreaterThan(coins: message.bid) {
             // If not, throw an error
@@ -23,16 +23,29 @@ func handleBuyNameMessage(request: Request, keeper: NameServiceKeeper, message: 
             toAddress: owner,
             amount: message.bid
         )
+        print("Sent \(message.bid) from \(message.buyer) to \(owner)")
+        try keeper.setOwner(request: request, name: message.name, owner: message.buyer)
+        try keeper.setPrice(request: request, name: message.name, price: message.bid)
+
     } else {
-        // If so, deduct the Bid amount from the sender
-        try keeper.coinKeeper.subtractCoins(
-            request: request,
-            address: message.buyer,
-            amount: message.bid
-        )
+        try keeper.setWhois(request: request, name: message.name, whois: Whois(value: message.name, owner: message.buyer, price:message.bid))
     }
-    
-    try keeper.setOwner(request: request, name: message.name, owner: message.buyer)
-    try keeper.setPrice(request: request, name: message.name, price: message.bid)
-    return Result()
+    // If so, deduct the Bid amount from the sender
+    try keeper.coinKeeper.subtractCoins(
+        request: request,
+        address: message.buyer,
+        amount: message.bid
+    )
+    let attribute = Attribute(
+        key: AttributeKey.module,
+        value: "buy-name"
+    )
+
+    let event = Event(
+        type: EventType.message,
+        attributes: [attribute]
+    )
+
+    request.eventManager.emit(event: event)
+    return Result(events: request.eventManager.events)
 }

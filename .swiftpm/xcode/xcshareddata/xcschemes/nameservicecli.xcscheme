@@ -56,6 +56,14 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "query account cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj --chain-id toto --node &quot;http://127.0.0.1:26657&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "query tx 93192A62962964335F9FA555D9E87BA0BC01145B3B99C3B14E293A5876A32DD8 --chain-id &quot;toto&quot; --node &quot;http://127.0.0.1:26657&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--help"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -68,7 +76,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "tx nameservice buy-name jack.id 5nametoken --from cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj -y --chain-id toto --gas-price 1000"
+            argument = "tx nameservice buy-name jack.id 5nametoken --from cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj -y --chain-id toto --gas-price 1000 --node &quot;http://127.0.0.1:26657&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

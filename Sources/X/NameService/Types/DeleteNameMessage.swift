@@ -13,6 +13,7 @@ public struct DeleteNameMessage: Codable {
 }
 
 extension DeleteNameMessage: Message {
+    
     public static let metaType: MetaType = Self.metaType(
         key: "nameservice/DeleteName"
     )
