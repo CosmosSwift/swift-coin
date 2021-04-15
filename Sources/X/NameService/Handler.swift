@@ -4,7 +4,7 @@ extension NameServiceKeeper {
     // NewHandler ...
     func makeHandler() -> Handler {
         return { request, message in
-            var request = request
+            let request = request
             request.eventManager = EventManager()
            
             switch message {
