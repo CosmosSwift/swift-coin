@@ -52,7 +52,7 @@ public struct QueryNameserviceCommand: ParsableCommand {
         discussion:"""
         """,
         subcommands: [
-            Resolve.self,
+            ResolveName.self,
             GetWhois.self,
             ListWhois.self
         ]

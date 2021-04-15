@@ -2,13 +2,17 @@ import Foundation
 import ArgumentParser
 import Cosmos
 
-public struct ListWhois: ParsableCommand {
+// GetCmdResolveName queries information about a name
+public struct ResolveName: ParsableCommand {
     public static let configuration = CommandConfiguration(
-        commandName: "list-whois",
-        abstract: "list all whois"
+        commandName: "resolve",
+        abstract: "resolve name"
     )
     
     @OptionGroup var queryFlags: Flags.QueryFlags
+    
+    @Argument(help: "Domain name to resolve")
+    var name: String
 
     public init() {}
     
@@ -17,7 +21,7 @@ public struct ListWhois: ParsableCommand {
         let queryRoute = "nameservice"
         
         let client = CosmosClient(url: queryFlags.node.description, eventLoopGroupProvider: .createNew)
-        let response = client.queryWithData(path: "custom/\(queryRoute)/list-whois", data: nil).map { data, height in
+        let response = client.queryWithData(path: "custom/\(queryRoute)/resolve-name/\(name)", data: nil).map { data, height in
             return data
         }
         
@@ -25,12 +29,12 @@ public struct ListWhois: ParsableCommand {
         case let .failure(error):
             fatalError(error.localizedDescription)
         case let .success(data):
-//            var out []types.Whois
+//            var out types.QueryResResolve
 //            cdc.MustUnmarshalJSON(res, &out)
 //            return cliCtx.PrintOutput(out)
             let jsonDecoder = JSONDecoder()
-            let whoIs = try jsonDecoder.decode(WhoIs.self, from: data)
-            print(whoIs)
+            let queryResponse = try jsonDecoder.decode(QueryResponseResolve.self, from: data)
+            print(queryResponse)
         }
     }
 }
