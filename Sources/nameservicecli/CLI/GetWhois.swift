@@ -1,6 +1,7 @@
 import Foundation
 import ArgumentParser
 import Cosmos
+import NameService
 
 
 public struct GetWhois: ParsableCommand {
@@ -20,20 +21,16 @@ public struct GetWhois: ParsableCommand {
         let queryRoute = "nameservice"
         
         let client = CosmosClient(url: queryFlags.node.description, eventLoopGroupProvider: .createNew)
-        let response = client.queryWithData(path: "custom/\(queryRoute)/get-whois/\(key)", data: nil).map { data, height in
-            return data
+        let response = client.query(path: "custom/\(queryRoute)/get-whois/\(key)").map { data, height in
+            return data as Whois
         }
         
         switch response {
         case let .failure(error):
             fatalError(error.localizedDescription)
         case let .success(data):
-//            var out []types.Whois
-//            cdc.MustUnmarshalJSON(res, &out)
-//            return cliCtx.PrintOutput(out)
-            let jsonDecoder = JSONDecoder()
-            let whoIs = try jsonDecoder.decode(WhoIs.self, from: data)
-            print(whoIs)
+            let d = try JSONEncoder().encode(data)
+            print(String(data: d, encoding: .utf8)!)
         }
     }
 }

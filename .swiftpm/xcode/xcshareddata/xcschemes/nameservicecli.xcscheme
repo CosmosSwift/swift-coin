@@ -56,6 +56,14 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "query nameservice resolve jack.id --chain-id toto --node &quot;http://127.0.0.1:26657&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "query nameservice get-whois jack.id --chain-id toto --node &quot;http://127.0.0.1:26657&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "query account cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj --chain-id toto --node &quot;http://127.0.0.1:26657&quot;"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -77,7 +85,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "tx nameservice buy-name jack.id 5nametoken --from cosmos1fcte6snpz7fu477ve2cmu3d7fgkdtnn4ed95pj -y --chain-id toto --gas-price 1000 --node &quot;http://127.0.0.1:26657&quot;"
-            isEnabled = "YES">
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "query nameservice list-whois --chain-id toto --node &quot;http://127.0.0.1:26657&quot;"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "keys list -n"

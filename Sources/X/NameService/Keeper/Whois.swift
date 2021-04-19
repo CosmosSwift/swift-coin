@@ -55,7 +55,7 @@ extension NameServiceKeeper {
                 continue
             }
             
-            let whois: Whois = codec.mustUnmarshalBinaryLength(data: data)
+            let whois: Whois = codec.mustUnmarshalBinaryLengthPrefixed(data: data)
             whoisList.append(whois)
         }
         

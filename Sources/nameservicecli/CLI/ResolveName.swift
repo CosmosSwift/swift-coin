@@ -19,22 +19,18 @@ public struct ResolveName: ParsableCommand {
     public mutating func run() throws {
         #warning("This can be removed or hardcoded in the url I believe")
         let queryRoute = "nameservice"
-        
-        let client = CosmosClient(url: queryFlags.node.description, eventLoopGroupProvider: .createNew)
-        let response = client.queryWithData(path: "custom/\(queryRoute)/resolve-name/\(name)", data: nil).map { data, height in
-            return data
-        }
-        
-        switch response {
-        case let .failure(error):
-            fatalError(error.localizedDescription)
-        case let .success(data):
-//            var out types.QueryResResolve
-//            cdc.MustUnmarshalJSON(res, &out)
-//            return cliCtx.PrintOutput(out)
-            let jsonDecoder = JSONDecoder()
-            let queryResponse = try jsonDecoder.decode(QueryResponseResolve.self, from: data)
-            print(queryResponse)
-        }
+    
+    let client = CosmosClient(url: queryFlags.node.description, eventLoopGroupProvider: .createNew)
+    let response = client.query(path: "custom/\(queryRoute)/resolve-name/\(name)").map { data, height in
+        return data as QueryResponseResolve
     }
+    
+    switch response {
+    case let .failure(error):
+        fatalError(error.localizedDescription)
+    case let .success(data):
+        let d = try JSONEncoder().encode(data)
+        print(String(data: d, encoding: .utf8)!)
+    }
+}
 }
