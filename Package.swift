@@ -19,11 +19,13 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "swift-cosmos", url: "https://github.com/CosmosSwift/swift-cosmos", .branch("main")),
-        .package(name: "swift-abci", url: "https://github.com/CosmosSwift/swift-abci", .branch("main")),
+        //.package(path: "../swift-cosmos"),
+        //.package(name: "swift-abci", url: "https://github.com/CosmosSwift/swift-abci", .branch("main")),
+        .package(path: "../swift-abci"),
         .package(name: "swift-tendermint", url: "https://github.com/CosmosSwift/swift-tendermint", .branch("main")),
+        //.package(path: "../swift-tendermint"),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.1")),
         .package(name: "swift-nio", url: "https://github.com/apple/swift-nio",  .upToNextMajor(from: "2.26.0")),
-        
     ],
     targets: [
         .executableTarget(

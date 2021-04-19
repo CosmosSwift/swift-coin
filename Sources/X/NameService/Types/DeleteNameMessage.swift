@@ -2,42 +2,39 @@ import Foundation
 import Tendermint
 import Cosmos
 
-struct DeleteNameMessage: Codable {
+public struct DeleteNameMessage: Codable {
     let name: String
     let owner: AccountAddress
     
-    init(name: String, owner: AccountAddress) {
+    public init(name: String, owner: AccountAddress) {
         self.name = name
         self.owner = owner
     }
 }
 
 extension DeleteNameMessage: Message {
-    var toSign: Data {
-        fatalError()
-    }
     
-    static let metaType: MetaType = Self.metaType(
+    public static let metaType: MetaType = Self.metaType(
         key: "nameservice/DeleteName"
     )
     
-    var route: String {
+    public var route: String {
         NameServiceKeys.routerKey
     }
     
-    var type: String {
+    public var type: String {
         "delete_name"
     }
 
-    var signers: [AccountAddress] {
+    public var signers: [AccountAddress] {
         [owner]
     }
 
-    var signedData: Data {
+    public var toSign: Data {
         mustSortJSON(data: Codec.moduleCodec.mustMarshalJSON(value: self))
     }
 
-    func validateBasic() throws {
+    public func validateBasic() throws {
         if owner.isEmpty {
             throw Cosmos.Error.invalidAddress(address: "owner can't be empty")
         }

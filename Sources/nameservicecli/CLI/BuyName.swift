@@ -78,7 +78,7 @@ public struct BuyName: ParsableCommand {
         
         
         // TODO: sign transaction using the key
-        let transaction = try txBuilder.buildAndSign(name: name, passPhrase: "", messages: [message])
+        let transaction = try txBuilder.buildAndSign(name: buyerKey.name, passPhrase: "", messages: [message])
         // TODO: send a broadcast transaction
         let httpClient = HTTPClient(eventLoopGroupProvider: .createNew)
         defer {
@@ -93,8 +93,11 @@ public struct BuyName: ParsableCommand {
         
         let data = try JSONEncoder().encode(response)
         
-        // TODO: print response ?
-        
+        if let result = String(data:data, encoding: .utf8) {
+            print(result)
+        } else {
+            print("Response is corrupt and not able to generate a JSON string.")
+        }
         
         //        RunE: func(cmd *cobra.Command, args []string) error {
         //            argsName := string(args[0])

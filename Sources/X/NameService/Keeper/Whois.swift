@@ -28,7 +28,7 @@ extension NameServiceKeeper {
             // TODO: throw a specific error
             throw Cosmos.Error.unknownRequest(reason: "invalid key")
         }
-        
+        print("Storing \(key) with value \(data)")
         store.set(key: key, value: data)
     }
     
@@ -55,7 +55,7 @@ extension NameServiceKeeper {
                 continue
             }
             
-            let whois: Whois = codec.mustUnmarshalBinaryLength(data: data)
+            let whois: Whois = codec.mustUnmarshalBinaryLengthPrefixed(data: data)
             whoisList.append(whois)
         }
         
