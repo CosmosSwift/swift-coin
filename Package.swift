@@ -18,8 +18,8 @@ let package = Package(
         .library(name: "NameService", targets: ["NameService"]),
     ],
     dependencies: [
-        //.package(name: "swift-cosmos", url: "https://github.com/CosmosSwift/swift-cosmos", .branch("main")),
-        .package(path: "../swift-cosmos"),
+        .package(name: "swift-cosmos", url: "https://github.com/CosmosSwift/swift-cosmos", .branch("main")),
+        //.package(path: "../swift-cosmos"),
         //.package(name: "swift-abci", url: "https://github.com/CosmosSwift/swift-abci", .branch("main")),
         .package(path: "../swift-abci"),
         .package(name: "swift-tendermint", url: "https://github.com/CosmosSwift/swift-tendermint", .branch("main")),
