@@ -42,11 +42,10 @@ let package = Package(
 git clone https://github.com/cosmosswift/swift-coin.git
 ```
 
-2. Compile and run
+1. Compile
 
 ```bash
 swift build
-swift run nameserviced ${COMMAND} ${OPTIONS}
 ```
 
 3. Run Tendermint and the nameservice. 
@@ -54,22 +53,58 @@ swift run nameserviced ${COMMAND} ${OPTIONS}
 Initialise and run Tendermint (for instance in Docker):
 ```bash
 # initialise tendermint
-docker run -it --rm -v "/tmp:/tendermint" tendermint/tendermint:v0.34.0 init
+docker run -it --rm -v "~/.nameserviced:/tendermint" tendermint/tendermint:v0.34.0 init
 
 # initialise the namservice daemon
 # note that this will update the config.toml file to use 0.0.0.0:26657 instead of 127.0.0.1:26657
 # for incoming connections (this is only good for a development node or one where tendermint is running in docker)
-swift run nameserviced init new_node -o
+nameserviced init new_node -o
+
+
+# the following commands assume the nameservicecli and the namserviced are in your $PATH
+
+# add a few users to the chain:
+nameservicecli keys add jack
+nameservicecli keys add alice
+
+# add them to the genesis file
+nameserviced add-genesis-account $(nameservicecli keys show jack -a) 1000nametoken,100000000stake
+nameserviced add-genesis-account $(nameservicecli keys show alice -a) 1000nametoken,100000000stake
+
 
 # run a single tendermint node
-docker run -it --rm --platform linux/amd64 -v "/tmp:/tendermint" -p "26656-26657:26656-26657"  tendermint/tendermint:v0.34.0 node --proxy_app="tcp://host.docker.internal:26658"
-# when using Docker for Apple M1 preview 7, add --platform linux/amd64 --add-host=host.docker.internal:host-gateway
-# also, possibly replace the proxy_app flag with this: --proxy_app="tcp://192.168.64.1:26658"
+docker run -it --rm --platform linux/amd64 -v "~/.nameserviced:/tendermint" -p "26656-26657:26656-26657"  tendermint/tendermint:v0.34.0 node --proxy_app="tcp://host.docker.internal:26658"
 
 # start the nameserviced
-swift run nameserviced start
-# when using Docker for Apple M1 preview 7, add --host 0.0.0.0 to enable listening from all addresses
+swift run nameserviced start --host 0.0.0.0
 
+# now you can start sending requests to the nameserviced using the nameservicecli
+
+nameservicecli query account $(nameservicecli keys show jack -a) | jq ".value.coins[0]"
+
+# Buy your first name using your coins from the genesis file
+nameservicecli tx nameservice buy-name jack.id 5nametoken --from jack -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli query tx
+
+# Set the value for the name you just bought
+nameservicecli tx nameservice set-name jack.id 8.8.8.8 --from jack -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Try out a resolve query against the name you registered
+nameservicecli query nameservice resolve jack.id | jq ".value"
+> 8.8.8.8
+
+# Try out a whois query against the name you just registered
+nameservicecli query nameservice get-whois jack.id
+> {"value":"8.8.8.8","owner":"cosmos1l7k5tdt2qam0zecxrx78yuw447ga54dsmtpk2s","price":[{"denom":"nametoken","amount":"5"}]}
+
+# Alice buys name from jack
+nameservicecli tx nameservice buy-name jack.id 10nametoken --from alice -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Alice decides to delete the name she just bought from jack
+nameservicecli tx nameservice delete-name jack.id --from alice -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
+
+# Try out a whois query against the name you just deleted
+nameservicecli query nameservice get-whois jack.id
+> {"value":"","owner":"","price":[{"denom":"nametoken","amount":"1"}]}
 ```
 
 ## Development
@@ -80,70 +115,20 @@ Compile:
 
 2. Initialize a Tendermint chain node and the nameserviced as explained above
 
-3. Run the [Go nameservicecli](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice/nameservice) to drive the Swift `nameserviced`
-```bash
-rm -rf ~/.nameserviced
-rm -rf ~/.nameservicecli
-
-# Swift nameserviced
-nameserviced init test --chain-id=namechain
-
-# Go nameservicecli
-nameservicecli config output json
-nameservicecli config indent true
-nameservicecli config trust-node true
-nameservicecli config chain-id namechain
-nameservicecli config keyring-backend test
-
-nameservicecli keys add user1
-nameservicecli keys add user2
-
-# Swift nameserviced
-nameserviced add-genesis-account $(nameservicecli keys show user1 -a) 1000nametoken,100000000stake
-nameserviced add-genesis-account $(nameservicecli keys show user2 -a) 1000nametoken,100000000stake
-
-# Not implemented
-# nameserviced gentx --name user1 --keyring-backend test
-
-echo "Collecting genesis txs..."
-# Not implemented
-# nameserviced collect-gentxs
-
-echo "Validating genesis file..."
-# Not implemented
-# nameserviced validate-genesis
-```
-Then:
-```bash
-nameservicecli query account $(nameservicecli keys show jack -a) | jq ".value.coins[0]"
-nameservicecli query account $(nameservicecli keys show alice -a) | jq ".value.coins[0]"
-
-# Below messages are not fully working at this stage
-
-# Buy your first name using your coins from the genesis file
-# nameservicecli tx nameservice buy-name jack.id 5nametoken --from jack -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
-
-# Set the value for the name you just bought
-# nameservicecli tx nameservice set-name jack.id 8.8.8.8 --from jack -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
-
-# Try out a resolve query against the name you registered
-# nameservicecli query nameservice resolve jack.id | jq ".value"
-# > 8.8.8.8
-
-# Try out a whois query against the name you just registered
-# nameservicecli query nameservice get-whois jack.id
-# > {"value":"8.8.8.8","owner":"cosmos1l7k5tdt2qam0zecxrx78yuw447ga54dsmtpk2s","price":[{"denom":"nametoken","amount":"5"}]}
-
-# Alice buys name from jack
-# nameservicecli tx nameservice buy-name jack.id 10nametoken --from alice -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
-
-# Alice decides to delete the name she just bought from jack
-# nameservicecli tx nameservice delete-name jack.id --from alice -y | jq ".txhash" |  xargs $(sleep 6) nameservicecli q tx
-
-# Try out a whois query against the name you just deleted
-# nameservicecli query nameservice get-whois jack.id
-# > {"value":"","owner":"","price":[{"denom":"nametoken","amount":"1"}]}
-
+3. In the cloned directory, if you need to reset the height of a chain:
+```sh
+#! /bin/sh
+NAMESERVICED_ROOT=~/.nameserviced
+OLD_PWD=`pwd`
+cd $NAMESERVICED_ROOT
+(cd $NAMESERVICED_ROOT/config; rm write-file-atomic-*)
+(cd $NAMESERVICED_ROOT/data; rm -Rf *)
+echo { \
+  \"height\": \"0\", \
+  \"round\": 0, \
+  \"step\": 0 \
+} > $NAMESERVICED_ROOT/config/priv_validator_state.json
+cd $OLD_PWD
 ```
 
 
