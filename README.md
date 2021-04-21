@@ -9,8 +9,6 @@ This project shows the work in progress for the port of the [Cosmos SDK](https:/
 
 To make the porting more exciting, we have chosen to use the [nameservice](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice) to implement the various necessary libraries for the sdk.
 
-The primary focus is to get to parity with the Cosmos-SDK version 0.40. We are currently tracking version 0.33.9 because the Go nameservice still requires it.
-
 ## Requirements
 - Swift version: 5.4.x
 - SwiftNIO version: 2.0.x
